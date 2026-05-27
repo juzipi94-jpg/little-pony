@@ -1,0 +1,2468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Little Pony · 小马出行</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --primary:#6C5CE7;--primary-light:#A29BFE;--primary-dark:#5A4BD1;
+  --accent:#FF6B6B;--accent-light:#FF8E8E;
+  --warn:#FDCB6E;--warn-dark:#F0A500;
+  --success:#00B894;--success-light:#55EFC4;
+  --bg:#F8F9FD;--card:#fff;--text:#2D3436;--text-secondary:#636E72;
+  --shadow:0 2px 16px rgba(108,92,231,.12);--radius:16px;
+}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+.app{max-width:430px;height:100vh;height:100dvh;margin:0 auto;position:relative;overflow:hidden;background:var(--bg)}
+
+/* Status Bar */
+.status-bar{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-size:12px;font-weight:600;position:relative;z-index:100}
+.status-bar .time{font-size:14px}
+.status-bar .icons{display:flex;gap:4px;align-items:center}
+
+/* Screens */
+.screen{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;padding:0 0 90px;transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .35s;will-change:transform,opacity}
+.screen.hidden{transform:translateX(100%);opacity:0;pointer-events:none}
+.screen.slide-left{transform:translateX(-30%);opacity:0;pointer-events:none}
+.screen::-webkit-scrollbar{display:none}
+
+/* Header */
+.header{padding:8px 20px 16px;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:22px;font-weight:700}
+.header .logo{display:flex;align-items:center;gap:8px}
+.header .logo span{font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header .logo .pony{font-size:24px;-webkit-text-fill-color:initial}
+
+/* Search */
+.search-box{margin:0 20px 16px;background:var(--card);border-radius:12px;display:flex;align-items:center;padding:12px 16px;box-shadow:var(--shadow)}
+.search-box svg{width:20px;height:20px;color:var(--text-secondary);margin-right:10px;flex-shrink:0}
+.search-box input{border:none;outline:none;font-size:14px;flex:1;background:transparent;color:var(--text)}
+.search-box input::placeholder{color:var(--text-secondary)}
+
+/* Section */
+.section{margin-bottom:20px}
+.section-title{font-size:16px;font-weight:700;padding:0 20px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.section-title .more{font-size:13px;color:var(--primary);font-weight:500;cursor:pointer}
+
+/* Tags */
+.tags{display:flex;gap:8px;padding:0 20px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tags::-webkit-scrollbar{display:none}
+.tag{padding:8px 16px;border-radius:20px;font-size:13px;font-weight:500;white-space:nowrap;background:var(--card);color:var(--text-secondary);border:1.5px solid transparent;cursor:pointer;transition:all .25s;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.tag.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.tag:not(.active):hover{border-color:var(--primary-light)}
+
+/* Cards */
+.card-scroll{display:flex;gap:12px;padding:0 20px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card-scroll::-webkit-scrollbar{display:none}
+.card{min-width:230px;border-radius:var(--radius);overflow:hidden;background:var(--card);box-shadow:var(--shadow);cursor:pointer;transition:transform .25s}
+.card:active{transform:scale(.97)}
+.card-img{height:130px;background-size:cover;background-position:center;position:relative}
+.card-img .badge{position:absolute;top:8px;left:8px;padding:3px 8px;border-radius:8px;font-size:11px;font-weight:600;backdrop-filter:blur(8px)}
+.card-img .badge.hot{background:rgba(255,107,107,.85);color:#fff}
+.card-img .badge.crowd{background:rgba(253,203,110,.9);color:#6b5000}
+.card-img .badge.good{background:rgba(0,184,148,.85);color:#fff}
+.card-body{padding:10px 12px}
+.card-body h3{font-size:14px;font-weight:600;margin-bottom:4px;line-height:1.3}
+.card-body p{font-size:12px;color:var(--text-secondary);line-height:1.4}
+.card-body .meta{display:flex;gap:8px;margin-top:6px;align-items:center}
+.card-body .meta span{font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:2px}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.card-tag{font-size:10px;padding:2px 7px;border-radius:6px;font-weight:500;white-space:nowrap}
+.card-tag.weather{background:#e8f4fd;color:#0984e3}
+.card-tag.crowd-low{background:#e6fff5;color:#00875a}
+.card-tag.crowd-mid{background:#fff9e6;color:#b8860b}
+.card-tag.crowd-high{background:#ffeaea;color:#c0392b}
+.card-tag.avoid{background:#fff0f0;color:#d63031}
+
+/* Quick Grid */
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:0 20px}
+.quick-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+.quick-item .icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;transition:transform .2s}
+.quick-item:active .icon{transform:scale(.9)}
+.quick-item span{font-size:12px;color:var(--text-secondary);font-weight:500}
+.icon-flight{background:linear-gradient(135deg,#a29bfe,#6c5ce7)}
+.icon-hotel{background:linear-gradient(135deg,#74b9ff,#0984e3)}
+.icon-food{background:linear-gradient(135deg,#ffeaa7,#fdcb6e)}
+.icon-photo{background:linear-gradient(135deg,#ff7675,#d63031)}
+.icon-ticket{background:linear-gradient(135deg,#55efc4,#00b894)}
+.icon-clothes{background:linear-gradient(135deg,#fd79a8,#e84393)}
+.icon-guide{background:linear-gradient(135deg,#fab1a0,#e17055)}
+.icon-avoid{background:linear-gradient(135deg,#ff7675,#b71540)}
+
+/* Alert Banner */
+.alert-banner{margin:0 20px 16px;padding:12px 16px;border-radius:12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:transform .2s}
+.alert-banner:active{transform:scale(.98)}
+.alert-banner.crowd-alert{background:linear-gradient(135deg,#fff3cd,#ffeeba);border:1px solid #f0d77c}
+.alert-banner.weather-alert{background:linear-gradient(135deg,#d6ecff,#bee5eb);border:1px solid #abd5db}
+.alert-banner .alert-icon{font-size:24px}
+.alert-banner .alert-text{flex:1}
+.alert-banner .alert-text strong{font-size:13px;display:block;margin-bottom:2px}
+.alert-banner .alert-text span{font-size:11px;color:var(--text-secondary)}
+.alert-banner .alert-arrow{color:var(--text-secondary);font-size:14px}
+
+/* Bottom Nav */
+.bottom-nav{position:absolute;bottom:0;left:0;right:0;height:80px;background:var(--card);display:flex;align-items:flex-start;justify-content:space-around;padding-top:8px;box-shadow:0 -2px 20px rgba(0,0,0,.06);z-index:50}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 12px;transition:all .2s}
+.nav-item .nav-icon{font-size:22px;transition:transform .2s}
+.nav-item span{font-size:11px;color:var(--text-secondary);font-weight:500}
+.nav-item.active span{color:var(--primary);font-weight:600}
+.nav-item.active .nav-icon{transform:scale(1.1)}
+.nav-center{margin-top:-24px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;box-shadow:0 4px 20px rgba(108,92,231,.4);transition:transform .2s}
+.nav-center:active{transform:scale(.9)}
+
+/* ---- Plan Screen ---- */
+.plan-header{padding:8px 20px 16px;display:flex;align-items:center;gap:12px}
+.plan-header .back{width:36px;height:36px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow);font-size:18px}
+.plan-header h2{font-size:18px;font-weight:700;flex:1}
+.plan-header .share-btn{padding:6px 14px;border-radius:20px;background:var(--primary);color:#fff;font-size:13px;font-weight:500;cursor:pointer;border:none}
+
+.scene-cards{padding:0 20px;display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.scene-card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);cursor:pointer;transition:all .25s;border:2px solid transparent}
+.scene-card.selected{border-color:var(--primary);background:linear-gradient(135deg,rgba(108,92,231,.04),rgba(162,155,254,.04))}
+.scene-card h3{font-size:15px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.scene-card p{font-size:12px;color:var(--text-secondary);line-height:1.5}
+.scene-card .icon{font-size:20px}
+
+/* Form */
+.form-section{padding:0 20px;margin-bottom:24px}
+.form-group{margin-bottom:16px}
+.form-group label{font-size:14px;font-weight:600;display:block;margin-bottom:8px}
+.form-input{width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid #e0e0e0;font-size:14px;outline:none;transition:border-color .2s;background:var(--card)}
+.form-input:focus{border-color:var(--primary)}
+.form-row{display:flex;gap:10px}
+.form-row .form-group{flex:1}
+.picker-tags{display:flex;flex-wrap:wrap;gap:8px}
+.picker-tag{padding:6px 14px;border-radius:16px;font-size:13px;background:var(--card);border:1.5px solid #e0e0e0;cursor:pointer;transition:all .2s}
+.picker-tag.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.slider-group{display:flex;align-items:center;gap:12px}
+.slider-group input[type=range]{flex:1;-webkit-appearance:none;height:6px;border-radius:3px;background:#e0e0e0;outline:none}
+.slider-group input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--primary);cursor:pointer;box-shadow:0 2px 8px rgba(108,92,231,.3)}
+.slider-group .slider-val{min-width:50px;text-align:center;font-size:14px;font-weight:600;color:var(--primary)}
+
+/* Result Cards */
+.result-card{background:var(--card);border-radius:var(--radius);margin:0 20px 14px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .2s}
+.result-card:active{transform:scale(.98)}
+.result-hero{height:140px;background-size:cover;background-position:center;position:relative}
+.result-hero .overlay{position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(0,0,0,.6))}
+.result-hero .title{position:absolute;bottom:12px;left:14px;color:#fff;font-size:16px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.3)}
+.result-hero .crowd-tag{position:absolute;top:10px;right:10px;padding:4px 10px;border-radius:10px;font-size:11px;font-weight:600;backdrop-filter:blur(8px)}
+.result-info{padding:14px}
+.result-info .tags{padding:0;margin-bottom:8px}
+.result-info .desc{font-size:13px;color:var(--text-secondary);line-height:1.5;margin-bottom:10px}
+.result-info .stats{display:flex;gap:16px}
+.result-info .stat{display:flex;flex-direction:column;align-items:center}
+.result-info .stat .val{font-size:16px;font-weight:700;color:var(--primary)}
+.result-info .stat .label{font-size:11px;color:var(--text-secondary)}
+.result-actions{display:flex;border-top:1px solid #f0f0f0}
+.result-actions button{flex:1;padding:12px;border:none;background:none;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:background .2s}
+.result-actions button:not(:last-child){border-right:1px solid #f0f0f0}
+.result-actions button:active{background:#f0f0f0}
+.result-actions .buy{color:var(--accent);font-weight:600}
+
+/* Detail Screen */
+.detail-hero{height:220px;background-size:cover;background-position:center;position:relative}
+.detail-hero .overlay{position:absolute;inset:0;background:linear-gradient(transparent 30%,rgba(0,0,0,.7))}
+.detail-hero .back-btn{position:absolute;top:48px;left:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;z-index:2}
+.detail-hero .detail-title{position:absolute;bottom:16px;left:16px;right:16px;color:#fff}
+.detail-hero .detail-title h2{font-size:20px;font-weight:700;text-shadow:0 2px 4px rgba(0,0,0,.3)}
+.detail-hero .detail-title .sub{font-size:13px;opacity:.85;margin-top:4px}
+.detail-content{padding:20px}
+.detail-section{margin-bottom:24px}
+.detail-section h3{font-size:16px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.timeline{position:relative;padding-left:24px}
+.timeline::before{content:'';position:absolute;left:7px;top:4px;bottom:4px;width:2px;background:var(--primary-light);border-radius:1px}
+.timeline-item{position:relative;margin-bottom:16px}
+.timeline-item::before{content:'';position:absolute;left:-21px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--primary);border:2px solid #fff;box-shadow:0 0 0 2px var(--primary-light)}
+.timeline-item .time{font-size:13px;color:var(--primary);font-weight:700}
+.timeline-item .activity{font-size:15px;font-weight:600;margin:4px 0;line-height:1.4;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.timeline-item .activity .activity-name{flex:1}
+.timeline-item .note{font-size:12px;color:var(--text-secondary);line-height:1.5;margin-top:3px}
+
+/* Crowd Map */
+.crowd-heatmap{background:var(--card);border-radius:var(--radius);padding:16px;margin:0 20px 16px;box-shadow:var(--shadow)}
+.crowd-heatmap h3{font-size:15px;font-weight:700;margin-bottom:12px}
+.heatmap-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.heatmap-cell{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;cursor:pointer;transition:transform .15s}
+.heatmap-cell:active{transform:scale(.9)}
+.heatmap-cell.low{background:#55efc4;color:#00695c}
+.heatmap-cell.mid{background:#ffeaa7;color:#8a6d00}
+.heatmap-cell.high{background:#ff7675;color:#fff}
+.heatmap-cell.extreme{background:#d63031;color:#fff}
+.heatmap-legend{display:flex;gap:12px;margin-top:10px;justify-content:center}
+.heatmap-legend span{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-secondary)}
+.heatmap-legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+/* Share Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:24px 20px 40px;animation:slideUp .3s}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;border-radius:2px;background:#ddd;margin:0 auto 20px}
+.modal h3{font-size:18px;font-weight:700;margin-bottom:16px;text-align:center}
+.share-preview{background:var(--bg);border-radius:12px;padding:16px;margin-bottom:20px}
+.share-preview .sp-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.share-preview .sp-avatar{width:36px;height:36px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px}
+.share-preview .sp-name{font-size:14px;font-weight:600}
+.share-preview .sp-sub{font-size:11px;color:var(--text-secondary)}
+.share-preview .sp-body{font-size:13px;line-height:1.6;color:var(--text)}
+.share-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.share-action{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+.share-action .sa-icon{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px}
+.share-action span{font-size:11px;color:var(--text-secondary)}
+.media-upload{border:2px dashed #ddd;border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:border-color .2s}
+.media-upload:active{border-color:var(--primary)}
+.media-upload .mu-icon{font-size:28px;margin-bottom:6px}
+.media-upload p{font-size:13px;color:var(--text-secondary)}
+
+/* Generate Button */
+.gen-btn{margin:20px;display:flex;align-items:center;justify-content:center;gap:8px;padding:16px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(108,92,231,.35);transition:transform .2s,box-shadow .2s;width:calc(100% - 40px)}
+.gen-btn:active{transform:scale(.97);box-shadow:0 2px 10px rgba(108,92,231,.25)}
+.gen-btn.loading{pointer-events:none;opacity:.8}
+.gen-btn.loading .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Toast */
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-100px);background:rgba(45,52,54,.9);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;font-weight:500;z-index:300;transition:transform .35s cubic-bezier(.4,0,.2,1);pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Loading Shimmer */
+.shimmer{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* Weather strip */
+.weather-strip{display:flex;gap:10px;padding:0 20px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.weather-strip::-webkit-scrollbar{display:none}
+.weather-item{min-width:60px;text-align:center;background:var(--card);border-radius:12px;padding:10px 8px;box-shadow:0 1px 6px rgba(0,0,0,.04);cursor:pointer}
+.weather-item .day{font-size:11px;color:var(--text-secondary);margin-bottom:4px}
+.weather-item .w-icon{font-size:22px;margin-bottom:4px}
+.weather-item .temp{font-size:14px;font-weight:700}
+
+/* Special offer strip */
+.offer-strip{margin:0 20px 16px;background:linear-gradient(135deg,#6c5ce7,#a29bfe);border-radius:14px;padding:14px 16px;color:#fff;cursor:pointer;transition:transform .2s}
+.offer-strip:active{transform:scale(.98)}
+.offer-strip h3{font-size:15px;font-weight:700;margin-bottom:4px}
+.offer-strip p{font-size:12px;opacity:.85}
+
+/* Avoid tips */
+.avoid-list{padding:0 20px;display:flex;flex-direction:column;gap:8px}
+.avoid-item{display:flex;align-items:flex-start;gap:10px;background:var(--card);padding:12px;border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+.avoid-item .a-icon{font-size:20px;flex-shrink:0}
+.avoid-item .a-text h4{font-size:13px;font-weight:600}
+.avoid-item .a-text p{font-size:12px;color:var(--text-secondary);margin-top:2px}
+
+/* Photo products */
+.product-scroll{display:flex;gap:10px;padding:0 20px;overflow-x:auto}
+.product-scroll::-webkit-scrollbar{display:none}
+.product-card{min-width:140px;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,.06);cursor:pointer}
+.product-card .p-img{height:100px;background-size:cover;background-position:center}
+.product-card .p-info{padding:8px 10px}
+.product-card .p-info h4{font-size:12px;font-weight:600;margin-bottom:4px}
+.product-card .p-info .price{font-size:14px;font-weight:700;color:var(--accent)}
+.product-card .p-info .price small{font-size:11px;color:var(--text-secondary);text-decoration:line-through;font-weight:400}
+
+/* Clothes */
+.clothes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px}
+.clothes-card{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 1px 8px rgba(0,0,0,.04);text-align:center}
+.clothes-card .c-icon{font-size:32px;margin-bottom:6px}
+.clothes-card h4{font-size:13px;font-weight:600;margin-bottom:2px}
+.clothes-card p{font-size:11px;color:var(--text-secondary)}
+
+/* Itinerary timeline enhanced */
+.day-header{display:flex;align-items:center;gap:10px;margin:20px 20px 12px}
+.day-header .day-badge{background:var(--primary);color:#fff;padding:4px 12px;border-radius:10px;font-size:13px;font-weight:700}
+.day-header .day-date{font-size:13px;color:var(--text-secondary)}
+
+/* Day Tabs */
+.day-tabs{display:flex;gap:6px;margin-bottom:16px}
+.day-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 8px;border-radius:12px;background:var(--card);cursor:pointer;transition:all .25s;box-shadow:0 1px 4px rgba(0,0,0,.04);border:2px solid transparent}
+.day-tab.active{border-color:var(--primary);background:linear-gradient(135deg,rgba(108,92,231,.06),rgba(162,155,254,.06))}
+.day-tab:active{transform:scale(.96)}
+.day-tab-num{font-size:15px;font-weight:700;color:var(--primary)}
+.day-tab-label{font-size:11px;color:var(--text-secondary)}
+.day-tab.active .day-tab-label{color:var(--primary);font-weight:500}
+
+/* Day Panels */
+.day-panel{display:none}
+.day-panel.active{display:block}
+
+/* Day weather bar */
+.day-weather-bar{background:var(--card);border-radius:10px;padding:8px 12px;margin-bottom:14px;font-size:12px;color:var(--text);display:flex;align-items:center;gap:6px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+
+/* Spot tags inside timeline */
+.spot-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.spot-tag{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:500;white-space:nowrap}
+.spot-tag.crowd-green{background:#e6fff5;color:#00875a}
+.spot-tag.crowd-yellow{background:#fff9e6;color:#b8860b}
+.spot-tag.crowd-red{background:#ffeaea;color:#c0392b}
+.spot-tag.avoid{background:#fff0f0;color:#d63031}
+.spot-tag.tip{background:#eef0ff;color:#5a4bd1}
+.spot-tag.buy-tag{background:linear-gradient(135deg,#ff6b6b,#ee5a24);color:#fff;cursor:pointer;font-weight:600;padding:3px 9px;border-radius:8px;transition:transform .15s,box-shadow .15s;box-shadow:0 1px 4px rgba(255,107,107,.3)}
+.spot-tag.buy-tag:active{transform:scale(.92)}
+
+/* Item cost inline */
+.item-cost{font-size:14px;font-weight:700;color:var(--accent);margin-left:8px}
+
+/* Transit between spots */
+.transit{margin:0 0 0 0;position:relative}
+.transit::before{content:'';position:absolute;left:-17px;top:50%;width:6px;height:6px;border-radius:50%;background:var(--primary-light);border:1.5px solid #fff;box-shadow:0 0 0 1px var(--primary-light);transform:translateY(-50%)}
+.transit-modes{display:flex;align-items:center;gap:6px;padding:2px 0}
+.transit-mode-btn{display:flex;align-items:center;gap:3px;padding:3px 8px;border-radius:6px;font-size:11px;color:var(--text-secondary);background:transparent;cursor:pointer;border:none;transition:all .15s;font-family:inherit}
+.transit-mode-btn:hover{background:#f0f0f0}
+.transit-mode-btn:active{transform:scale(.95)}
+.transit-mode-btn .mode-icon{font-size:13px}
+.transit-mode-btn .mode-label{color:var(--text-secondary)}
+.transit-mode-btn .mode-time{color:var(--text-secondary);opacity:.7}
+.transit-sep{width:1px;height:10px;background:#e0e0e0;flex-shrink:0}
+
+/* Day cost bar */
+.day-cost-bar{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:10px 14px;background:var(--card);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.day-cost-bar span:first-child{font-size:12px;color:var(--text-secondary)}
+.day-cost-bar span:last-child{font-size:16px;font-weight:700;color:var(--accent)}
+
+/* Floating action */
+.fab{position:fixed;bottom:100px;right:20px;width:50px;height:50px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 16px rgba(255,107,107,.35);cursor:pointer;z-index:40;transition:transform .2s}
+.fab:active{transform:scale(.9)}
+
+/* Animations */
+.fade-in{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.slide-in{animation:slideIn .4s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
+/* Detail: Tip Cards (collapsible) */
+.tip-card{background:var(--card);border-radius:12px;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+.tip-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;font-size:14px;font-weight:600;transition:background .15s}
+.tip-header:active{background:#f8f8f8}
+.tip-toggle{font-size:12px;color:var(--text-secondary);font-weight:400}
+.tip-body{padding:0 14px 14px}
+.tip-card.collapsed .tip-body{display:none}
+.tip-card.collapsed .tip-toggle::after{content:'展开'}
+.tip-card:not(.collapsed) .tip-toggle::after{content:''}
+
+/* Cost rows inside tip */
+.cost-row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px}
+.cost-row.total{border-top:1px solid #f0f0f0;margin-top:4px;padding-top:8px;font-weight:700}
+.cost-row.total span:last-child{color:var(--accent);font-size:15px}
+
+/* Inline tags */
+.inline-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+
+/* Mini clothes */
+.mini-clothes{display:flex;flex-wrap:wrap;gap:8px}
+.mini-clothes span{font-size:12px;padding:4px 10px;border-radius:8px;background:var(--bg);color:var(--text)}
+
+/* Compact crowd alerts */
+.crowd-alerts-compact{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center;font-size:12px;color:var(--text)}
+.crowd-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.crowd-dot.red{background:#d63031}
+.crowd-dot.yellow{background:#f0a500}
+.crowd-dot.green{background:#00b894}
+.crowd-alerts-compact span{display:flex;align-items:center;gap:4px}
+.crowd-alerts-compact>span{display:inline}
+
+/* Compact avoid list */
+.avoid-list-compact{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.avoid-list-compact span{font-size:12px;color:var(--text-secondary);padding:2px 0}
+
+/* Detail bottom bar */
+.detail-bottom-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:60px;background:var(--card);display:none;align-items:center;padding:0 16px;box-shadow:0 -2px 16px rgba(0,0,0,.08);z-index:60}
+.detail-bottom-bar.show{display:flex}
+.dbb-price{margin-right:16px}
+.dbb-total{font-size:20px;font-weight:800;color:var(--accent)}
+.dbb-per{font-size:12px;color:var(--text-secondary)}
+.dbb-actions{display:flex;gap:8px;flex:1}
+.dbb-btn{flex:1;padding:8px 0;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:transform .15s}
+.dbb-btn:active{transform:scale(.95)}
+.dbb-collect{background:#f0f0f0;color:var(--text)}
+.dbb-share{background:var(--bg);color:var(--primary);border:1.5px solid var(--primary)}
+.dbb-buy{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;box-shadow:0 2px 10px rgba(108,92,231,.3)}
+
+/* Ticket Modal */
+.ticket-modal .modal{max-height:80vh;overflow-y:auto}
+.ticket-modal .modal::-webkit-scrollbar{display:none}
+.ticket-item{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #f0f0f0}
+.ticket-item:last-child{border-bottom:none}
+.ticket-check{width:22px;height:22px;border-radius:6px;border:2px solid #ddd;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;font-size:13px}
+.ticket-check.checked{background:var(--primary);border-color:var(--primary);color:#fff}
+.ticket-info{flex:1}
+.ticket-info h4{font-size:14px;font-weight:600;margin-bottom:2px}
+.ticket-info p{font-size:12px;color:var(--text-secondary)}
+.ticket-price{font-size:16px;font-weight:700;color:var(--accent);flex-shrink:0}
+.ticket-modal-footer{position:sticky;bottom:0;background:var(--card);padding:16px 0 4px;border-top:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between}
+.ticket-total{font-size:13px;color:var(--text-secondary)}
+.ticket-total strong{font-size:20px;font-weight:800;color:var(--accent)}
+.ticket-buy-btn{padding:10px 28px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;box-shadow:0 2px 10px rgba(108,92,231,.3);transition:transform .15s}
+.ticket-buy-btn:active{transform:scale(.95)}
+
+/* Hide bottom nav on detail screen - controlled by JS */
+
+/* Chat styles */
+.chat-container{display:flex;flex-direction:column;height:calc(100vh - 180px);height:calc(100dvh - 180px)}
+.chat-messages{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+.chat-messages::-webkit-scrollbar{display:none}
+.chat-bubble{max-width:85%;padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.6;animation:fadeIn .3s ease}
+.chat-bubble.bot{background:var(--card);border:1px solid #f0f0f0;align-self:flex-start;border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.chat-bubble.bot .bot-avatar{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.chat-bubble.bot .bot-avatar .avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff}
+.chat-bubble.bot .bot-avatar .name{font-size:12px;color:var(--text-secondary);font-weight:500}
+.chat-bubble.user{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.chat-quick-replies{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 16px}
+.chat-quick-reply{padding:8px 16px;border-radius:20px;font-size:13px;font-weight:500;background:var(--card);color:var(--primary);border:1.5px solid var(--primary);cursor:pointer;transition:all .2s;box-shadow:0 1px 4px rgba(108,92,231,.1)}
+.chat-quick-reply:active{background:var(--primary);color:#fff}
+.chat-quick-reply.selected{background:var(--primary);color:#fff}
+.chat-input-bar{display:flex;gap:10px;padding:12px 20px;background:var(--card);border-top:1px solid #f0f0f0;position:absolute;bottom:80px;left:0;right:0}
+.chat-input-bar input{flex:1;padding:10px 16px;border-radius:20px;border:1.5px solid #e0e0e0;font-size:14px;outline:none;background:var(--bg)}
+.chat-input-bar input:focus{border-color:var(--primary)}
+.chat-input-bar .send-btn{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(108,92,231,.3);transition:transform .2s}
+.chat-input-bar .send-btn:active{transform:scale(.9)}
+
+/* Typing indicator */
+.typing-dots{display:flex;gap:4px;padding:4px 0}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--text-secondary);animation:typingBounce .6s infinite alternate}
+.typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes typingBounce{to{opacity:.3;transform:translateY(-4px)}}
+
+/* Responsive hint */
+@media(min-width:431px){.app{border-left:1px solid #e0e0e0;border-right:1px solid #e0e0e0}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ===== HOME SCREEN ===== -->
+  <div class="screen" id="screen-home">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">📶 📡 🔋</span>
+    </div>
+
+    <div class="header">
+      <div class="logo"><span class="pony">🐴</span><span>Little Pony</span></div>
+      <div style="font-size:22px;cursor:pointer" onclick="showToast('消息中心开发中')">🔔</div>
+    </div>
+
+    <div class="search-box" onclick="switchScreen('chat')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="跟小马聊聊你的出行计划..." readonly style="cursor:pointer">
+    </div>
+
+    <!-- Special Offer -->
+    <div class="offer-strip" onclick="showToast('活动详情开发中')">
+      <h3>🎉 限时特惠 · 暑期早鸟票</h3>
+      <p>热门景区门票低至5折，机酒套餐直减500元</p>
+    </div>
+
+    <!-- Quick Grid -->
+    <div class="section">
+      <div class="section-title">快捷服务</div>
+      <div class="quick-grid">
+        <div class="quick-item" onclick="showToast('机票预订开发中')"><div class="icon icon-flight">✈️</div><span>买机票</span></div>
+        <div class="quick-item" onclick="showToast('酒店预订开发中')"><div class="icon icon-hotel">🏨</div><span>订酒店</span></div>
+        <div class="quick-item" onclick="showToast('门票购买开发中')"><div class="icon icon-ticket">🎫</div><span>买门票</span></div>
+        <div class="quick-item" onclick="switchScreen('food')"><div class="icon icon-food">🍜</div><span>特色饮食</span></div>
+        <div class="quick-item" onclick="switchScreen('photo')"><div class="icon icon-photo">📷</div><span>旅拍道具</span></div>
+        <div class="quick-item" onclick="switchScreen('clothes')"><div class="icon icon-clothes">👗</div><span>穿衣建议</span></div>
+        <div class="quick-item" onclick="showToast('避坑指南已融入推荐卡片')"><div class="icon icon-guide">📖</div><span>避坑指南</span></div>
+        <div class="quick-item" onclick="showToast('人流热力已融入推荐卡片')"><div class="icon icon-avoid">🔥</div><span>人流热力</span></div>
+      </div>
+    </div>
+
+    <!-- Recent Recommendations -->
+    <div class="section">
+      <div class="section-title">近期推荐 <span class="more">查看全部 ›</span></div>
+      <div class="card-scroll">
+        <div class="card" onclick="openDetail('杭州',0)">
+          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1534190239940-9ba8944ea261?w=400&h=200&fit=crop)">
+            <span class="badge good">适宜出行</span>
+          </div>
+          <div class="card-body">
+            <h3>杭州 · 西湖慢生活</h3>
+            <p>3天2晚，白堤+灵隐+九溪+西溪</p>
+            <div class="meta"><span>💰 ¥1,238起</span><span>⏱️ 3天</span><span>👥 2人</span></div>
+            <div class="card-tags">
+              <span class="card-tag weather">☀️ 28°C 晴</span>
+              <span class="card-tag crowd-low">🟢 人流适中</span>
+              <span class="card-tag avoid">⚠️ 灵隐黑车绕路</span>
+            </div>
+          </div>
+        </div>
+        <div class="card" onclick="openDetail('北京',0)">
+          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=400&h=200&fit=crop)">
+            <span class="badge hot">🔥 热门</span>
+          </div>
+          <div class="card-body">
+            <h3>北京 · 皇城文化深度游</h3>
+            <p>5天4晚，故宫+长城+颐和园+胡同</p>
+            <div class="meta"><span>💰 ¥3,800起</span><span>⏱️ 5天</span><span>👥 2人</span></div>
+            <div class="card-tags">
+              <span class="card-tag weather">⛅ 26°C 多云</span>
+              <span class="card-tag crowd-high">🔴 故宫需抢票</span>
+              <span class="card-tag avoid">⚠️ 远离低价一日游团</span>
+            </div>
+          </div>
+        </div>
+        <div class="card" onclick="openDetail('成都',0)">
+          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=400&h=200&fit=crop)">
+            <span class="badge crowd">较拥挤</span>
+          </div>
+          <div class="card-body">
+            <h3>成都 · 熊猫美食之旅</h3>
+            <p>4天3晚，熊猫基地+宽窄巷+锦里+太古里</p>
+            <div class="meta"><span>💰 ¥2,600起</span><span>⏱️ 4天</span><span>👥 2人</span></div>
+            <div class="card-tags">
+              <span class="card-tag weather">🌧️ 22°C 阵雨</span>
+              <span class="card-tag crowd-mid">🟡 宽窄巷下午挤</span>
+              <span class="card-tag avoid">⚠️ 景区出租车不打表</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Future Month Recommendations -->
+    <div class="section">
+      <div class="section-title">未来1个月推荐 <span class="more">更多 ›</span></div>
+      <div class="card-scroll">
+        <div class="card" onclick="openDetail('大理',0)">
+          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=200&fit=crop)">
+            <span class="badge good">适宜出行</span>
+          </div>
+          <div class="card-body">
+            <h3>大理 · 风花雪月慢时光</h3>
+            <p>5天4晚，苍山+洱海+双廊+喜洲</p>
+            <div class="meta"><span>💰 ¥3,200起</span><span>⏱️ 5天</span></div>
+            <div class="card-tags">
+              <span class="card-tag weather">🌤️ 24°C 舒适</span>
+              <span class="card-tag crowd-mid">🟡 古城晚间人多</span>
+              <span class="card-tag avoid">⚠️ 银饰别在古城买</span>
+            </div>
+          </div>
+        </div>
+        <div class="card" onclick="openDetail('青岛',0)">
+          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400&h=200&fit=crop)">
+            <span class="badge good">夏日限定</span>
+          </div>
+          <div class="card-body">
+            <h3>青岛 · 海鲜啤酒之旅</h3>
+            <p>3天2晚，栈桥+八大关+啤酒博物馆</p>
+            <div class="meta"><span>💰 ¥2,200起</span><span>⏱️ 3天</span></div>
+            <div class="card-tags">
+              <span class="card-tag weather">☀️ 25°C 海风</span>
+              <span class="card-tag crowd-low">🟢 6月人少</span>
+              <span class="card-tag avoid">⚠️ 营口路海鲜先问价</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHAT SCREEN ===== -->
+  <div class="screen hidden" id="screen-chat">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">📶 📡 🔋</span>
+    </div>
+
+    <div class="plan-header">
+      <div class="back" onclick="goBack()">←</div>
+      <h2>🐴 Little Pony</h2>
+    </div>
+
+    <div class="chat-container">
+      <div class="chat-messages" id="chat-messages">
+        <!-- Messages will be populated by JS -->
+      </div>
+    </div>
+
+    <div class="chat-quick-replies" id="chat-quick-replies">
+      <!-- Quick replies populated by JS -->
+    </div>
+
+    <div class="chat-input-bar">
+      <input type="text" id="chat-input" placeholder="输入你的想法..." onkeydown="if(event.key==='Enter')sendChatMessage()">
+      <button class="send-btn" onclick="sendChatMessage()">➤</button>
+    </div>
+  </div>
+
+  <!-- ===== RESULT SCREEN ===== -->
+  <div class="screen hidden" id="screen-result">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">📶 📡 🔋</span>
+    </div>
+
+    <div class="plan-header">
+      <div class="back" onclick="goBack()">←</div>
+      <h2 id="result-title">为你推荐</h2>
+      <button class="share-btn" onclick="openShareModal()">分享</button>
+    </div>
+
+    <div id="result-list"></div>
+  </div>
+
+  <!-- ===== DETAIL SCREEN ===== -->
+  <div class="screen hidden" id="screen-detail">
+    <div class="detail-hero" id="detail-hero-img" style="">
+      <div class="overlay"></div>
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="detail-title" id="detail-title-area">
+        <h2></h2>
+        <div class="sub"></div>
+      </div>
+    </div>
+    <div class="detail-content">
+      <!-- Populated dynamically by renderDetail() -->
+    </div>
+  </div>
+
+  <!-- Detail固定底栏 - 放在screen外部，避免will-change导致fixed失效 -->
+  <div class="detail-bottom-bar">
+    <div class="dbb-price">
+      <span class="dbb-total">¥1,238</span>
+      <span class="dbb-per">/人起</span>
+    </div>
+    <div class="dbb-actions">
+      <button class="dbb-btn dbb-share" onclick="openShareModal()">📤 分享</button>
+      <button class="dbb-btn dbb-buy" onclick="openBatchTicketModal()">🎫 一键订票</button>
+    </div>
+  </div>
+
+  <!-- ===== FOOD SCREEN ===== -->
+  <div class="screen hidden" id="screen-food">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">📶 📡 🔋</span>
+    </div>
+    <div class="plan-header">
+      <div class="back" onclick="goBack()">←</div>
+      <h2>🍜 地方特色饮食</h2>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🔥 当地必吃</div>
+      <div class="card-scroll">
+        <div class="card" style="min-width:160px">
+          <div class="card-img" style="height:100px;background-image:url(https://images.unsplash.com/photo-1555126634-323283e090fa?w=300&h=150&fit=crop)"></div>
+          <div class="card-body">
+            <h3>西湖醋鱼</h3>
+            <div class="meta"><span>⭐ 4.3</span><span>💰 ¥128/条</span></div>
+          </div>
+        </div>
+        <div class="card" style="min-width:160px">
+          <div class="card-img" style="height:100px;background-image:url(https://images.unsplash.com/photo-1563245372-f21724e3856d?w=300&h=150&fit=crop)"></div>
+          <div class="card-body">
+            <h3>东坡肉</h3>
+            <div class="meta"><span>⭐ 4.8</span><span>💰 ¥38/份</span></div>
+          </div>
+        </div>
+        <div class="card" style="min-width:160px">
+          <div class="card-img" style="height:100px;background-image:url(https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=300&h=150&fit=crop)"></div>
+          <div class="card-body">
+            <h3>龙井虾仁</h3>
+            <div class="meta"><span>⭐ 4.5</span><span>💰 ¥88/份</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🏠 本地人推荐餐厅</div>
+      <div style="padding:0 20px;display:flex;flex-direction:column;gap:10px">
+        <div class="avoid-item" style="cursor:pointer" onclick="showToast('餐厅详情开发中')">
+          <span class="a-icon">🏪</span>
+          <div class="a-text"><h4>楼外楼（孤山路店）</h4><p>百年老店 · 人均¥150 · 距西湖200m · ⭐4.3 · 必点西湖醋鱼</p></div>
+        </div>
+        <div class="avoid-item" style="cursor:pointer" onclick="showToast('餐厅详情开发中')">
+          <span class="a-icon">🍜</span>
+          <div class="a-text"><h4>知味观（总店）</h4><p>传统小吃 · 人均¥60 · 距西湖800m · ⭐4.6 · 必点小笼包+猫耳朵</p></div>
+        </div>
+        <div class="avoid-item" style="cursor:pointer" onclick="showToast('餐厅详情开发中')">
+          <span class="a-icon">🍲</span>
+          <div class="a-text"><h4>新白鹿餐厅</h4><p>杭帮菜连锁 · 人均¥80 · 多家分店 · ⭐4.4 · 性价比之王</p></div>
+        </div>
+        <div class="avoid-item" style="cursor:pointer" onclick="showToast('餐厅详情开发中')">
+          <span class="a-icon">🥟</span>
+          <div class="a-text"><h4>奎元馆（解放路店）</h4><p>百年面馆 · 人均¥45 · 距西湖1km · ⭐4.5 · 必点片儿川+虾爆鳝面</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🛒 一键点餐/预订</div>
+      <div class="offer-strip" onclick="showToast('预订功能开发中')">
+        <h3>🍱 到店免排队 · 在线预订</h3>
+        <p>提前30分钟预订，到店即食不等待</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PHOTO SCREEN ===== -->
+  <div class="screen hidden" id="screen-photo">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">📶 📡 🔋</span>
+    </div>
+    <div class="plan-header">
+      <div class="back" onclick="goBack()">←</div>
+      <h2>📷 旅拍道具</h2>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🔥 热门旅拍道具</div>
+      <div class="product-scroll">
+        <div class="product-card" onclick="showToast('已加入购物车')">
+          <div class="p-img" style="background-image:url(https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=280&h=180&fit=crop)"></div>
+          <div class="p-info"><h4>复古胶片相机</h4><div class="price">¥89 <small>¥159</small></div></div>
+        </div>
+        <div class="product-card" onclick="showToast('已加入购物车')">
+          <div class="p-img" style="background-image:url(https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=280&h=180&fit=crop)"></div>
+          <div class="p-info"><h4>编织草帽</h4><div class="price">¥39 <small>¥69</small></div></div>
+        </div>
+        <div class="product-card" onclick="showToast('已加入购物车')">
+          <div class="p-img" style="background-image:url(https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=280&h=180&fit=crop)"></div>
+          <div class="p-info"><h4>丝巾拍照披肩</h4><div class="price">¥29 <small>¥59</small></div></div>
+        </div>
+        <div class="product-card" onclick="showToast('已加入购物车')">
+          <div class="p-img" style="background-image:url(https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=280&h=180&fit=crop)"></div>
+          <div class="p-info"><h4>便携补光灯</h4><div class="price">¥49 <small>¥99</small></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">📸 旅拍服务</div>
+      <div style="padding:0 20px;display:flex;flex-direction:column;gap:10px">
+        <div class="avoid-item" style="cursor:pointer" onclick="showToast('预约功能开发中')">
+          <span class="a-icon">🎥</span>
+          <div class="a-text"><h4>专业跟拍 · 3小时</h4><p>含精修30张+3段Vlog · ¥699</p></div>
+        </div>
+        <div class="avoid-item" style="cursor:pointer" onclick="showToast('预约功能开发中')">
+          <span class="a-icon">🤳</span>
+          <div class="a-text"><h4>无人机航拍体验</h4><p>含视频剪辑 · ¥299/次</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CLOTHES SCREEN ===== -->
+  <div class="screen hidden" id="screen-clothes">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">📶 📡 🔋</span>
+    </div>
+    <div class="plan-header">
+      <div class="back" onclick="goBack()">←</div>
+      <h2>👗 穿衣建议</h2>
+    </div>
+
+    <div class="alert-banner weather-alert" style="margin:0 20px 16px">
+      <span class="alert-icon">🌤️</span>
+      <div class="alert-text">
+        <strong>目的地近期天气</strong>
+        <span>平均气温 22-28°C · 周四有雨 · 建议备薄外套+雨具</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">👔 按场景推荐</div>
+      <div class="clothes-grid">
+        <div class="clothes-card"><div class="c-icon">👕</div><h4>白天游览</h4><p>轻薄透气T恤+短裤/裙</p></div>
+        <div class="clothes-card"><div class="c-icon">🧥</div><h4>晚间出行</h4><p>薄外套/针织开衫</p></div>
+        <div class="clothes-card"><div class="c-icon">👟</div><h4>徒步探索</h4><p>运动鞋+速干衣</p></div>
+        <div class="clothes-card"><div class="c-icon">🌂</div><h4>雨天方案</h4><p>防水外套+折叠伞</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🛍️ 一键购买穿搭</div>
+      <div class="product-scroll">
+        <div class="product-card" onclick="showToast('已加入购物车')">
+          <div class="p-img" style="background-color:#f0e6ff"></div>
+          <div class="p-info"><h4>防晒冰丝外套</h4><div class="price">¥79 <small>¥129</small></div></div>
+        </div>
+        <div class="product-card" onclick="showToast('已加入购物车')">
+          <div class="p-img" style="background-color:#e6f7ff"></div>
+          <div class="p-info"><h4>透气运动鞋</h4><div class="price">¥199 <small>¥359</small></div></div>
+        </div>
+        <div class="product-card" onclick="showToast('已加入购物车')">
+          <div class="p-img" style="background-color:#fff3e0"></div>
+          <div class="p-info"><h4>折叠防晒帽</h4><div class="price">¥39 <small>¥69</small></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MY SCREEN ===== -->
+  <div class="screen hidden" id="screen-my">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">📶 📡 🔋</span>
+    </div>
+    <div style="padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px">
+      <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff">🐴</div>
+      <div>
+        <div style="font-size:18px;font-weight:700">小马旅行者</div>
+        <div style="font-size:13px;color:var(--text-secondary)">探索世界，享受旅途</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:0 20px 20px;background:var(--card);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)">
+      <div style="text-align:center;padding:16px;cursor:pointer" onclick="showToast('我的攻略开发中')"><div style="font-size:20px;font-weight:700;color:var(--primary)">3</div><div style="font-size:12px;color:var(--text-secondary)">我的攻略</div></div>
+      <div style="text-align:center;padding:16px;border-left:1px solid #f0f0f0;border-right:1px solid #f0f0f0;cursor:pointer" onclick="showToast('收藏开发中')"><div style="font-size:20px;font-weight:700;color:var(--primary)">12</div><div style="font-size:12px;color:var(--text-secondary)">收藏</div></div>
+      <div style="text-align:center;padding:16px;cursor:pointer" onclick="showToast('足迹开发中')"><div style="font-size:20px;font-weight:700;color:var(--primary)">8</div><div style="font-size:12px;color:var(--text-secondary)">足迹</div></div>
+    </div>
+
+    <div style="padding:0 20px;display:flex;flex-direction:column;gap:1px;background:transparent">
+      <div class="avoid-item" style="cursor:pointer" onclick="showToast('功能开发中')"><span class="a-icon">📋</span><div class="a-text"><h4>我的出行偏好</h4><p>休闲游 · 美食之旅 · 深度文化</p></div></div>
+      <div class="avoid-item" style="cursor:pointer" onclick="showToast('功能开发中')"><span class="a-icon">🏰</span><div class="a-text"><h4>已去过的地方</h4><p>北京、上海、成都、西安</p></div></div>
+      <div class="avoid-item" style="cursor:pointer" onclick="showToast('功能开发中')"><span class="a-icon">🎫</span><div class="a-text"><h4>我的订单</h4><p>机票、酒店、门票订单管理</p></div></div>
+      <div class="avoid-item" style="cursor:pointer" onclick="showToast('功能开发中')"><span class="a-icon">⚙️</span><div class="a-text"><h4>设置</h4><p>账号安全、通知、隐私</p></div></div>
+    </div>
+  </div>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <div class="bottom-nav" id="bottom-nav">
+    <div class="nav-item active" data-tab="home" onclick="switchTab('home')">
+      <span class="nav-icon">🏠</span><span>首页</span>
+    </div>
+    <div class="nav-center" onclick="switchScreen('chat')">+</div>
+    <div class="nav-item" data-tab="my" onclick="switchTab('my')">
+      <span class="nav-icon">👤</span><span>我的</span>
+    </div>
+  </div>
+
+  <!-- ===== SHARE MODAL ===== -->
+  <div class="modal-overlay" id="share-modal" onclick="closeShareModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <h3>📤 分享出行攻略</h3>
+
+      <div class="share-preview">
+        <div class="sp-header">
+          <div class="sp-avatar">🐴</div>
+          <div>
+            <div class="sp-name">小马旅行者的攻略</div>
+            <div class="sp-sub">Little Pony · 3天2晚杭州西湖慢生活</div>
+          </div>
+        </div>
+        <div class="sp-body" id="share-body">
+          🏖️ 杭州·西湖慢生活之旅<br>
+          💰 预算 ¥1,238/人 | ⏱️ 3天2晚<br>
+          📍 Day1: 白堤断桥→孤山西泠→楼外楼→音乐喷泉<br>
+          📍 Day2: 灵隐寺→龙井问茶→九溪烟树→河坊街<br>
+          📍 Day3: 美院象山→西溪湿地→返程<br>
+          <span style="color:var(--primary)">#LittlePony #杭州旅行 #西湖攻略</span>
+        </div>
+      </div>
+
+      <div class="media-upload" onclick="showToast('上传功能开发中')">
+        <div class="mu-icon">🎬</div>
+        <p>添加你的旅行体验 · 支持图片/视频/文字</p>
+      </div>
+
+      <div style="margin:16px 0">
+        <div class="share-actions">
+          <div class="share-action" onclick="showToast('已复制分享链接')">
+            <div class="sa-icon" style="background:#07c160;color:#fff">💬</div>
+            <span>微信</span>
+          </div>
+          <div class="share-action" onclick="showToast('已生成海报')">
+            <div class="sa-icon" style="background:#12b7f5;color:#fff">🐧</div>
+            <span>QQ</span>
+          </div>
+          <div class="share-action" onclick="showToast('已保存图片')">
+            <div class="sa-icon" style="background:#ff2442;color:#fff">📕</div>
+            <span>小红书</span>
+          </div>
+          <div class="share-action" onclick="showToast('已复制链接')">
+            <div class="sa-icon" style="background:#666;color:#fff">🔗</div>
+            <span>复制链接</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ===== SINGLE TICKET MODAL ===== -->
+  <div class="modal-overlay ticket-modal" id="single-ticket-modal" onclick="closeTicketModal(event,'single-ticket-modal')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <h3>🎫 购买门票</h3>
+      <div id="single-ticket-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== BATCH TICKET MODAL ===== -->
+  <div class="modal-overlay ticket-modal" id="batch-ticket-modal" onclick="closeTicketModal(event,'batch-ticket-modal')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <h3>🎫 一键订票</h3>
+      <div id="batch-ticket-list"></div>
+      <div class="ticket-modal-footer">
+        <div class="ticket-total">合计 <strong id="batch-total-price">¥0</strong></div>
+        <button class="ticket-buy-btn" onclick="confirmBatchBuy()">确认购买</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== STATE =====
+let currentScreen = 'home';
+const screenStack = [];
+let selectedPrefs = ['休闲游'];
+
+// ===== CHAT ENGINE =====
+const chatState = {
+  step: 0,
+  hasDestination: null,
+  destination: '',
+  hasPlan: null,
+  timeFixed: null,
+  timeRange: '',
+  preferences: [],
+  groupSize: 2,
+  budget: 5000,
+  specialNeeds: [],
+  visitedSpots: ''
+};
+
+const chatFlow = [
+  // Step 0: Welcome + first question
+  {
+    bot: '你好呀！我是小马 🐴，你的出行小助手～ 让我先了解一下你的情况吧！\n\n你有明确的目的地吗？',
+    quickReplies: [
+      { text: '📍 有明确目的地', value: 'yes' },
+      { text: '🤔 还没想好去哪', value: 'no' }
+    ],
+    handler(val) {
+      chatState.hasDestination = val === 'yes';
+      chatState.step = val === 'yes' ? 1 : 3;
+    }
+  },
+  // Step 1: Destination input (has destination)
+  {
+    bot: '打算去哪呢？告诉我目的地，我来帮你规划～',
+    quickReplies: [
+      { text: '🏖️ 杭州', value: '杭州' },
+      { text: '🐼 成都', value: '成都' },
+      { text: '🏔️ 大理', value: '大理' },
+      { text: '🌊 厦门', value: '厦门' },
+      { text: '🏯 西安', value: '西安' },
+      { text: '🍺 青岛', value: '青岛' }
+    ],
+    allowInput: true,
+    inputPlaceholder: '输入你想去的城市...',
+    handler(val) {
+      chatState.destination = val;
+      chatState.step = 2;
+    }
+  },
+  // Step 2: Has plan? (destination clear)
+  {
+    bot: '去' + (chatState.destination || '那里') + '好呀！你有做攻略了吗？',
+    quickReplies: [
+      { text: '📋 有攻略了，想优化', value: 'yes' },
+      { text: '🆘 还没做，帮我出！', value: 'no' }
+    ],
+    handler(val) {
+      chatState.hasPlan = val === 'yes';
+      chatState.step = 5;
+    }
+  },
+  // Step 3: Time fixed? (no destination)
+  {
+    bot: '没关系，让我来帮你找到最适合的目的地！你的出行时间确定了吗？',
+    quickReplies: [
+      { text: '📅 时间确定了', value: 'fixed' },
+      { text: '🕐 时间灵活', value: 'flexible' },
+      { text: '💰 看经费决定', value: 'budget' }
+    ],
+    handler(val) {
+      chatState.timeFixed = val;
+      chatState.step = 4;
+    }
+  },
+  // Step 4: Time details
+  {
+    bot: chatState.timeFixed === 'budget' ? '你的预算大概多少呢？' : '大概计划玩几天呢？',
+    quickReplies: chatState.timeFixed === 'budget'
+      ? [{ text: '💰 3000以内', value: '3000' }, { text: '💰 5000左右', value: '5000' }, { text: '💰 8000+', value: '8000' }, { text: '💰 不差钱', value: '20000' }]
+      : [{ text: '⚡ 2天周末', value: '2' }, { text: '🌴 3-4天小长假', value: '3' }, { text: '🏖️ 5-7天长假', value: '5' }, { text: '🧳 一周以上', value: '7+' }],
+    allowInput: true,
+    inputPlaceholder: chatState.timeFixed === 'budget' ? '输入预算金额...' : '输入天数...',
+    handler(val) {
+      if (chatState.timeFixed === 'budget') {
+        chatState.budget = parseInt(val) || 5000;
+      } else {
+        chatState.timeRange = val;
+      }
+      chatState.step = 5;
+    }
+  },
+  // Step 5: Preferences
+  {
+    bot: '你偏好哪种出行方式呢？可以多选哦～',
+    quickReplies: [
+      { text: '🏖️ 休闲度假', value: '休闲度假' },
+      { text: '⚡ 特种兵打卡', value: '特种兵打卡' },
+      { text: '🏛️ 深度文化', value: '深度文化' },
+      { text: '🏔️ 自然探索', value: '自然探索' },
+      { text: '🍜 美食之旅', value: '美食之旅' },
+      { text: '👨‍👩‍👧 亲子出游', value: '亲子出游' },
+      { text: '💕 情侣浪漫', value: '情侣浪漫' },
+      { text: '📷 摄影采风', value: '摄影采风' }
+    ],
+    multiSelect: true,
+    nextText: '选好了，下一步 →',
+    handler(val) {
+      chatState.preferences = val;
+      chatState.step = 6;
+    }
+  },
+  // Step 6: Group size
+  {
+    bot: '几个人一起出行呢？',
+    quickReplies: [
+      { text: '🧑 单人出行', value: '1' },
+      { text: '👫 2人同行', value: '2' },
+      { text: '👨‍👩‍👧 3-4人', value: '3-4' },
+      { text: '👨‍👩‍👧‍👦 5人以上', value: '5+' }
+    ],
+    handler(val) {
+      chatState.groupSize = val;
+      chatState.step = 7;
+    }
+  },
+  // Step 7: Budget
+  {
+    bot: '预算大概多少呢？',
+    quickReplies: [
+      { text: '💰 经济型 3000内', value: '3000' },
+      { text: '💰 舒适型 5000左右', value: '5000' },
+      { text: '💰 品质型 8000+', value: '8000' },
+      { text: '💰 不限预算', value: '20000' }
+    ],
+    handler(val) {
+      chatState.budget = parseInt(val) || 5000;
+      chatState.step = 8;
+    }
+  },
+  // Step 8: Special needs
+  {
+    bot: '有没有什么特别在意的？',
+    quickReplies: [
+      { text: '🚫 避开人多', value: '避开人多' },
+      { text: '👶 带老人小孩', value: '带老人小孩' },
+      { text: '🍜 要美食推荐', value: '要美食推荐' },
+      { text: '👗 需要穿衣建议', value: '需要穿衣建议' },
+      { text: '🥗 有饮食忌口', value: '有饮食忌口' },
+      { text: '🎁 想买伴手礼', value: '想买伴手礼' }
+    ],
+    multiSelect: true,
+    nextText: '就这些了，生成建议 →',
+    handler(val) {
+      chatState.specialNeeds = val;
+      chatState.step = 9;
+    }
+  },
+  // Step 9: Generate
+  {
+    bot: '收到！让我帮你规划一下 ✨\n正在综合分析天气、人流、交通、美食...',
+    quickReplies: [],
+    autoHandler: true,
+    handler() {
+      setTimeout(() => {
+        const dest = chatState.destination || '推荐目的地';
+        const pref = chatState.preferences.length > 0 ? chatState.preferences.join('、') : '休闲度假';
+        const budget = chatState.budget ? '¥' + chatState.budget + '以内' : '';
+        const group = chatState.groupSize === '1' ? '单人' : chatState.groupSize + '人';
+        const summaryMsg = `规划好了！为你精选了${dest}的出行方案 🎉\n偏好：${pref} · ${group}出行${budget ? ' · 预算' + budget : ''}\n\n👇 即将跳转到推荐页...`;
+        const msgContainer = document.getElementById('chat-messages');
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble bot fade-in';
+        bubble.innerHTML = '<div class="bot-avatar"><div class="avatar">🐴</div><div class="name">Little Pony</div></div>' + summaryMsg.replace(/\n/g, '<br>');
+        msgContainer.appendChild(bubble);
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+
+        setTimeout(() => generateAndShowResults(), 800);
+      }, 2000);
+    }
+  }
+];
+
+let currentChatStep = -1;
+let multiSelections = [];
+
+function startChat() {
+  currentChatStep = -1;
+  multiSelections = [];
+  document.getElementById('chat-messages').innerHTML = '';
+  document.getElementById('chat-quick-replies').innerHTML = '';
+  advanceChat();
+}
+
+function advanceChat() {
+  currentChatStep++;
+
+  if (currentChatStep >= chatFlow.length) return;
+
+  const step = chatFlow[currentChatStep];
+  const msgContainer = document.getElementById('chat-messages');
+
+  // Add typing indicator
+  const typingEl = document.createElement('div');
+  typingEl.className = 'chat-bubble bot';
+  typingEl.innerHTML = '<div class="bot-avatar"><div class="avatar">🐴</div><div class="name">Little Pony</div></div><div class="typing-dots"><span></span><span></span><span></span></div>';
+  msgContainer.appendChild(typingEl);
+  msgContainer.scrollTop = msgContainer.scrollHeight;
+
+  setTimeout(() => {
+    // Replace typing with actual message
+    let botText = step.bot;
+    // Dynamic text replacement based on state
+    if (currentChatStep === 2 && chatState.destination) {
+      botText = botText.replace('那里', chatState.destination);
+    }
+    if (currentChatStep === 4) {
+      botText = chatState.timeFixed === 'budget' ? '你的预算大概多少呢？' : '大概计划玩几天呢？';
+    }
+
+    typingEl.innerHTML = '<div class="bot-avatar"><div class="avatar">🐴</div><div class="name">Little Pony</div></div>' + botText.replace(/\n/g, '<br>');
+    msgContainer.scrollTop = msgContainer.scrollHeight;
+
+    // Show quick replies
+    const qrContainer = document.getElementById('chat-quick-replies');
+    qrContainer.innerHTML = '';
+
+    if (step.quickReplies && step.quickReplies.length > 0) {
+      step.quickReplies.forEach(qr => {
+        const btn = document.createElement('div');
+        btn.className = 'chat-quick-reply';
+        btn.textContent = qr.text;
+        btn.onclick = () => handleQuickReply(qr.value, qr.text, step);
+        qrContainer.appendChild(btn);
+      });
+    }
+
+    if (step.multiSelect && step.nextText) {
+      const nextBtn = document.createElement('div');
+      nextBtn.className = 'chat-quick-reply';
+      nextBtn.style.background = 'linear-gradient(135deg,var(--primary),var(--accent))';
+      nextBtn.style.color = '#fff';
+      nextBtn.style.border = 'none';
+      nextBtn.textContent = step.nextText;
+      nextBtn.onclick = () => handleMultiSelectDone(step);
+      qrContainer.appendChild(nextBtn);
+    }
+
+    // Show/hide input
+    const inputBar = document.querySelector('.chat-input-bar');
+    if (step.allowInput) {
+      inputBar.style.display = 'flex';
+      document.getElementById('chat-input').placeholder = step.inputPlaceholder || '输入...';
+    } else if (!step.multiSelect) {
+      inputBar.style.display = 'none';
+    } else {
+      inputBar.style.display = 'none';
+    }
+
+    // Auto-execute handler for steps like generate
+    if (step.autoHandler && step.handler) {
+      step.handler();
+    }
+  }, 800 + Math.random() * 600);
+}
+
+function handleQuickReply(value, text, step) {
+  if (step.multiSelect) {
+    multiSelections.push(value);
+    const btns = document.querySelectorAll('#chat-quick-replies .chat-quick-reply:not(:last-child)');
+    btns.forEach(b => {
+      if (b.textContent === text || b.textContent.includes(text.split(' ').pop())) {
+        b.classList.toggle('selected');
+      }
+    });
+    return;
+  }
+
+  addUserBubble(text);
+  document.getElementById('chat-quick-replies').innerHTML = '';
+  step.handler(value);
+  advanceChat();
+}
+
+function handleMultiSelectDone(step) {
+  if (multiSelections.length === 0) {
+    showToast('请至少选择一项');
+    return;
+  }
+  const selected = [...multiSelections];
+  multiSelections = [];
+
+  const selectedTexts = selected.map(s => {
+    const qr = step.quickReplies.find(q => q.value === s);
+    return qr ? qr.text : s;
+  });
+  addUserBubble(selectedTexts.join('、'));
+
+  document.getElementById('chat-quick-replies').innerHTML = '';
+  step.handler(selected);
+  advanceChat();
+}
+
+function addUserBubble(text) {
+  const msgContainer = document.getElementById('chat-messages');
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble user';
+  bubble.textContent = text;
+  msgContainer.appendChild(bubble);
+  msgContainer.scrollTop = msgContainer.scrollHeight;
+}
+
+function sendChatMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  addUserBubble(text);
+  input.value = '';
+
+  const step = chatFlow[currentChatStep];
+  if (step && step.handler) {
+    step.handler(text);
+  }
+
+  document.getElementById('chat-quick-replies').innerHTML = '';
+  advanceChat();
+}
+
+// ===== RESULT DATA =====
+const resultData = {
+  '杭州': { title: '杭州出行建议', plans: [
+    { name:'西湖慢生活之旅', img:'photo-1534190239940-9ba8944ea261', tag:'适宜出行', tagClass:'good', desc:'3天2晚，白堤断桥→灵隐→九溪→西溪，人均¥1,238', crowd:'适中', cost:'¥1,238', days:'3天' },
+    { name:'杭州文艺深度路线', img:'photo-1523580494863-6f3031224c94', tag:'人少小众', tagClass:'good', desc:'3天2晚，省博→南宋御街→美院象山→良渚，人均¥1,400', crowd:'稀少', cost:'¥1,400', days:'3天' },
+    { name:'杭州特种兵打卡', img:'photo-1534190239940-9ba8944ea261', tag:'效率拉满', tagClass:'hot', desc:'2天1晚，西湖环湖+灵隐+河坊街+湘湖，人均¥680', crowd:'较多', cost:'¥680', days:'2天' }
+  ]},
+  '北京': { title: '北京出行建议', plans: [
+    { name:'皇城文化深度游', img:'photo-1547981609-4b6bfe67ca0b', tag:'🔥 热门', tagClass:'hot', desc:'5天4晚，故宫+长城+颐和园+胡同，人均¥3,800', crowd:'较多', cost:'¥3,800', days:'5天' },
+    { name:'北京美食打卡', img:'photo-1547981609-4b6bfe67ca0b', tag:'吃货之选', tagClass:'good', desc:'4天3晚，烤鸭+炸酱面+涮羊肉+卤煮，人均¥2,800', crowd:'适中', cost:'¥2,800', days:'4天' }
+  ]},
+  '成都': { title: '成都出行建议', plans: [
+    { name:'熊猫美食之旅', img:'photo-1476514525535-07fb3b4ae5f1', tag:'吃货首选', tagClass:'hot', desc:'4天3晚，熊猫基地+宽窄巷+锦里+太古里，人均¥2,600', crowd:'适中', cost:'¥2,600', days:'4天' },
+    { name:'成都慢生活路线', img:'photo-1476514525535-07fb3b4ae5f1', tag:'休闲首选', tagClass:'good', desc:'3天2晚，人民公园茶馆+文殊院+东郊记忆，人均¥1,800', crowd:'稀少', cost:'¥1,800', days:'3天' }
+  ]},
+  '大理': { title: '大理出行建议', plans: [
+    { name:'风花雪月慢时光', img:'photo-1504280390367-361c6d9f38f4', tag:'最推荐', tagClass:'good', desc:'5天4晚，苍山索道+洱海环湖+双廊+喜洲，人均¥3,200', crowd:'适中', cost:'¥3,200', days:'5天' },
+    { name:'大理环海骑行', img:'photo-1504280390367-361c6d9f38f4', tag:'户外之选', tagClass:'good', desc:'4天3晚，洱海环骑+古城+沙溪古镇，人均¥2,500', crowd:'稀少', cost:'¥2,500', days:'4天' }
+  ]},
+  '厦门': { title: '厦门出行建议', plans: [
+    { name:'海岛文艺之旅', img:'photo-1506929562872-bb421503ef21', tag:'热门推荐', tagClass:'hot', desc:'4天3晚，鼓浪屿+环岛路+沙坡尾+曾厝垵，人均¥2,800', crowd:'较多', cost:'¥2,800', days:'4天' },
+    { name:'厦门美食探店', img:'photo-1506929562872-bb421503ef21', tag:'吃货必去', tagClass:'good', desc:'3天2晚，八市+中山路+沙茶面+姜母鸭，人均¥1,600', crowd:'适中', cost:'¥1,600', days:'3天' }
+  ]},
+  '西安': { title: '西安出行建议', plans: [
+    { name:'千年古都深度游', img:'photo-1547981609-4b6bfe67ca0b', tag:'文化之旅', tagClass:'hot', desc:'4天3晚，兵马俑+城墙+陕历博+回民街，人均¥2,800', crowd:'较多', cost:'¥2,800', days:'4天' },
+    { name:'西安美食考古', img:'photo-1547981609-4b6bfe67ca0b', tag:'美食考古', tagClass:'good', desc:'3天2晚，肉夹馍+凉皮+泡馍+永兴坊，人均¥1,500', crowd:'适中', cost:'¥1,500', days:'3天' }
+  ]},
+  '青岛': { title: '青岛出行建议', plans: [
+    { name:'海鲜啤酒之旅', img:'photo-1506929562872-bb421503ef21', tag:'夏日限定', tagClass:'good', desc:'3天2晚，栈桥+八大关+啤酒博物馆+营口路，人均¥2,200', crowd:'适中', cost:'¥2,200', days:'3天' },
+    { name:'青岛海岸线徒步', img:'photo-1506929562872-bb421503ef21', tag:'户外之选', tagClass:'good', desc:'3天2晚，奥帆中心→小麦岛→崂山，人均¥2,000', crowd:'稀少', cost:'¥2,000', days:'3天' }
+  ]},
+  'default': { title: '智能推荐', plans: [
+    { name:'杭州 · 西湖慢生活', img:'photo-1534190239940-9ba8944ea261', tag:'最匹配', tagClass:'good', desc:'3天2晚，白堤+灵隐+九溪+西溪，人均¥1,238', crowd:'适中', cost:'¥1,238', days:'3天' },
+    { name:'大理 · 风花雪月', img:'photo-1504280390367-361c6d9f38f4', tag:'深度推荐', tagClass:'good', desc:'5天4晚，苍山+洱海+双廊+喜洲，人均¥3,200', crowd:'稀少', cost:'¥3,200', days:'5天' },
+    { name:'成都 · 熊猫美食', img:'photo-1476514525535-07fb3b4ae5f1', tag:'热门之选', tagClass:'hot', desc:'4天3晚，熊猫基地+宽窄巷+锦里，人均¥2,600', crowd:'较多', cost:'¥2,600', days:'4天' }
+  ]}
+};
+
+// ===== DETAIL DATA =====
+const detailData = {
+  '杭州': [
+    {
+      title: '杭州 · 西湖慢生活之旅',
+      subtitle: '3天2晚 · 休闲游 · 2人 · ¥1,238起',
+      heroImg: 'https://images.unsplash.com/photo-1534190239940-9ba8944ea261?w=600&h=300&fit=crop',
+      totalCost: 1238,
+      paidItems: [
+        { name: '湖滨商圈酒店', type: '住宿', price: 480, day: 1 },
+        { name: '楼外楼晚餐', type: '餐饮', price: 180, day: 1 },
+        { name: '灵隐寺', type: '门票', price: 75, day: 2 },
+        { name: '河坊街小吃', type: '餐饮', price: 60, day: 2 },
+        { name: '西溪湿地', type: '门票+船票', price: 180, day: 3 },
+        { name: '返程高铁', type: '交通', price: 263, day: 3 }
+      ],
+      shareBody: '🏖️ 杭州·西湖慢生活之旅\n💰 预算 ¥1,238/人 | ⏱️ 3天2晚\n📍 Day1: 白堤断桥→孤山西泠→楼外楼→音乐喷泉\n📍 Day2: 灵隐寺→龙井问茶→九溪烟树→河坊街\n📍 Day3: 美院象山→西溪湿地→返程\n#LittlePony #杭州旅行 #西湖攻略',
+      days: [
+        {
+          label: '湖滨漫步', weather: '☀️ 28°C 晴 · 👕 轻薄T恤+薄外套', cost: 660,
+          items: [
+            { time: '13:00', activity: '抵达杭州东站，入住湖滨商圈酒店', cost: '¥480', note: '推荐：如家商旅(西湖店)或全季(湖滨店)，步行至西湖5分钟', tags: [{ type: 'buy', text: '🎫 预订', name: '湖滨商圈酒店', ticketType: '住宿', price: 480 }] },
+            { transit: [{ mode: '步行', from: '湖滨商圈', to: '断桥', time: '10min' }, { mode: '打车', from: '湖滨商圈', to: '断桥', time: '5min' }] },
+            { time: '14:30', activity: '漫步白堤，经断桥残雪至平湖秋月', cost: '免费', note: '白堤柳荫成行，断桥为西湖十景之一', tags: [{ type: 'crowd-green', text: '🟢 下午人流适中' }, { type: 'avoid', text: '⚠️ 断桥边"免费拍照"后会推销收费' }, { type: 'tip', text: '🔄 建议走白堤替代断桥观景' }] },
+            { transit: [{ mode: '步行', from: '平湖秋月', to: '孤山', time: '10min' }, { mode: '打车', from: '平湖秋月', to: '孤山', time: '3min' }] },
+            { time: '16:00', activity: '孤山·浙江省博物馆孤山馆 + 西泠印社', cost: '免费', note: '省博需预约，西泠印社为百年印学圣地，免票', tags: [{ type: 'crowd-green', text: '🟢 室内人流少' }, { type: 'tip', text: '📱 省博提前在「浙江博物馆」公众号预约' }] },
+            { transit: [{ mode: '步行', from: '孤山', to: '楼外楼', time: '5min' }, { mode: '打车', from: '孤山', to: '楼外楼', time: '3min' }] },
+            { time: '18:00', activity: '楼外楼(孤山路店)晚餐', cost: '¥180', note: '必点：西湖醋鱼(草鱼¥128/条)、东坡肉¥38/份、龙井虾仁¥88', tags: [{ type: 'buy', text: '🎫 预订', name: '楼外楼', ticketType: '餐饮', price: 180 }, { type: 'tip', text: '📍 1楼散座免排队，2楼包间需预约' }] },
+            { transit: [{ mode: '步行', from: '楼外楼', to: '音乐喷泉', time: '12min' }, { mode: '打车', from: '楼外楼', to: '音乐喷泉', time: '5min' }] },
+            { time: '20:00', activity: '西湖音乐喷泉', cost: '免费', note: '每晚19:30/20:00两场，每场约15分钟，湖滨三公园', tags: [{ type: 'crowd-yellow', text: '🟡 观赏位需提前30分钟占' }, { type: 'tip', text: '🌙 第二场20:00人少一些' }] }
+          ]
+        },
+        {
+          label: '茶文化', weather: '⛅ 26°C 多云 · 👕 透气T恤+折叠伞', cost: 135,
+          items: [
+            { time: '07:30', activity: '灵隐寺 + 飞来峰', cost: '¥75', note: '飞来峰门票¥45+灵隐寺香花券¥30，7:30开门', tags: [{ type: 'buy', text: '🎫 购票', name: '灵隐寺', ticketType: '门票', price: 75 }, { type: 'crowd-yellow', text: '🟡 9点后旅游团涌入，建议8点前到' }, { type: 'avoid', text: '🚫 景区门口拉客黑车绕路加价，坐7路公交' }, { type: 'tip', text: '🌅 早7:30到几乎包场，拍照绝佳' }] },
+            { transit: [{ mode: '步行', from: '灵隐寺', to: '龙井村', time: '35min' }, { mode: '打车', from: '灵隐寺', to: '龙井村', time: '10min' }, { mode: '公交', from: '灵隐寺', to: '龙井村', time: '25min' }] },
+            { time: '10:00', activity: '龙井村问茶 + 中国茶叶博物馆', cost: '¥0', note: '茶叶博物馆免费，龙井村漫步免费，品茶自愿消费', tags: [{ type: 'avoid', text: '🚫 路边散客茶摊以次充好，去龙井村正规茶农家或茶叶博物馆' }, { type: 'tip', text: '🍵 茶叶博物馆双峰馆区可免费品龙井茶3杯' }] },
+            { transit: [{ mode: '步行', from: '龙井村', to: '九溪', time: '40min' }, { mode: '打车', from: '龙井村', to: '九溪', time: '10min' }] },
+            { time: '13:00', activity: '九溪烟树徒步', cost: '免费', note: '九溪十八涧全程约3km，溪水潺潺，天然氧吧', tags: [{ type: 'crowd-green', text: '🟢 工作日几乎无人' }, { type: 'tip', text: '👟 必穿防滑运动鞋，溪石可踩水' }] },
+            { transit: [{ mode: '步行', from: '九溪', to: '河坊街', time: '—' }, { mode: '打车', from: '九溪', to: '河坊街', time: '20min' }, { mode: '公交', from: '九溪', to: '河坊街', time: '40min' }] },
+            { time: '17:00', activity: '河坊街 + 南宋御街觅食', cost: '¥60', note: '定胜糕¥5/个、葱包桧¥8/份、片儿川¥22/碗、藕粉¥10', tags: [{ type: 'crowd-yellow', text: '🟡 17-19点人流高峰' }, { type: 'avoid', text: '🚫 河坊街"特产店"多为义乌批发，别当伴手礼买' }] }
+          ]
+        },
+        {
+          label: '文艺收尾', weather: '🌧️ 22°C 阵雨 · 🧥 薄外套+折叠伞', cost: 443,
+          items: [
+            { time: '09:00', activity: '中国美术学院象山校区', cost: '免费', note: '王澍设计，普利兹克奖建筑群，需在校门登记入校', tags: [{ type: 'crowd-green', text: '🟢 几乎无游客' }, { type: 'tip', text: '🌂 今天有雨，室内民俗博物馆优先' }] },
+            { transit: [{ mode: '步行', from: '美院象山校区', to: '西溪湿地', time: '—' }, { mode: '打车', from: '美院象山校区', to: '西溪湿地', time: '30min' }, { mode: '地铁', from: '美院象山校区', to: '西溪湿地', time: '50min' }] },
+            { time: '11:00', activity: '西溪湿地摇橹船', cost: '¥100', note: '摇橹船¥100/船(6人)，湿地公园门票¥80含电瓶船', tags: [{ type: 'buy', text: '🎫 购票', name: '西溪湿地', ticketType: '门票+船票', price: 180 }, { type: 'crowd-green', text: '🟢 工作日包船体验极佳' }, { type: 'tip', text: '🌧️ 雨天摇橹船别有韵味，且人更少' }] },
+            { transit: [{ mode: '步行', from: '西溪湿地', to: '杭州东站', time: '—' }, { mode: '打车', from: '西溪湿地', to: '杭州东站', time: '25min' }, { mode: '地铁', from: '西溪湿地', to: '杭州东站', time: '40min' }] },
+            { time: '14:30', activity: '返程 · 杭州东站出发', cost: '¥263', note: '杭州东→上海虹桥 高铁二等座¥73/人，约1小时', tags: [{ type: 'buy', text: '🎫 购票', name: '返程高铁', ticketType: '交通', price: 263 }] }
+          ]
+        }
+      ]
+    },
+    {
+      title: '杭州 · 文艺深度路线',
+      subtitle: '3天2晚 · 文艺游 · 2人 · ¥1,400起',
+      heroImg: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&h=300&fit=crop',
+      totalCost: 1400,
+      paidItems: [
+        { name: '南宋御街民宿', type: '住宿', price: 380, day: 1 },
+        { name: '知味观午餐', type: '餐饮', price: 120, day: 1 },
+        { name: '外婆家晚餐', type: '餐饮', price: 150, day: 2 },
+        { name: '返程高铁', type: '交通', price: 263, day: 3 }
+      ],
+      shareBody: '🏖️ 杭州·文艺深度路线\n💰 预算 ¥1,400/人 | ⏱️ 3天2晚\n📍 Day1: 南宋御街→省博→知味观→北山街\n📍 Day2: 良渚博物院→晓书馆→西溪慢生活\n📍 Day3: 丝绸博物馆→中国美院→返程\n#LittlePony #杭州旅行 #文艺深度',
+      days: [
+        { label: '宋韵寻踪', weather: '☀️ 27°C 晴 · 👕 轻薄衬衫', cost: 500,
+          items: [
+            { time: '10:00', activity: '南宋御街漫步，入住御街旁民宿', cost: '¥380', note: '推荐南宋御街附近精品民宿，步行可达西湖', tags: [{ type: 'buy', text: '🎫 预订', name: '南宋御街民宿', ticketType: '住宿', price: 380 }] },
+            { transit: [{ mode: '步行', from: '南宋御街', to: '省博', time: '15min' }, { mode: '打车', from: '南宋御街', to: '省博', time: '5min' }] },
+            { time: '11:30', activity: '浙江省博物馆武林馆区', cost: '免费', note: '镇馆之宝：十里红妆、万工轿，需公众号预约', tags: [{ type: 'crowd-green', text: '🟢 工作日人少' }, { type: 'tip', text: '📱 提前在「浙江博物馆」公众号预约' }] },
+            { transit: [{ mode: '步行', from: '省博', to: '知味观', time: '8min' }] },
+            { time: '13:00', activity: '知味观(总店)午餐', cost: '¥120', note: '小笼包¥28/笼、猫耳朵¥18、片儿川¥22', tags: [{ type: 'buy', text: '🎫 预订', name: '知味观午餐', ticketType: '餐饮', price: 120 }, { type: 'tip', text: '📍 总店在仁和路，不是景区分店' }] },
+            { transit: [{ mode: '步行', from: '知味观', to: '北山街', time: '15min' }] },
+            { time: '15:00', activity: '北山街历史街区漫步', cost: '免费', note: '民国外交官旧宅群、新新饭店、秋水山庄', tags: [{ type: 'crowd-green', text: '🟢 游客很少知道' }] }
+          ]
+        },
+        { label: '良渚文明', weather: '⛅ 25°C 多云 · 👕 薄外套', cost: 350,
+          items: [
+            { time: '09:00', activity: '良渚博物院', cost: '免费', note: '大卫·奇普菲尔德设计，良渚文明五千年，需预约', tags: [{ type: 'tip', text: '📱 提前在「良渚博物院」公众号预约' }] },
+            { transit: [{ mode: '打车', from: '良渚博物院', to: '晓书馆', time: '15min' }] },
+            { time: '12:00', activity: '晓书馆(良渚文化村)', cost: '免费', note: '高晓松创办，落地窗面朝大屋顶，免费需预约', tags: [{ type: 'crowd-green', text: '🟢 安静读书好去处' }] },
+            { transit: [{ mode: '打车', from: '晓书馆', to: '西溪', time: '20min' }] },
+            { time: '15:00', activity: '西溪湿地慢生活街区', cost: '免费', note: '不用买门票的区域，慢生活街区免费漫步', tags: [{ type: 'tip', text: '☕ 福堤茶室品茶¥30/位起' }] },
+            { transit: [{ mode: '打车', from: '西溪', to: '外婆家', time: '15min' }] },
+            { time: '18:00', activity: '外婆家(西溪天堂店)晚餐', cost: '¥150', note: '茶香鸡¥38、麻婆豆腐¥8、西湖醋鱼¥68', tags: [{ type: 'buy', text: '🎫 预订', name: '外婆家晚餐', ticketType: '餐饮', price: 150 }] }
+          ]
+        },
+        { label: '丝绸美院', weather: '🌧️ 23°C 阵雨 · 🧥 薄外套+伞', cost: 550,
+          items: [
+            { time: '09:00', activity: '中国丝绸博物馆', cost: '免费', note: '最大丝绸专业博物馆，丝路故事常设展', tags: [{ type: 'tip', text: '👗 可试穿汉服拍照¥50' }] },
+            { transit: [{ mode: '打车', from: '丝绸博物馆', to: '中国美院', time: '15min' }] },
+            { time: '11:30', activity: '中国美术学院象山校区', cost: '免费', note: '王澍设计，普利兹克奖建筑群，校门登记入校', tags: [{ type: 'crowd-green', text: '🟢 几乎无游客' }] },
+            { transit: [{ mode: '打车', from: '中国美院', to: '杭州东站', time: '25min' }, { mode: '地铁', from: '中国美院', to: '杭州东站', time: '45min' }] },
+            { time: '14:30', activity: '返程 · 杭州东站出发', cost: '¥263', note: '杭州东→上海虹桥 高铁二等座¥73/人', tags: [{ type: 'buy', text: '🎫 购票', name: '返程高铁', ticketType: '交通', price: 263 }] }
+          ]
+        }
+      ]
+    },
+    {
+      title: '杭州 · 特种兵打卡',
+      subtitle: '2天1晚 · 特种兵 · 2人 · ¥680起',
+      heroImg: 'https://images.unsplash.com/photo-1534190239940-9ba8944ea261?w=600&h=300&fit=crop',
+      totalCost: 680,
+      paidItems: [
+        { name: '青旅/快捷酒店', type: '住宿', price: 150, day: 1 },
+        { name: '灵隐寺', type: '门票', price: 75, day: 1 },
+        { name: '河坊街小吃', type: '餐饮', price: 60, day: 1 },
+        { name: '湘湖游船', type: '门票+船票', price: 80, day: 2 },
+        { name: '返程高铁', type: '交通', price: 263, day: 2 }
+      ],
+      shareBody: '🏖️ 杭州·特种兵打卡\n💰 预算 ¥680/人 | ⏱️ 2天1晚\n📍 Day1: 灵隐寺→龙井→九溪→河坊街→西湖喷泉\n📍 Day2: 西湖环湖→湘湖→返程\n#LittlePony #杭州旅行 #特种兵',
+      days: [
+        { label: '西湖+灵隐', weather: '☀️ 28°C 晴 · 👕 速干T恤', cost: 285,
+          items: [
+            { time: '07:00', activity: '灵隐寺 + 飞来峰', cost: '¥75', note: '飞来峰¥45+香花券¥30，趁早避开旅游团', tags: [{ type: 'buy', text: '🎫 购票', name: '灵隐寺', ticketType: '门票', price: 75 }, { type: 'tip', text: '🌅 7点开门即到，拍照绝佳' }] },
+            { transit: [{ mode: '打车', from: '灵隐寺', to: '龙井村', time: '10min' }, { mode: '公交', from: '灵隐寺', to: '龙井村', time: '25min' }] },
+            { time: '10:00', activity: '龙井村 + 九溪烟树', cost: '免费', note: '龙井漫步+九溪徒步，全程约5km', tags: [{ type: 'tip', text: '👟 穿运动鞋，九溪踩水很舒服' }] },
+            { transit: [{ mode: '打车', from: '九溪', to: '河坊街', time: '20min' }, { mode: '公交', from: '九溪', to: '河坊街', time: '40min' }] },
+            { time: '13:00', activity: '河坊街觅食', cost: '¥60', note: '葱包桧¥8、片儿川¥22、定胜糕¥5', tags: [{ type: 'avoid', text: '🚫 特产店别买，义乌批发货' }] },
+            { transit: [{ mode: '步行', from: '河坊街', to: '西湖', time: '10min' }] },
+            { time: '15:00', activity: '西湖环湖(断桥→白堤→苏堤)', cost: '免费', note: '环湖步行约10km，也可骑共享单车', tags: [{ type: 'tip', text: '🚲 共享单车环湖更轻松' }] },
+            { transit: [{ mode: '步行', from: '苏堤', to: '湖滨', time: '15min' }] },
+            { time: '19:30', activity: '西湖音乐喷泉', cost: '免费', note: '湖滨三公园，每场约15分钟', tags: [{ type: 'crowd-yellow', text: '🟡 提前30分钟占位' }] }
+          ]
+        },
+        { label: '湘湖+返程', weather: '⛅ 26°C 多云 · 👕 透气T恤', cost: 395,
+          items: [
+            { time: '09:00', activity: '湘湖游船', cost: '¥80', note: '西湖姊妹湖，游船¥80含门票，人少景美', tags: [{ type: 'buy', text: '🎫 购票', name: '湘湖游船', ticketType: '门票+船票', price: 80 }, { type: 'crowd-green', text: '🟢 游客很少，比西湖清静' }] },
+            { transit: [{ mode: '打车', from: '湘湖', to: '杭州东站', time: '25min' }, { mode: '地铁', from: '湘湖', to: '杭州东站', time: '35min' }] },
+            { time: '13:00', activity: '返程 · 杭州东站出发', cost: '¥263', note: '杭州东→上海虹桥 高铁二等座¥73/人', tags: [{ type: 'buy', text: '🎫 购票', name: '返程高铁', ticketType: '交通', price: 263 }] }
+          ]
+        }
+      ]
+    }
+  ],
+  '北京': [
+    {
+      title: '北京 · 皇城文化深度游',
+      subtitle: '5天4晚 · 文化游 · 2人 · ¥3,800起',
+      heroImg: 'https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=600&h=300&fit=crop',
+      totalCost: 3800,
+      paidItems: [
+        { name: '王府井酒店', type: '住宿', price: 500, day: 1 },
+        { name: '全聚德烤鸭', type: '餐饮', price: 200, day: 1 },
+        { name: '故宫', type: '门票', price: 60, day: 2 },
+        { name: '景山公园', type: '门票', price: 2, day: 2 },
+        { name: '八达岭长城', type: '门票+交通', price: 80, day: 3 },
+        { name: '颐和园', type: '门票', price: 30, day: 4 },
+        { name: '圆明园', type: '门票', price: 10, day: 4 },
+        { name: '返程高铁', type: '交通', price: 553, day: 5 }
+      ],
+      shareBody: '🏖️ 北京·皇城文化深度游\n💰 预算 ¥3,800/人 | ⏱️ 5天4晚\n📍 Day1: 天安门→王府井→全聚德\n📍 Day2: 故宫→景山→南锣鼓巷\n📍 Day3: 八达岭长城→鸟巢水立方\n📍 Day4: 颐和园→圆明园→清华北大\n📍 Day5: 天坛→返程\n#LittlePony #北京旅行 #故宫长城',
+      days: [
+        { label: '皇城初见', weather: '⛅ 26°C 多云 · 👕 薄长袖+防晒', cost: 700,
+          items: [
+            { time: '12:00', activity: '抵达北京南站，入住王府井酒店', cost: '¥500', note: '推荐王府井/东单附近，步行可达天安门', tags: [{ type: 'buy', text: '🎫 预订', name: '王府井酒店', ticketType: '住宿', price: 500 }] },
+            { transit: [{ mode: '步行', from: '王府井', to: '天安门', time: '15min' }, { mode: '地铁', from: '王府井', to: '天安门', time: '5min' }] },
+            { time: '14:00', activity: '天安门广场', cost: '免费', note: '需携带身份证过安检，建议下午去避开升旗人流', tags: [{ type: 'tip', text: '📱 提前1天在「天安门广场预约参观」小程序预约' }] },
+            { transit: [{ mode: '步行', from: '天安门', to: '王府井', time: '10min' }] },
+            { time: '16:00', activity: '王府井步行街闲逛', cost: '免费', note: '百货大楼+和平菓局(地下老北京街景)', tags: [{ type: 'tip', text: '📍 和平菓局免费，拍照很出片' }] },
+            { transit: [{ mode: '步行', from: '王府井', to: '全聚德', time: '5min' }] },
+            { time: '18:00', activity: '全聚德烤鸭(王府井店)', cost: '¥200', note: '整只烤鸭¥238/只，2人半只即可，人均¥100', tags: [{ type: 'buy', text: '🎫 预订', name: '全聚德烤鸭', ticketType: '餐饮', price: 200 }, { type: 'tip', text: '📍 便宜坊焖炉烤鸭更地道，本地人更爱' }, { type: 'avoid', text: '🚫 王府井小吃街贵且不正宗' }] }
+          ]
+        },
+        { label: '故宫探秘', weather: '☀️ 28°C 晴 · 👕 防晒+帽子+舒适鞋', cost: 262,
+          items: [
+            { time: '08:30', activity: '故宫博物院', cost: '¥60', note: '旺季¥60，淡季¥40，必须提前7天抢票', tags: [{ type: 'buy', text: '🎫 购票', name: '故宫', ticketType: '门票', price: 60 }, { type: 'tip', text: '📱 提前7天20:00在「故宫博物院」小程序抢票' }, { type: 'avoid', text: '🚫 故宫周一闭馆，别跑空' }, { type: 'crowd-red', text: '🔴 8:30开门即排队，越早越好' }] },
+            { transit: [{ mode: '步行', from: '故宫神武门', to: '景山公园', time: '5min' }] },
+            { time: '12:30', activity: '景山公园万春亭', cost: '¥2', note: '俯瞰故宫全景最佳位置，2元门票', tags: [{ type: 'buy', text: '🎫 购票', name: '景山公园', ticketType: '门票', price: 2 }, { type: 'tip', text: '📸 万春亭拍故宫全景是经典机位' }] },
+            { transit: [{ mode: '打车', from: '景山', to: '南锣鼓巷', time: '10min' }, { mode: '地铁', from: '景山', to: '南锣鼓巷', time: '15min' }] },
+            { time: '14:00', activity: '南锣鼓巷 + 胡同漫步', cost: '¥50', note: '文宇奶酪¥15/份、炸酱面¥25/碗', tags: [{ type: 'tip', text: '📍 别只走主街，钻东西两侧胡同更有味道' }, { type: 'avoid', text: '🚫 南锣主街小吃溢价严重' }] },
+            { transit: [{ mode: '打车', from: '南锣鼓巷', to: '什刹海', time: '5min' }] },
+            { time: '17:00', activity: '什刹海 + 后海酒吧街', cost: '¥50', note: '傍晚湖边散步，后海灯笼亮起很美', tags: [{ type: 'tip', text: '🌙 后海夜景比白天美' }, { type: 'avoid', text: '🚫 后海酒吧酒托多，别跟拉客的走' }] }
+          ]
+        },
+        { label: '长城豪情', weather: '☀️ 30°C 晴 · 👕 防晒全套+运动鞋', cost: 580,
+          items: [
+            { time: '06:30', activity: '八达岭长城', cost: '¥80', note: '门票¥40+877路公交¥12往返，缆车单程¥100', tags: [{ type: 'buy', text: '🎫 购票', name: '八达岭长城', ticketType: '门票+交通', price: 80 }, { type: 'tip', text: '🚌 德胜门坐877路直达，别坐黑车' }, { type: 'avoid', text: '🚫 景区门口"热心人"带路全是购物点' }] },
+            { transit: [{ mode: '公交', from: '八达岭', to: '市区', time: '90min' }] },
+            { time: '14:00', activity: '回城休整', cost: '免费', note: '爬长城很累，建议回酒店休息', tags: [{ type: 'tip', text: '💡 长城回程很堵，下午2点前下山' }] },
+            { transit: [{ mode: '地铁', from: '市区', to: '奥体中心', time: '20min' }] },
+            { time: '18:00', activity: '鸟巢+水立方(外景)', cost: '免费', note: '夜景免费看，内部参观需购票', tags: [{ type: 'tip', text: '🌙 天黑后灯光最美，不用买票进内场' }, { type: 'avoid', text: '🚫 鸟巢内部参观¥50不值' }] }
+          ]
+        },
+        { label: '皇家园林', weather: '⛅ 27°C 多云 · 👕 轻薄长袖', cost: 640,
+          items: [
+            { time: '08:00', activity: '颐和园', cost: '¥30', note: '联票¥60含苏州街等，单独门票¥30即可', tags: [{ type: 'buy', text: '🎫 购票', name: '颐和园', ticketType: '门票', price: 30 }, { type: 'tip', text: '🌅 早上人少，从北宫门进人最少' }, { type: 'avoid', text: '🚫 昆明湖游船¥100/人，不如步行沿湖' }] },
+            { transit: [{ mode: '步行', from: '颐和园', to: '圆明园', time: '15min' }] },
+            { time: '12:00', activity: '圆明园遗址公园', cost: '¥10', note: '大水法遗址是必看，西洋楼遗址区另收¥15', tags: [{ type: 'buy', text: '🎫 购票', name: '圆明园', ticketType: '门票', price: 10 }, { type: 'tip', text: '📸 大水法最佳拍照时间是正午' }] },
+            { transit: [{ mode: '打车', from: '圆明园', to: '清华北大', time: '10min' }] },
+            { time: '15:00', activity: '清华大学/北京大学', cost: '免费', note: '需提前预约入校，清华二校门+北大未名湖', tags: [{ type: 'tip', text: '📱 提前在「参观清华」「参观北大」小程序预约' }] },
+            { transit: [{ mode: '地铁', from: '北大', to: '五道口', time: '10min' }] },
+            { time: '18:00', activity: '五道口枣糕王+附近晚餐', cost: '¥50', note: '枣糕¥10/份，韩式烤肉人均¥80', tags: [{ type: 'tip', text: '🍞 枣糕王排队但值得' }] }
+          ]
+        },
+        { label: '天坛+返程', weather: '⛅ 25°C 多云 · 👕 舒适穿搭', cost: 1618,
+          items: [
+            { time: '08:00', activity: '天坛公园', cost: '¥34', note: '联票¥34含祈年殿，公园门票¥15', tags: [{ type: 'tip', text: '🌅 早上回音壁人少' }, { type: 'avoid', text: '🚫 天坛周边"一日游"全是购物团' }] },
+            { transit: [{ mode: '打车', from: '天坛', to: '北京南站', time: '20min' }, { mode: '地铁', from: '天坛', to: '北京南站', time: '25min' }] },
+            { time: '13:00', activity: '返程 · 北京南站出发', cost: '¥553', note: '北京南→上海虹桥 高铁二等座¥553/人', tags: [{ type: 'buy', text: '🎫 购票', name: '返程高铁', ticketType: '交通', price: 553 }] }
+          ]
+        }
+      ]
+    },
+    {
+      title: '北京 · 美食打卡',
+      subtitle: '4天3晚 · 美食游 · 2人 · ¥2,800起',
+      heroImg: 'https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=600&h=300&fit=crop',
+      totalCost: 2800,
+      paidItems: [
+        { name: '前门酒店', type: '住宿', price: 400, day: 1 },
+        { name: '四季民福烤鸭', type: '餐饮', price: 180, day: 1 },
+        { name: '故宫', type: '门票', price: 60, day: 2 },
+        { name: '护国寺小吃', type: '餐饮', price: 50, day: 2 },
+        { name: '八达岭长城', type: '门票+交通', price: 80, day: 3 },
+        { name: '涮羊肉', type: '餐饮', price: 150, day: 3 },
+        { name: '返程高铁', type: '交通', price: 553, day: 4 }
+      ],
+      shareBody: '🏖️ 北京·美食打卡\n💰 预算 ¥2,800/人 | ⏱️ 4天3晚\n📍 Day1: 前门→四季民福→大栅栏\n📍 Day2: 故宫→护国寺小吃→后海\n📍 Day3: 长城→涮羊肉→簋街\n📍 Day4: 天坛→牛街→返程\n#LittlePony #北京旅行 #美食打卡',
+      days: [
+        { label: '烤鸭前门', weather: '⛅ 26°C 多云 · 👕 薄长袖', cost: 580,
+          items: [
+            { time: '11:00', activity: '入住前门附近酒店', cost: '¥400', note: '前门/大栅栏附近，吃喝方便', tags: [{ type: 'buy', text: '🎫 预订', name: '前门酒店', ticketType: '住宿', price: 400 }] },
+            { transit: [{ mode: '步行', from: '前门', to: '四季民福', time: '10min' }] },
+            { time: '12:00', activity: '四季民福烤鸭(故宫店)', cost: '¥180', note: '人均¥90，比全聚德性价比高，本地人常去', tags: [{ type: 'buy', text: '🎫 预订', name: '四季民福烤鸭', ticketType: '餐饮', price: 180 }, { type: 'tip', text: '📍 故宫店靠窗位可看故宫角楼' }] },
+            { transit: [{ mode: '步行', from: '四季民福', to: '大栅栏', time: '10min' }] },
+            { time: '15:00', activity: '大栅栏 + 琉璃厂', cost: '免费', note: '老字号一条街，同仁堂+瑞蚨祥', tags: [{ type: 'tip', text: '📚 琉璃厂古书街，文青必逛' }] }
+          ]
+        },
+        { label: '故宫+小吃', weather: '☀️ 28°C 晴 · 👕 防晒+舒适鞋', cost: 410,
+          items: [
+            { time: '08:30', activity: '故宫博物院', cost: '¥60', note: '必须提前7天抢票', tags: [{ type: 'buy', text: '🎫 购票', name: '故宫', ticketType: '门票', price: 60 }, { type: 'tip', text: '📱 提前7天20:00抢票' }] },
+            { transit: [{ mode: '地铁', from: '故宫', to: '护国寺', time: '20min' }] },
+            { time: '12:30', activity: '护国寺小吃街', cost: '¥50', note: '豆汁¥3/碗(慎点！)、驴打滚¥8、艾窝窝¥5、面茶¥8', tags: [{ type: 'buy', text: '🎫 预订', name: '护国寺小吃', ticketType: '餐饮', price: 50 }, { type: 'tip', text: '📍 护国寺是北京人自己的小吃街' }, { type: 'avoid', text: '🚫 豆汁味道很冲，先买小碗试试' }] },
+            { transit: [{ mode: '打车', from: '护国寺', to: '后海', time: '10min' }] },
+            { time: '16:00', activity: '后海+烟袋斜街', cost: '免费', note: '银锭桥看西山，烟袋斜街逛文创', tags: [{ type: 'tip', text: '🌙 傍晚后海最美' }] }
+          ]
+        },
+        { label: '长城+涮肉', weather: '☀️ 30°C 晴 · 👕 防晒+运动鞋', cost: 530,
+          items: [
+            { time: '06:30', activity: '八达岭长城', cost: '¥80', note: '德胜门877路直达', tags: [{ type: 'buy', text: '🎫 购票', name: '八达岭长城', ticketType: '门票+交通', price: 80 }, { type: 'tip', text: '🚌 6:30到德胜门排877路' }] },
+            { transit: [{ mode: '公交', from: '八达岭', to: '市区', time: '90min' }] },
+            { time: '16:00', activity: '聚宝源涮羊肉(牛街总店)', cost: '¥150', note: '手切鲜羊肉¥48/盘，麻酱蘸料绝配，人均¥75', tags: [{ type: 'buy', text: '🎫 预订', name: '涮羊肉', ticketType: '餐饮', price: 150 }, { type: 'tip', text: '📍 牛街总店最正宗' }] },
+            { transit: [{ mode: '打车', from: '牛街', to: '簋街', time: '15min' }] },
+            { time: '19:00', activity: '簋街夜宵', cost: '¥50', note: '小龙虾+烤串，北京最热闹夜宵街', tags: [{ type: 'tip', text: '🦞 簋街小龙虾5月起最肥' }] }
+          ]
+        },
+        { label: '天坛+返程', weather: '⛅ 25°C 多云 · 👕 舒适穿搭', cost: 1280,
+          items: [
+            { time: '08:00', activity: '天坛公园', cost: '¥34', note: '联票含祈年殿', tags: [{ type: 'tip', text: '🌅 早上回音壁人少' }] },
+            { transit: [{ mode: '打车', from: '天坛', to: '牛街', time: '10min' }] },
+            { time: '11:00', activity: '牛街清真超市+白记年糕', cost: '¥30', note: '驴打滚¥8、豌豆黄¥8、糖卷果¥12', tags: [{ type: 'tip', text: '📍 牛街是北京最地道的清真美食街' }] },
+            { transit: [{ mode: '地铁', from: '牛街', to: '北京南站', time: '20min' }] },
+            { time: '14:00', activity: '返程 · 北京南站出发', cost: '¥553', note: '北京南→上海虹桥 高铁¥553/人', tags: [{ type: 'buy', text: '🎫 购票', name: '返程高铁', ticketType: '交通', price: 553 }] }
+          ]
+        }
+      ]
+    }
+  ],
+  '成都': [
+    {
+      title: '成都 · 熊猫美食之旅',
+      subtitle: '4天3晚 · 休闲游 · 2人 · ¥2,600起',
+      heroImg: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&h=300&fit=crop',
+      totalCost: 2600,
+      paidItems: [
+        { name: '春熙路酒店', type: '住宿', price: 450, day: 1 },
+        { name: '大龙燚火锅', type: '餐饮', price: 180, day: 1 },
+        { name: '熊猫基地', type: '门票', price: 55, day: 2 },
+        { name: '宽窄巷小吃', type: '餐饮', price: 80, day: 2 },
+        { name: '都江堰', type: '门票', price: 80, day: 3 },
+        { name: '陈麻婆豆腐', type: '餐饮', price: 120, day: 3 },
+        { name: '返程高铁', type: '交通', price: 263, day: 4 }
+      ],
+      shareBody: '🏖️ 成都·熊猫美食之旅\n💰 预算 ¥2,600/人 | ⏱️ 4天3晚\n📍 Day1: 春熙路→太古里→大龙燚火锅\n📍 Day2: 熊猫基地→宽窄巷→锦里\n📍 Day3: 都江堰→陈麻婆→人民公园\n📍 Day4: 文殊院→返程\n#LittlePony #成都旅行 #熊猫美食',
+      days: [
+        { label: '潮流成都', weather: '🌧️ 22°C 阵雨 · 👕 短袖+薄外套', cost: 630,
+          items: [
+            { time: '12:00', activity: '抵达成都东站，入住春熙路酒店', cost: '¥450', note: '推荐春熙路/太古里附近，出行方便', tags: [{ type: 'buy', text: '🎫 预订', name: '春熙路酒店', ticketType: '住宿', price: 450 }] },
+            { transit: [{ mode: '步行', from: '春熙路', to: '太古里', time: '5min' }] },
+            { time: '14:00', activity: '成都远洋太古里 + IFS', cost: '免费', note: 'IFS屋顶大熊猫打卡，太古里逛潮店', tags: [{ type: 'crowd-yellow', text: '🟡 周末人较多' }] },
+            { transit: [{ mode: '步行', from: '太古里', to: '大龙燚', time: '10min' }] },
+            { time: '18:00', activity: '大龙燚火锅(春熙路店)', cost: '¥180', note: '人均¥90，推荐：牛油锅底、毛肚、鹅肠、酥肉', tags: [{ type: 'buy', text: '🎫 预订', name: '大龙燚火锅', ticketType: '餐饮', price: 180 }, { type: 'avoid', text: '🚫 景区出租车不打表，用网约车' }] }
+          ]
+        },
+        { label: '熊猫+古街', weather: '⛅ 24°C 多云 · 👕 透气T恤', cost: 415,
+          items: [
+            { time: '07:30', activity: '成都大熊猫繁育研究基地', cost: '¥55', note: '门票¥55，7:30开门，上午熊猫最活跃', tags: [{ type: 'buy', text: '🎫 购票', name: '熊猫基地', ticketType: '门票', price: 55 }, { type: 'tip', text: '🌅 8点前到，幼年熊猫9点后睡觉' }, { type: 'avoid', text: '🚫 别跟园内付费拍照，坑' }] },
+            { transit: [{ mode: '打车', from: '熊猫基地', to: '宽窄巷子', time: '25min' }, { mode: '地铁', from: '熊猫基地', to: '宽窄巷子', time: '40min' }] },
+            { time: '11:30', activity: '宽窄巷子漫步', cost: '¥80', note: '三大炮¥10、甜水面¥8、蛋烘糕¥5', tags: [{ type: 'crowd-yellow', text: '🟡 下午人多，建议中午去' }, { type: 'avoid', text: '🚫 宽窄巷餐饮贵且不地道，吃小吃即可' }] },
+            { transit: [{ mode: '打车', from: '宽窄巷子', to: '锦里', time: '10min' }] },
+            { time: '16:00', activity: '锦里古街', cost: '免费', note: '三国文化主题街，灯笼夜景很美', tags: [{ type: 'tip', text: '🌙 傍晚灯笼亮起时最美' }, { type: 'avoid', text: '🚫 锦里小吃比宽窄巷更贵' }] }
+          ]
+        },
+        { label: '都江堰', weather: '☀️ 26°C 晴 · 👕 防晒+帽子', cost: 700,
+          items: [
+            { time: '07:30', activity: '都江堰景区', cost: '¥80', note: '世界遗产，鱼嘴分水堤+飞沙堰+宝瓶口', tags: [{ type: 'buy', text: '🎫 购票', name: '都江堰', ticketType: '门票', price: 80 }, { type: 'tip', text: '⏰ 早上人少，约2.5小时游览' }] },
+            { transit: [{ mode: '打车', from: '都江堰', to: '成都', time: '60min' }, { mode: '地铁', from: '都江堰', to: '成都', time: '70min' }] },
+            { time: '13:00', activity: '陈麻婆豆腐(骡马市店)', cost: '¥120', note: '麻婆豆腐¥38、宫保鸡丁¥42、担担面¥18', tags: [{ type: 'buy', text: '🎫 预订', name: '陈麻婆豆腐', ticketType: '餐饮', price: 120 }] },
+            { transit: [{ mode: '步行', from: '陈麻婆', to: '人民公园', time: '10min' }] },
+            { time: '15:00', activity: '人民公园鹤鸣茶社', cost: '¥30', note: '盖碗茶¥15-30，体验成都人掏耳朵+喝茶', tags: [{ type: 'tip', text: '🍵 下午茶位紧张，建议3点前到' }] }
+          ]
+        },
+        { label: '文殊+返程', weather: '⛅ 25°C 多云 · 👕 长袖薄衫', cost: 855,
+          items: [
+            { time: '09:00', activity: '文殊院', cost: '免费', note: '千年古刹，香火旺盛，院内有素斋¥15', tags: [{ type: 'tip', text: '🍜 文殊院素斋11:00开餐，早到排队' }, { type: 'avoid', text: '🚫 院外"算命先生"全是骗子' }] },
+            { transit: [{ mode: '打车', from: '文殊院', to: '成都东站', time: '20min' }, { mode: '地铁', from: '文殊院', to: '成都东站', time: '30min' }] },
+            { time: '13:00', activity: '返程 · 成都东站出发', cost: '¥263', note: '成都东→上海虹桥 高铁二等座¥263/人', tags: [{ type: 'buy', text: '🎫 购票', name: '返程高铁', ticketType: '交通', price: 263 }] }
+          ]
+        }
+      ]
+    },
+    {
+      title: '成都 · 慢生活路线',
+      subtitle: '3天2晚 · 休闲游 · 2人 · ¥1,800起',
+      heroImg: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&h=300&fit=crop',
+      totalCost: 1800,
+      paidItems: [
+        { name: '宽窄巷民宿', type: '住宿', price: 380, day: 1 },
+        { name: '小龙坎火锅', type: '餐饮', price: 160, day: 1 },
+        { name: '熊猫基地', type: '门票', price: 55, day: 2 },
+        { name: '马路边边串串', type: '餐饮', price: 80, day: 2 },
+        { name: '返程高铁', type: '交通', price: 263, day: 3 }
+      ],
+      shareBody: '🏖️ 成都·慢生活路线\n💰 预算 ¥1,800/人 | ⏱️ 3天2晚\n📍 Day1: 宽窄巷→人民公园→小龙坎\n📍 Day2: 熊猫基地→东郊记忆→串串\n📍 Day3: 文殊院→茶馆→返程\n#LittlePony #成都旅行 #慢生活',
+      days: [
+        { label: '古街慢行', weather: '🌧️ 22°C 阵雨 · 👕 短袖+薄外套', cost: 540,
+          items: [
+            { time: '11:00', activity: '入住宽窄巷旁民宿', cost: '¥380', note: '推荐宽窄巷附近民宿，步行逛古街', tags: [{ type: 'buy', text: '🎫 预订', name: '宽窄巷民宿', ticketType: '住宿', price: 380 }] },
+            { transit: [{ mode: '步行', from: '宽窄巷', to: '人民公园', time: '15min' }] },
+            { time: '14:00', activity: '人民公园鹤鸣茶社', cost: '¥30', note: '盖碗茶¥15-30，成都人最爱的下午', tags: [{ type: 'tip', text: '🍵 躺竹椅喝茶才是成都慢生活' }] },
+            { transit: [{ mode: '打车', from: '人民公园', to: '小龙坎', time: '10min' }] },
+            { time: '18:00', activity: '小龙坎火锅(春熙路店)', cost: '¥160', note: '人均¥80，推荐牛油锅底、毛肚、鹅肠', tags: [{ type: 'buy', text: '🎫 预订', name: '小龙坎火锅', ticketType: '餐饮', price: 160 }] }
+          ]
+        },
+        { label: '熊猫+文创', weather: '⛅ 24°C 多云 · 👕 透气T恤', cost: 435,
+          items: [
+            { time: '07:30', activity: '成都大熊猫繁育研究基地', cost: '¥55', note: '7:30开门，上午熊猫活跃', tags: [{ type: 'buy', text: '🎫 购票', name: '熊猫基地', ticketType: '门票', price: 55 }, { type: 'tip', text: '🌅 8点前到看幼年熊猫' }] },
+            { transit: [{ mode: '打车', from: '熊猫基地', to: '东郊记忆', time: '20min' }] },
+            { time: '12:00', activity: '东郊记忆文创园', cost: '免费', note: '老工厂改造文创园，拍照打卡胜地', tags: [{ type: 'crowd-green', text: '🟢 工作日人少' }] },
+            { transit: [{ mode: '打车', from: '东郊记忆', to: '马路边边', time: '10min' }] },
+            { time: '18:00', activity: '马路边边串串香', cost: '¥80', note: '人均¥40，串串按签签算，便宜又好吃', tags: [{ type: 'buy', text: '🎫 预订', name: '马路边边串串', ticketType: '餐饮', price: 80 }] }
+          ]
+        },
+        { label: '文殊+返程', weather: '⛅ 25°C 多云 · 👕 长袖薄衫', cost: 825,
+          items: [
+            { time: '09:00', activity: '文殊院', cost: '免费', note: '千年古刹，素斋¥15/位', tags: [{ type: 'tip', text: '🍜 11点素斋开餐' }] },
+            { transit: [{ mode: '打车', from: '文殊院', to: '成都东站', time: '20min' }, { mode: '地铁', from: '文殊院', to: '成都东站', time: '30min' }] },
+            { time: '13:00', activity: '返程 · 成都东站出发', cost: '¥263', note: '成都东→上海虹桥 高铁¥263/人', tags: [{ type: 'buy', text: '🎫 购票', name: '返程高铁', ticketType: '交通', price: 263 }] }
+          ]
+        }
+      ]
+    }
+  ],
+  '大理': [
+    {
+      title: '大理 · 风花雪月慢时光',
+      subtitle: '5天4晚 · 休闲游 · 2人 · ¥3,200起',
+      heroImg: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&h=300&fit=crop',
+      totalCost: 3200,
+      paidItems: [
+        { name: '古城客栈', type: '住宿', price: 400, day: 1 },
+        { name: '苍山索道', type: '门票', price: 120, day: 2 },
+        { name: '洱海游船', type: '船票', price: 150, day: 3 },
+        { name: '双廊海景民宿', type: '住宿', price: 500, day: 3 },
+        { name: '喜洲扎染体验', type: '体验', price: 80, day: 4 },
+        { name: '返程机票', type: '交通', price: 800, day: 5 }
+      ],
+      shareBody: '🏖️ 大理·风花雪月慢时光\n💰 预算 ¥3,200/人 | ⏱️ 5天4晚\n📍 Day1: 大理古城→洋人街\n📍 Day2: 苍山索道→天龙八部城\n📍 Day3: 洱海游船→双廊\n📍 Day4: 喜洲古镇→扎染体验\n📍 Day5: 返程\n#LittlePony #大理旅行 #洱海',
+      days: [
+        { label: '古城初探', weather: '🌤️ 24°C 舒适 · 👕 薄长袖+防晒', cost: 400,
+          items: [
+            { time: '12:00', activity: '抵达大理，入住古城客栈', cost: '¥400', note: '推荐人民路旁白族风格客栈', tags: [{ type: 'buy', text: '🎫 预订', name: '古城客栈', ticketType: '住宿', price: 400 }] },
+            { transit: [{ mode: '步行', from: '客栈', to: '古城', time: '5min' }] },
+            { time: '14:00', activity: '大理古城漫步', cost: '免费', note: '人民路+复兴路+洋人街', tags: [{ type: 'crowd-yellow', text: '🟡 下午人流适中' }, { type: 'avoid', text: '🚫 银饰别在古城买，水很深' }] },
+            { transit: [{ mode: '步行', from: '古城', to: '洋人街', time: '5min' }] },
+            { time: '19:00', activity: '洋人街夜生活', cost: '¥50', note: '小酒馆坐坐，感受大理文艺氛围', tags: [{ type: 'tip', text: '🌙 晚上人民路小摊多' }] }
+          ]
+        },
+        { label: '苍山览胜', weather: '☀️ 22°C 晴 · 👕 防晒外套+帽子', cost: 520,
+          items: [
+            { time: '08:30', activity: '苍山洗马潭索道', cost: '¥120', note: '索道往返¥120，海拔3920米，注意高反', tags: [{ type: 'buy', text: '🎫 购票', name: '苍山索道', ticketType: '门票', price: 120 }, { type: 'tip', text: '🧥 山顶温度低10°C，带厚外套' }] },
+            { transit: [{ mode: '打车', from: '苍山', to: '天龙八部城', time: '15min' }] },
+            { time: '13:00', activity: '天龙八部影视城', cost: '¥50', note: '金庸武侠主题，适合拍照', tags: [{ type: 'tip', text: '📸 穿汉服拍照超好看' }] },
+            { transit: [{ mode: '打车', from: '影视城', to: '古城', time: '10min' }] },
+            { time: '17:00', activity: '古城闲逛+白族菜', cost: '¥80', note: '砂锅鱼¥68、乳扇¥10、饵丝¥15', tags: [{ type: 'avoid', text: '🚫 古城酒吧一条街酒托多' }] }
+          ]
+        },
+        { label: '洱海双廊', weather: '☀️ 25°C 晴 · 👕 防晒+墨镜', cost: 850,
+          items: [
+            { time: '09:00', activity: '洱海游船(下关→双廊)', cost: '¥150', note: '游船约2小时，洱海全景尽收眼底', tags: [{ type: 'buy', text: '🎫 购票', name: '洱海游船', ticketType: '船票', price: 150 }] },
+            { transit: [{ mode: '步行', from: '双廊码头', to: '民宿', time: '10min' }] },
+            { time: '12:00', activity: '入住双廊海景民宿', cost: '¥500', note: '推荐玉几岛海景房，推窗见洱海', tags: [{ type: 'buy', text: '🎫 预订', name: '双廊海景民宿', ticketType: '住宿', price: 500 }, { type: 'tip', text: '🌅 黄昏阳台看日落绝美' }] },
+            { transit: [{ mode: '步行', from: '民宿', to: '南诏风情岛', time: '15min' }] },
+            { time: '15:00', activity: '南诏风情岛', cost: '¥50', note: '洱海中岛屿，杨丽萍艺术酒店', tags: [{ type: 'crowd-yellow', text: '🟡 下午游客较多' }] }
+          ]
+        },
+        { label: '喜洲扎染', weather: '🌤️ 23°C 舒适 · 👕 轻薄长袖', cost: 430,
+          items: [
+            { time: '09:00', activity: '喜洲古镇', cost: '免费', note: '白族民居建筑群，转角楼打卡', tags: [{ type: 'tip', text: '🍞 喜洲粑粑¥5/个，甜咸两种' }] },
+            { transit: [{ mode: '步行', from: '喜洲', to: '周城', time: '15min' }, { mode: '打车', from: '喜洲', to: '周城', time: '5min' }] },
+            { time: '11:00', activity: '周城扎染体验', cost: '¥80', note: '白族扎染非遗，亲手做一块扎染布', tags: [{ type: 'buy', text: '🎫 体验', name: '喜洲扎染体验', ticketType: '体验', price: 80 }] },
+            { transit: [{ mode: '打车', from: '周城', to: '古城', time: '20min' }] },
+            { time: '16:00', activity: '古城买伴手礼+休整', cost: '¥50', note: '推荐：鲜花饼、普洱茶、扎染手帕', tags: [{ type: 'avoid', text: '⚠️ 普洱茶水很深，不懂别买贵的' }] }
+          ]
+        },
+        { label: '返程', weather: '⛅ 24°C 多云 · 👕 舒适穿搭', cost: 1000,
+          items: [
+            { time: '09:00', activity: '古城最后闲逛', cost: '免费', note: '人民路早市买花，最地道的大理早晨', tags: [{ type: 'tip', text: '🌸 早市鲜花¥5一大把' }] },
+            { transit: [{ mode: '打车', from: '古城', to: '大理机场', time: '40min' }] },
+            { time: '13:00', activity: '返程 · 大理机场出发', cost: '¥800', note: '大理→上海 机票约¥800/人', tags: [{ type: 'buy', text: '🎫 购票', name: '返程机票', ticketType: '交通', price: 800 }] }
+          ]
+        }
+      ]
+    },
+    {
+      title: '大理 · 环海骑行',
+      subtitle: '4天3晚 · 户外游 · 2人 · ¥2,500起',
+      heroImg: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&h=300&fit=crop',
+      totalCost: 2500,
+      paidItems: [
+        { name: '古城客栈', type: '住宿', price: 350, day: 1 },
+        { name: '电动车租赁', type: '交通', price: 100, day: 2 },
+        { name: '双廊民宿', type: '住宿', price: 400, day: 2 },
+        { name: '沙溪古镇交通', type: '交通', price: 80, day: 3 },
+        { name: '沙溪客栈', type: '住宿', price: 300, day: 3 },
+        { name: '返程机票', type: '交通', price: 800, day: 4 }
+      ],
+      shareBody: '🏖️ 大理·环海骑行\n💰 预算 ¥2,500/人 | ⏱️ 4天3晚\n📍 Day1: 古城→崇圣寺三塔\n📍 Day2: 环洱海骑行→双廊\n📍 Day3: 沙溪古镇\n📍 Day4: 返程\n#LittlePony #大理旅行 #环洱海',
+      days: [
+        { label: '古城+三塔', weather: '🌤️ 24°C 舒适 · 👕 薄长袖', cost: 650,
+          items: [
+            { time: '12:00', activity: '入住大理古城客栈', cost: '¥350', note: '推荐人民路旁客栈', tags: [{ type: 'buy', text: '🎫 预订', name: '古城客栈', ticketType: '住宿', price: 350 }] },
+            { transit: [{ mode: '打车', from: '古城', to: '三塔', time: '10min' }] },
+            { time: '14:00', activity: '崇圣寺三塔', cost: '¥75', note: '大理地标，三塔倒影经典机位', tags: [{ type: 'tip', text: '📸 三塔倒影池是最佳机位' }] },
+            { transit: [{ mode: '打车', from: '三塔', to: '古城', time: '10min' }] },
+            { time: '17:00', activity: '古城闲逛+白族菜', cost: '¥80', note: '砂锅鱼、乳扇、饵丝', tags: [{ type: 'tip', text: '🌙 夜晚古城灯笼很美' }] }
+          ]
+        },
+        { label: '环海骑行', weather: '☀️ 25°C 晴 · 👕 防晒+墨镜', cost: 700,
+          items: [
+            { time: '08:00', activity: '租电动车环洱海', cost: '¥100', note: '电动车¥100/天，环海约120km', tags: [{ type: 'buy', text: '🎫 租赁', name: '电动车租赁', ticketType: '交通', price: 100 }, { type: 'tip', text: '🔋 提前充好电，中途有充电站' }, { type: 'avoid', text: '🚫 不要租自行车，太远骑不动' }] },
+            { transit: [{ mode: '骑行', from: '古城', to: '喜洲', time: '40min' }] },
+            { time: '09:30', activity: '喜洲古镇早市', cost: '¥20', note: '喜洲粑粑¥5、鲜花¥5/把', tags: [{ type: 'tip', text: '🌸 早市9点前最热闹' }] },
+            { transit: [{ mode: '骑行', from: '喜洲', to: '双廊', time: '60min' }] },
+            { time: '12:00', activity: '双廊古镇+入住海景民宿', cost: '¥400', note: '推窗见洱海，下午晒太阳', tags: [{ type: 'buy', text: '🎫 预订', name: '双廊民宿', ticketType: '住宿', price: 400 }] }
+          ]
+        },
+        { label: '沙溪秘境', weather: '⛅ 23°C 多云 · 👕 薄外套', cost: 550,
+          items: [
+            { time: '08:00', activity: '前往沙溪古镇', cost: '¥80', note: '包车约1.5小时，茶马古道最后一座古集市', tags: [{ type: 'buy', text: '🎫 车费', name: '沙溪古镇交通', ticketType: '交通', price: 80 }] },
+            { transit: [{ mode: '步行', from: '沙溪入口', to: '寺登街', time: '5min' }] },
+            { time: '10:00', activity: '沙溪古镇漫步', cost: '免费', note: '寺登街+古戏台+兴教寺，比大理古城安静100倍', tags: [{ type: 'crowd-green', text: '🟢 几乎没有游客' }, { type: 'tip', text: '☕ 先锋书局沙溪店，山谷中的书店' }] },
+            { transit: [{ mode: '步行', from: '寺登街', to: '客栈', time: '5min' }] },
+            { time: '15:00', activity: '入住沙溪客栈+发呆', cost: '¥300', note: '推荐古戏台旁小院，发呆最佳', tags: [{ type: 'buy', text: '🎫 预订', name: '沙溪客栈', ticketType: '住宿', price: 300 }] }
+          ]
+        },
+        { label: '返程', weather: '⛅ 24°C 多云 · 👕 舒适穿搭', cost: 600,
+          items: [
+            { time: '08:00', activity: '沙溪晨间漫步', cost: '免费', note: '清晨沙溪最美，无游客，炊烟袅袅', tags: [{ type: 'tip', text: '📸 清晨的光线最适合拍照' }] },
+            { transit: [{ mode: '打车', from: '沙溪', to: '大理机场', time: '90min' }] },
+            { time: '14:00', activity: '返程 · 大理机场出发', cost: '¥800', note: '大理→上海 机票约¥800/人', tags: [{ type: 'buy', text: '🎫 购票', name: '返程机票', ticketType: '交通', price: 800 }] }
+          ]
+        }
+      ]
+    }
+  ],
+  '厦门': [
+    {
+      title: '厦门 · 海岛文艺之旅',
+      subtitle: '4天3晚 · 休闲游 · 2人 · ¥2,800起',
+      heroImg: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=600&h=300&fit=crop',
+      totalCost: 2800,
+      paidItems: [
+        { name: '中山路酒店', type: '住宿', price: 400, day: 1 },
+        { name: '鼓浪屿船票', type: '交通', price: 35, day: 2 },
+        { name: '日光岩', type: '门票', price: 60, day: 2 },
+        { name: '曾厝垵民宿', type: '住宿', price: 350, day: 2 },
+        { name: '返程高铁', type: '交通', price: 350, day: 4 }
+      ],
+      shareBody: '🏖️ 厦门·海岛文艺之旅\n💰 预算 ¥2,800/人 | ⏱️ 4天3晚\n📍 Day1: 中山路→沙坡尾→海沧夜景\n📍 Day2: 鼓浪屿→日光岩→曾厝垵\n📍 Day3: 南普陀→厦大→环岛路\n📍 Day4: 八市→返程\n#LittlePony #厦门旅行 #鼓浪屿',
+      days: [
+        { label: '老城初探', weather: '☀️ 29°C 晴 · 👕 防晒衫+墨镜', cost: 600,
+          items: [
+            { time: '12:00', activity: '抵达厦门，入住中山路酒店', cost: '¥400', note: '中山路步行街旁，出行方便', tags: [{ type: 'buy', text: '🎫 预订', name: '中山路酒店', ticketType: '住宿', price: 400 }] },
+            { transit: [{ mode: '步行', from: '中山路', to: '沙坡尾', time: '15min' }] },
+            { time: '14:30', activity: '沙坡尾艺术西区', cost: '免费', note: '旧渔港改造文创区，文艺拍照圣地', tags: [{ type: 'tip', text: '📸 下午4-5点光线最好' }] },
+            { transit: [{ mode: '步行', from: '沙坡尾', to: '中山路', time: '15min' }] },
+            { time: '18:00', activity: '中山路步行街觅食', cost: '¥80', note: '沙茶面¥15、花生汤¥8、土笋冻¥10', tags: [{ type: 'avoid', text: '🚫 中山路"特产"店别买' }] }
+          ]
+        },
+        { label: '鼓浪屿', weather: '⛅ 28°C 多云 · 👕 轻薄裙装', cost: 845,
+          items: [
+            { time: '08:00', activity: '乘船前往鼓浪屿', cost: '¥35', note: '轮渡¥35往返，建议早点上岛', tags: [{ type: 'buy', text: '🎫 购票', name: '鼓浪屿船票', ticketType: '交通', price: 35 }, { type: 'tip', text: '📱 提前在「厦门轮渡」公众号购票' }] },
+            { transit: [{ mode: '步行', from: '码头', to: '日光岩', time: '15min' }] },
+            { time: '09:30', activity: '日光岩登顶', cost: '¥60', note: '鼓浪屿最高点，360°俯瞰全岛', tags: [{ type: 'buy', text: '🎫 购票', name: '日光岩', ticketType: '门票', price: 60 }, { type: 'crowd-yellow', text: '🟡 10点后旅游团到' }] },
+            { transit: [{ mode: '步行', from: '日光岩', to: '菽庄花园', time: '10min' }] },
+            { time: '12:00', activity: '菽庄花园 + 钢琴博物馆', cost: '¥30', note: '海上园林+百架古钢琴', tags: [{ type: 'tip', text: '🎹 钢琴博物馆有定时演奏' }] },
+            { transit: [{ mode: '步行', from: '菽庄花园', to: '码头', time: '20min' }] },
+            { time: '16:00', activity: '返回厦门本岛，入住曾厝垵民宿', cost: '¥350', note: '海边文艺村，美食集中', tags: [{ type: 'buy', text: '🎫 预订', name: '曾厝垵民宿', ticketType: '住宿', price: 350 }, { type: 'avoid', text: '🚫 曾厝垵海鲜大排档先问价再吃' }] }
+          ]
+        },
+        { label: '厦大环岛', weather: '☀️ 30°C 晴 · 👕 防晒全套', cost: 300,
+          items: [
+            { time: '08:30', activity: '南普陀寺', cost: '免费', note: '千年古刹，素饼¥30/盒很出名', tags: [{ type: 'tip', text: '🍰 南普陀素饼是厦门必买伴手礼' }] },
+            { transit: [{ mode: '步行', from: '南普陀', to: '厦大', time: '5min' }] },
+            { time: '10:00', activity: '厦门大学', cost: '免费', note: '中国最美大学，芙蓉湖+芙蓉隧道涂鸦', tags: [{ type: 'tip', text: '📱 厦大需提前预约入校' }] },
+            { transit: [{ mode: '步行', from: '厦大', to: '环岛路', time: '15min' }] },
+            { time: '14:00', activity: '环岛路骑行', cost: '¥50', note: '租车¥50/天，沿海骑行约15km', tags: [{ type: 'tip', text: '🌅 傍晚骑行看日落最美' }] }
+          ]
+        },
+        { label: '八市+返程', weather: '⛅ 28°C 多云 · 👕 舒适穿搭', cost: 1055,
+          items: [
+            { time: '08:00', activity: '第八市场(八市)', cost: '¥60', note: '阿杰五香¥5、满煎糕¥3', tags: [{ type: 'tip', text: '🍜 八市早餐最地道' }] },
+            { transit: [{ mode: '打车', from: '八市', to: '厦门站', time: '15min' }] },
+            { time: '12:00', activity: '返程 · 厦门站出发', cost: '¥350', note: '厦门→上海 高铁¥350/人', tags: [{ type: 'buy', text: '🎫 购票', name: '返程高铁', ticketType: '交通', price: 350 }] }
+          ]
+        }
+      ]
+    },
+    {
+      title: '厦门 · 美食探店',
+      subtitle: '3天2晚 · 美食游 · 2人 · ¥1,600起',
+      heroImg: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=600&h=300&fit=crop',
+      totalCost: 1600,
+      paidItems: [
+        { name: '中山路快捷酒店', type: '住宿', price: 280, day: 1 },
+        { name: '姜母鸭', type: '餐饮', price: 120, day: 1 },
+        { name: '鼓浪屿船票', type: '交通', price: 35, day: 2 },
+        { name: '海鲜大排档', type: '餐饮', price: 200, day: 2 },
+        { name: '返程高铁', type: '交通', price: 350, day: 3 }
+      ],
+      shareBody: '🏖️ 厦门·美食探店\n💰 预算 ¥1,600/人 | ⏱️ 3天2晚\n📍 Day1: 八市→中山路→姜母鸭\n📍 Day2: 鼓浪屿→沙坡尾→海鲜\n📍 Day3: 沙茶面→返程\n#LittlePony #厦门旅行 #美食',
+      days: [
+        { label: '八市扫街', weather: '☀️ 29°C 晴 · 👕 轻薄短袖', cost: 600,
+          items: [
+            { time: '08:00', activity: '第八市场早餐', cost: '¥30', note: '阿杰五香¥5、满煎糕¥3、面线糊¥10', tags: [{ type: 'tip', text: '🍜 八市是厦门人自己的菜市场' }] },
+            { transit: [{ mode: '步行', from: '八市', to: '中山路', time: '10min' }] },
+            { time: '11:00', activity: '中山路逛街+入住', cost: '¥280', note: '推荐中山路附近快捷酒店', tags: [{ type: 'buy', text: '🎫 预订', name: '中山路快捷酒店', ticketType: '住宿', price: 280 }] },
+            { transit: [{ mode: '步行', from: '中山路', to: '月华沙茶面', time: '8min' }] },
+            { time: '12:30', activity: '月华沙茶面(中山路店)', cost: '¥20', note: '厦门沙茶面天花板，¥15-25/碗', tags: [{ type: 'tip', text: '🍜 加大肠+豆腐最好吃' }] },
+            { transit: [{ mode: '打车', from: '中山路', to: '姜母鸭店', time: '10min' }] },
+            { time: '18:00', activity: '灌顶姜母鸭(总店)', cost: '¥120', note: '半只¥60，红面番鸭+老姜+米酒', tags: [{ type: 'buy', text: '🎫 预订', name: '姜母鸭', ticketType: '餐饮', price: 120 }] }
+          ]
+        },
+        { label: '鼓浪屿美食', weather: '⛅ 28°C 多云 · 👕 轻薄裙装', cost: 600,
+          items: [
+            { time: '08:00', activity: '乘船前往鼓浪屿', cost: '¥35', note: '轮渡¥35往返', tags: [{ type: 'buy', text: '🎫 购票', name: '鼓浪屿船票', ticketType: '交通', price: 35 }] },
+            { transit: [{ mode: '步行', from: '码头', to: '龙头路', time: '10min' }] },
+            { time: '09:30', activity: '龙头路美食街', cost: '¥50', note: '叶氏麻糍¥5、黄胜记肉脯¥10', tags: [{ type: 'avoid', text: '🚫 龙头路网红店排队久性价比低' }] },
+            { transit: [{ mode: '步行', from: '龙头路', to: '码头', time: '10min' }] },
+            { time: '15:00', activity: '返回厦门+沙坡尾', cost: '免费', note: '沙坡尾下午茶+拍照', tags: [{ type: 'tip', text: '☕ 沙坡尾有很多精品咖啡馆' }] },
+            { transit: [{ mode: '打车', from: '沙坡尾', to: '大排档', time: '10min' }] },
+            { time: '18:00', activity: '海鲜大排档(曾厝垵)', cost: '¥200', note: '白灼虾、清蒸石斑、海蛎煎', tags: [{ type: 'buy', text: '🎫 预订', name: '海鲜大排档', ticketType: '餐饮', price: 200 }, { type: 'avoid', text: '⚠️ 先问价再点菜' }] }
+          ]
+        },
+        { label: '收官+返程', weather: '☀️ 29°C 晴 · 👕 舒适穿搭', cost: 400,
+          items: [
+            { time: '08:00', activity: '乌糖沙茶面(民族路)', cost: '¥25', note: '另一家沙茶面名店，汤头更浓', tags: [{ type: 'tip', text: '🍜 早上去汤底最新鲜' }] },
+            { transit: [{ mode: '打车', from: '乌糖', to: '厦门站', time: '15min' }] },
+            { time: '12:00', activity: '返程 · 厦门站出发', cost: '¥350', note: '厦门→上海 高铁¥350/人', tags: [{ type: 'buy', text: '🎫 购票', name: '返程高铁', ticketType: '交通', price: 350 }] }
+          ]
+        }
+      ]
+    }
+  ],
+  '西安': [
+    {
+      title: '西安 · 千年古都深度游',
+      subtitle: '4天3晚 · 文化游 · 2人 · ¥2,800起',
+      heroImg: 'https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=600&h=300&fit=crop',
+      totalCost: 2800,
+      paidItems: [
+        { name: '钟楼附近酒店', type: '住宿', price: 400, day: 1 },
+        { name: '兵马俑', type: '门票', price: 120, day: 2 },
+        { name: '城墙骑行', type: '门票', price: 54, day: 2 },
+        { name: '陕历博讲解', type: '服务', price: 50, day: 3 },
+        { name: '返程高铁', type: '交通', price: 520, day: 4 }
+      ],
+      shareBody: '🏖️ 西安·千年古都深度游\n💰 预算 ¥2,800/人 | ⏱️ 4天3晚\n📍 Day1: 钟鼓楼→回民街→城墙夜景\n📍 Day2: 兵马俑→华清宫→城墙骑行\n📍 Day3: 陕历博→大雁塔→大唐不夜城\n📍 Day4: 永兴坊→返程\n#LittlePony #西安旅行 #兵马俑',
+      days: [
+        { label: '城墙回民街', weather: '⛅ 26°C 多云 · 👕 轻薄长袖', cost: 650,
+          items: [
+            { time: '12:00', activity: '抵达西安，入住钟楼附近酒店', cost: '¥400', note: '推荐钟楼/南门附近，步行逛老城', tags: [{ type: 'buy', text: '🎫 预订', name: '钟楼附近酒店', ticketType: '住宿', price: 400 }] },
+            { transit: [{ mode: '步行', from: '钟楼', to: '回民街', time: '5min' }] },
+            { time: '13:30', activity: '回民街觅食', cost: '¥60', note: '肉夹馍¥12、凉皮¥8、酸梅汤¥5', tags: [{ type: 'avoid', text: '🚫 回民街主街贵且不正宗，钻小巷' }, { type: 'tip', text: '📍 定家小酥肉、老米家泡馍更地道' }] },
+            { transit: [{ mode: '步行', from: '回民街', to: '钟楼', time: '5min' }] },
+            { time: '16:00', activity: '钟楼+鼓楼', cost: '¥30', note: '登楼看古城中轴线', tags: [{ type: 'tip', text: '🌅 黄昏登楼光线最美' }] }
+          ]
+        },
+        { label: '兵马俑', weather: '☀️ 28°C 晴 · 👕 防晒+帽子', cost: 700,
+          items: [
+            { time: '07:30', activity: '兵马俑博物馆', cost: '¥120', note: '门票¥120含三个坑', tags: [{ type: 'buy', text: '🎫 购票', name: '兵马俑', ticketType: '门票', price: 120 }, { type: 'tip', text: '📱 提前在「秦始皇帝陵博物院」预约' }, { type: 'avoid', text: '🚫 别跟"热心人"走，全是购物点' }] },
+            { transit: [{ mode: '公交', from: '兵马俑', to: '华清宫', time: '10min' }] },
+            { time: '12:00', activity: '华清宫', cost: '¥120', note: '杨贵妃沐浴之地+骊山', tags: [{ type: 'tip', text: '♨️ 长恨歌演出晚8点，值得看' }] },
+            { transit: [{ mode: '地铁', from: '华清宫', to: '南门', time: '50min' }] },
+            { time: '17:00', activity: '城墙骑行', cost: '¥54', note: '城墙门票¥54，租自行车¥45', tags: [{ type: 'buy', text: '🎫 购票', name: '城墙骑行', ticketType: '门票', price: 54 }, { type: 'tip', text: '🌅 傍晚骑行，夕阳+城墙绝配' }] }
+          ]
+        },
+        { label: '博物馆之夜', weather: '⛅ 27°C 多云 · 👕 轻薄长袖', cost: 830,
+          items: [
+            { time: '09:00', activity: '陕西历史博物馆', cost: '免费(讲解¥50)', note: '国宝级文物3000+，需提前预约', tags: [{ type: 'tip', text: '📱 提前在「陕西历史博物馆」预约' }, { type: 'buy', text: '🎫 讲解', name: '陕历博讲解', ticketType: '服务', price: 50 }] },
+            { transit: [{ mode: '步行', from: '陕历博', to: '大雁塔', time: '10min' }] },
+            { time: '13:00', activity: '大雁塔+大慈恩寺', cost: '¥40', note: '玄奘译经之地', tags: [{ type: 'tip', text: '📸 大雁塔北广场喷泉表演12:00/20:00' }] },
+            { transit: [{ mode: '步行', from: '大雁塔', to: '大唐不夜城', time: '10min' }] },
+            { time: '18:00', activity: '大唐不夜城', cost: '¥80', note: '唐风步行街，夜景璀璨', tags: [{ type: 'tip', text: '🌙 天黑后才美，7点后到' }, { type: 'avoid', text: '🚫 不夜城物价偏高' }] }
+          ]
+        },
+        { label: '永兴坊+返程', weather: '⛅ 26°C 多云 · 👕 舒适穿搭', cost: 620,
+          items: [
+            { time: '09:00', activity: '永兴坊美食街', cost: '¥60', note: '摔碗酒¥5、子长煎饼¥10、甑糕¥8', tags: [{ type: 'tip', text: '🍶 摔碗酒是网红打卡' }] },
+            { transit: [{ mode: '打车', from: '永兴坊', to: '西安北站', time: '25min' }, { mode: '地铁', from: '永兴坊', to: '西安北站', time: '35min' }] },
+            { time: '13:00', activity: '返程 · 西安北站出发', cost: '¥520', note: '西安北→上海虹桥 高铁¥520/人', tags: [{ type: 'buy', text: '🎫 购票', name: '返程高铁', ticketType: '交通', price: 520 }] }
+          ]
+        }
+      ]
+    },
+    {
+      title: '西安 · 美食考古',
+      subtitle: '3天2晚 · 美食游 · 2人 · ¥1,500起',
+      heroImg: 'https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=600&h=300&fit=crop',
+      totalCost: 1500,
+      paidItems: [
+        { name: '南门快捷酒店', type: '住宿', price: 300, day: 1 },
+        { name: '老米家泡馍', type: '餐饮', price: 50, day: 1 },
+        { name: '兵马俑', type: '门票', price: 120, day: 2 },
+        { name: '永兴坊', type: '餐饮', price: 60, day: 2 },
+        { name: '返程高铁', type: '交通', price: 520, day: 3 }
+      ],
+      shareBody: '🏖️ 西安·美食考古\n💰 预算 ¥1,500/人 | ⏱️ 3天2晚\n📍 Day1: 回民街→老米家泡馍→城墙\n📍 Day2: 兵马俑→永兴坊→大唐不夜城\n📍 Day3: 陕历博→返程\n#LittlePony #西安旅行 #美食',
+      days: [
+        { label: '回民街美食', weather: '⛅ 26°C 多云 · 👕 轻薄长袖', cost: 450,
+          items: [
+            { time: '11:00', activity: '入住南门附近酒店', cost: '¥300', note: '南门附近交通方便', tags: [{ type: 'buy', text: '🎫 预订', name: '南门快捷酒店', ticketType: '住宿', price: 300 }] },
+            { transit: [{ mode: '步行', from: '南门', to: '回民街', time: '10min' }] },
+            { time: '12:00', activity: '回民街钻小巷', cost: '¥40', note: '肉夹馍¥12、凉皮¥8、甑糕¥8', tags: [{ type: 'tip', text: '📍 定家小酥肉在化觉巷深处' }, { type: 'avoid', text: '🚫 主街红柳烤肉别买' }] },
+            { transit: [{ mode: '步行', from: '回民街', to: '老米家', time: '5min' }] },
+            { time: '18:00', activity: '老米家大雨泡馍', cost: '¥50', note: '牛肉泡馍¥35/碗，手掰馍才正宗', tags: [{ type: 'buy', text: '🎫 预订', name: '老米家泡馍', ticketType: '餐饮', price: 50 }, { type: 'tip', text: '🤲 掰越小越好，黄豆大小最佳' }] }
+          ]
+        },
+        { label: '兵马俑+夜市', weather: '☀️ 28°C 晴 · 👕 防晒+帽子', cost: 530,
+          items: [
+            { time: '07:30', activity: '兵马俑博物馆', cost: '¥120', note: '3个坑+铜车马，世界第八奇迹', tags: [{ type: 'buy', text: '🎫 购票', name: '兵马俑', ticketType: '门票', price: 120 }, { type: 'tip', text: '📱 提前预约，8点前到' }] },
+            { transit: [{ mode: '地铁', from: '兵马俑', to: '永兴坊', time: '60min' }] },
+            { time: '14:00', activity: '永兴坊', cost: '¥60', note: '摔碗酒、子长煎饼、甑糕', tags: [{ type: 'tip', text: '🍶 摔碗酒图个乐' }] },
+            { transit: [{ mode: '地铁', from: '永兴坊', to: '大唐不夜城', time: '20min' }] },
+            { time: '19:00', activity: '大唐不夜城', cost: '免费', note: '夜景免费看，唐风灯火璀璨', tags: [{ type: 'tip', text: '🌙 天黑后才到最美' }] }
+          ]
+        },
+        { label: '收官+返程', weather: '⛅ 26°C 多云 · 👕 舒适穿搭', cost: 520,
+          items: [
+            { time: '09:00', activity: '陕西历史博物馆', cost: '免费', note: '需提前抢免费票', tags: [{ type: 'tip', text: '📱 免费票非常抢手，提前3天预约' }] },
+            { transit: [{ mode: '打车', from: '陕历博', to: '西安北站', time: '30min' }, { mode: '地铁', from: '陕历博', to: '西安北站', time: '40min' }] },
+            { time: '13:00', activity: '返程 · 西安北站出发', cost: '¥520', note: '西安北→上海虹桥 高铁¥520/人', tags: [{ type: 'buy', text: '🎫 购票', name: '返程高铁', ticketType: '交通', price: 520 }] }
+          ]
+        }
+      ]
+    }
+  ],
+  '青岛': [
+    {
+      title: '青岛 · 海鲜啤酒之旅',
+      subtitle: '3天2晚 · 休闲游 · 2人 · ¥2,200起',
+      heroImg: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=600&h=300&fit=crop',
+      totalCost: 2200,
+      paidItems: [
+        { name: '栈桥附近酒店', type: '住宿', price: 380, day: 1 },
+        { name: '青岛啤酒博物馆', type: '门票', price: 60, day: 2 },
+        { name: '营口路海鲜', type: '餐饮', price: 200, day: 2 },
+        { name: '崂山', type: '门票', price: 90, day: 3 },
+        { name: '返程高铁', type: '交通', price: 350, day: 3 }
+      ],
+      shareBody: '🏖️ 青岛·海鲜啤酒之旅\n💰 预算 ¥2,200/人 | ⏱️ 3天2晚\n📍 Day1: 栈桥→八大关→五四广场\n📍 Day2: 啤酒博物馆→台东夜市→营口路\n📍 Day3: 崂山→返程\n#LittlePony #青岛旅行 #海鲜啤酒',
+      days: [
+        { label: '老城漫步', weather: '☀️ 25°C 海风 · 👕 薄外套+墨镜', cost: 600,
+          items: [
+            { time: '12:00', activity: '抵达青岛，入住栈桥附近酒店', cost: '¥380', note: '推荐栈桥/中山路附近，步行看海', tags: [{ type: 'buy', text: '🎫 预订', name: '栈桥附近酒店', ticketType: '住宿', price: 380 }] },
+            { transit: [{ mode: '步行', from: '酒店', to: '栈桥', time: '5min' }] },
+            { time: '14:00', activity: '栈桥+回澜阁', cost: '免费', note: '青岛地标', tags: [{ type: 'tip', text: '📸 退潮时栈桥下礁石拍照很美' }] },
+            { transit: [{ mode: '公交', from: '栈桥', to: '八大关', time: '15min' }] },
+            { time: '15:30', activity: '八大关风景区', cost: '免费', note: '万国建筑群+花石楼¥8.5', tags: [{ type: 'tip', text: '🌸 6-7月八大关花石路最美' }, { type: 'crowd-green', text: '🟢 工作日人少' }] },
+            { transit: [{ mode: '公交', from: '八大关', to: '五四广场', time: '10min' }] },
+            { time: '19:00', activity: '五四广场+奥帆中心夜景', cost: '免费', note: '"五月的风"雕塑灯光秀', tags: [{ type: 'tip', text: '🌙 7-9点灯光秀' }] }
+          ]
+        },
+        { label: '啤酒海鲜', weather: '⛅ 24°C 多云 · 👕 透气T恤', cost: 650,
+          items: [
+            { time: '09:00', activity: '青岛啤酒博物馆', cost: '¥60', note: '含一杯原浆+一杯纯生+啤酒豆', tags: [{ type: 'buy', text: '🎫 购票', name: '青岛啤酒博物馆', ticketType: '门票', price: 60 }, { type: 'tip', text: '🍺 现场原浆最鲜，只有青岛能喝到' }] },
+            { transit: [{ mode: '地铁', from: '啤酒博物馆', to: '台东', time: '10min' }] },
+            { time: '12:00', activity: '台东步行街小吃', cost: '¥50', note: '烤鱿鱼¥10、海胆蒸蛋¥15、鲅鱼饺子¥20', tags: [{ type: 'tip', text: '🍜 台东是本地人逛的夜市' }] },
+            { transit: [{ mode: '打车', from: '台东', to: '营口路', time: '10min' }] },
+            { time: '17:00', activity: '营口路海鲜市场', cost: '¥200', note: '买海鲜找店加工，比餐厅便宜一半', tags: [{ type: 'buy', text: '🎫 预订', name: '营口路海鲜', ticketType: '餐饮', price: 200 }, { type: 'avoid', text: '⚠️ 先问价再买，加工费也要问清' }, { type: 'tip', text: '🍺 配袋装原浆啤酒' }] }
+          ]
+        },
+        { label: '崂山+返程', weather: '☀️ 26°C 晴 · 👕 防晒+运动鞋', cost: 950,
+          items: [
+            { time: '07:30', activity: '崂山风景区', cost: '¥90', note: '太清宫景区最经典', tags: [{ type: 'buy', text: '🎫 购票', name: '崂山', ticketType: '门票', price: 90 }, { type: 'tip', text: '⏰ 早去人少，约4小时游览' }] },
+            { transit: [{ mode: '打车', from: '崂山', to: '青岛站', time: '40min' }] },
+            { time: '14:00', activity: '返程 · 青岛站出发', cost: '¥350', note: '青岛→上海 高铁¥350/人', tags: [{ type: 'buy', text: '🎫 购票', name: '返程高铁', ticketType: '交通', price: 350 }] }
+          ]
+        }
+      ]
+    },
+    {
+      title: '青岛 · 海岸线徒步',
+      subtitle: '3天2晚 · 户外游 · 2人 · ¥2,000起',
+      heroImg: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=600&h=300&fit=crop',
+      totalCost: 2000,
+      paidItems: [
+        { name: '奥帆中心酒店', type: '住宿', price: 400, day: 1 },
+        { name: '崂山', type: '门票', price: 90, day: 3 },
+        { name: '返程高铁', type: '交通', price: 350, day: 3 }
+      ],
+      shareBody: '🏖️ 青岛·海岸线徒步\n💰 预算 ¥2,000/人 | ⏱️ 3天2晚\n📍 Day1: 奥帆中心→燕儿岛→小麦岛日落\n📍 Day2: 金沙滩→八大关→信号山\n📍 Day3: 崂山→返程\n#LittlePony #青岛旅行 #海岸线',
+      days: [
+        { label: '东海岸', weather: '☀️ 25°C 海风 · 👕 运动装+墨镜', cost: 550,
+          items: [
+            { time: '12:00', activity: '入住奥帆中心附近酒店', cost: '¥400', note: '推荐奥帆中心旁，看海方便', tags: [{ type: 'buy', text: '🎫 预订', name: '奥帆中心酒店', ticketType: '住宿', price: 400 }] },
+            { transit: [{ mode: '步行', from: '酒店', to: '燕儿岛公园', time: '15min' }] },
+            { time: '14:00', activity: '燕儿岛公园', cost: '免费', note: '海边栈道+海蚀洞，小众秘境', tags: [{ type: 'crowd-green', text: '🟢 游客很少' }, { type: 'tip', text: '📸 海蚀洞是最佳拍照点' }] },
+            { transit: [{ mode: '步行', from: '燕儿岛', to: '小麦岛', time: '15min' }] },
+            { time: '17:00', activity: '小麦岛公园看日落', cost: '免费', note: '青岛最佳日落观赏点', tags: [{ type: 'tip', text: '🌅 日落前1小时到占位' }] }
+          ]
+        },
+        { label: '西海岸', weather: '⛅ 24°C 多云 · 👕 透气运动装', cost: 700,
+          items: [
+            { time: '08:00', activity: '金沙滩', cost: '免费', note: '青岛最美沙滩，细沙如金', tags: [{ type: 'tip', text: '🏃 早上人少，可以慢跑' }] },
+            { transit: [{ mode: '公交', from: '金沙滩', to: '八大关', time: '40min' }] },
+            { time: '11:30', activity: '八大关+第二海水浴场', cost: '免费', note: '万国建筑+海泳', tags: [{ type: 'tip', text: '👙 带泳衣，第二浴场水清' }] },
+            { transit: [{ mode: '步行', from: '八大关', to: '信号山', time: '15min' }] },
+            { time: '16:00', activity: '信号山公园', cost: '¥15', note: '俯瞰红瓦绿树+碧海蓝天', tags: [{ type: 'tip', text: '📸 旋转观景台是经典机位' }] }
+          ]
+        },
+        { label: '崂山+返程', weather: '☀️ 26°C 晴 · 👕 防晒+运动鞋', cost: 750,
+          items: [
+            { time: '07:30', activity: '崂山太清游览区', cost: '¥90', note: '海上名山第一', tags: [{ type: 'buy', text: '🎫 购票', name: '崂山', ticketType: '门票', price: 90 }] },
+            { transit: [{ mode: '打车', from: '崂山', to: '青岛站', time: '40min' }] },
+            { time: '14:00', activity: '返程 · 青岛站出发', cost: '¥350', note: '青岛→上海 高铁¥350/人', tags: [{ type: 'buy', text: '🎫 购票', name: '返程高铁', ticketType: '交通', price: 350 }] }
+          ]
+        }
+      ]
+    }
+  ],
+  'default': [
+    {
+      title: '杭州 · 西湖慢生活之旅',
+      subtitle: '3天2晚 · 休闲游 · 2人 · ¥1,238起',
+      heroImg: 'https://images.unsplash.com/photo-1534190239940-9ba8944ea261?w=600&h=300&fit=crop',
+      totalCost: 1238,
+      paidItems: [
+        { name: '湖滨商圈酒店', type: '住宿', price: 480, day: 1 },
+        { name: '楼外楼晚餐', type: '餐饮', price: 180, day: 1 },
+        { name: '灵隐寺', type: '门票', price: 75, day: 2 },
+        { name: '河坊街小吃', type: '餐饮', price: 60, day: 2 },
+        { name: '西溪湿地', type: '门票+船票', price: 180, day: 3 },
+        { name: '返程高铁', type: '交通', price: 263, day: 3 }
+      ],
+      shareBody: '🏖️ 杭州·西湖慢生活之旅\n💰 预算 ¥1,238/人 | ⏱️ 3天2晚\n📍 Day1: 白堤断桥→孤山西泠→楼外楼→音乐喷泉\n📍 Day2: 灵隐寺→龙井问茶→九溪烟树→河坊街\n📍 Day3: 美院象山→西溪湿地→返程\n#LittlePony #杭州旅行 #西湖攻略',
+      days: [
+        { label: '湖滨漫步', weather: '☀️ 28°C 晴 · 👕 轻薄T恤+薄外套', cost: 660,
+          items: [
+            { time: '13:00', activity: '抵达杭州东站，入住湖滨商圈酒店', cost: '¥480', note: '推荐：如家商旅(西湖店)或全季(湖滨店)', tags: [{ type: 'buy', text: '🎫 预订', name: '湖滨商圈酒店', ticketType: '住宿', price: 480 }] },
+            { transit: [{ mode: '步行', from: '湖滨商圈', to: '断桥', time: '10min' }, { mode: '打车', from: '湖滨商圈', to: '断桥', time: '5min' }] },
+            { time: '14:30', activity: '漫步白堤，经断桥残雪至平湖秋月', cost: '免费', note: '白堤柳荫成行，断桥为西湖十景之一', tags: [{ type: 'crowd-green', text: '🟢 下午人流适中' }, { type: 'avoid', text: '⚠️ 断桥边"免费拍照"后会推销收费' }] },
+            { transit: [{ mode: '步行', from: '平湖秋月', to: '孤山', time: '10min' }] },
+            { time: '18:00', activity: '楼外楼(孤山路店)晚餐', cost: '¥180', note: '必点：西湖醋鱼¥128/条、东坡肉¥38/份', tags: [{ type: 'buy', text: '🎫 预订', name: '楼外楼', ticketType: '餐饮', price: 180 }] },
+            { transit: [{ mode: '步行', from: '楼外楼', to: '音乐喷泉', time: '12min' }] },
+            { time: '20:00', activity: '西湖音乐喷泉', cost: '免费', note: '每晚19:30/20:00两场，湖滨三公园', tags: [{ type: 'crowd-yellow', text: '🟡 提前30分钟占位' }] }
+          ]
+        },
+        { label: '茶文化', weather: '⛅ 26°C 多云 · 👕 透气T恤+折叠伞', cost: 135,
+          items: [
+            { time: '07:30', activity: '灵隐寺 + 飞来峰', cost: '¥75', note: '飞来峰¥45+香花券¥30', tags: [{ type: 'buy', text: '🎫 购票', name: '灵隐寺', ticketType: '门票', price: 75 }, { type: 'tip', text: '🌅 7:30到几乎包场' }] },
+            { transit: [{ mode: '打车', from: '灵隐寺', to: '龙井村', time: '10min' }] },
+            { time: '13:00', activity: '九溪烟树徒步', cost: '免费', note: '全程约3km，天然氧吧', tags: [{ type: 'crowd-green', text: '🟢 工作日几乎无人' }] },
+            { transit: [{ mode: '打车', from: '九溪', to: '河坊街', time: '20min' }] },
+            { time: '17:00', activity: '河坊街觅食', cost: '¥60', note: '定胜糕¥5、葱包桧¥8、片儿川¥22', tags: [{ type: 'avoid', text: '🚫 特产店义乌货' }] }
+          ]
+        },
+        { label: '文艺收尾', weather: '🌧️ 22°C 阵雨 · 🧥 薄外套+折叠伞', cost: 443,
+          items: [
+            { time: '09:00', activity: '中国美术学院象山校区', cost: '免费', note: '王澍设计，校门登记入校', tags: [{ type: 'crowd-green', text: '🟢 几乎无游客' }] },
+            { transit: [{ mode: '打车', from: '美院象山校区', to: '西溪湿地', time: '30min' }] },
+            { time: '11:00', activity: '西溪湿地摇橹船', cost: '¥100', note: '摇橹船¥100/船(6人)，门票¥80', tags: [{ type: 'buy', text: '🎫 购票', name: '西溪湿地', ticketType: '门票+船票', price: 180 }] },
+            { transit: [{ mode: '打车', from: '西溪湿地', to: '杭州东站', time: '25min' }] },
+            { time: '14:30', activity: '返程 · 杭州东站出发', cost: '¥263', note: '杭州东→上海虹桥 高铁¥73/人', tags: [{ type: 'buy', text: '🎫 购票', name: '返程高铁', ticketType: '交通', price: 263 }] }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+// ===== DETAIL RENDERING =====
+let currentDetail = { city: '', planIndex: 0 };
+
+const transitIcons = { '步行': '🚶', '打车': '🚗', '公交': '🚌', '地铁': '🚇', '骑行': '🚴' };
+
+function buildTransitHTML(modes) {
+  let html = '<div class="transit"><div class="transit-modes">';
+  modes.forEach((m, i) => {
+    if (i > 0) html += '<span class="transit-sep"></span>';
+    html += '<button class="transit-mode-btn" onclick="openNav(\'' + m.mode + '\',\'' + m.from + '\',\'' + m.to + '\')">';
+    html += '<span class="mode-icon">' + (transitIcons[m.mode] || '🚶') + '</span>';
+    html += '<span class="mode-label">' + m.mode + '</span>';
+    html += '<span class="mode-time">' + m.time + '</span>';
+    html += '</button>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
+function buildTimelineItemHTML(item) {
+  let buyTagHTML = '';
+  let otherTagsHTML = '';
+  if (item.tags && item.tags.length > 0) {
+    item.tags.forEach(tag => {
+      if (tag.type === 'buy') {
+        buyTagHTML = '<span class="spot-tag buy-tag" onclick="event.stopPropagation();buySingleTicket(\'' + tag.name + '\',\'' + tag.ticketType + '\',' + tag.price + ')">' + tag.text + '</span>';
+      } else {
+        otherTagsHTML += '<span class="spot-tag ' + tag.type + '">' + tag.text + '</span>';
+      }
+    });
+  }
+  let html = '<div class="timeline-item">';
+  html += '<div class="time">' + item.time + '</div>';
+  html += '<div class="activity"><span class="activity-name">' + item.activity + '</span><span class="item-cost">' + item.cost + '</span>' + buyTagHTML + '</div>';
+  if (item.note) html += '<div class="note">' + item.note + '</div>';
+  if (otherTagsHTML) html += '<div class="spot-tags">' + otherTagsHTML + '</div>';
+  html += '</div>';
+  return html;
+}
+
+function buildDetailHTML(plan) {
+  let html = '<div class="detail-section"><h3>📋 行程安排</h3>';
+  html += '<div class="day-tabs">';
+  plan.days.forEach((day, i) => {
+    const activeClass = i === 0 ? ' active' : '';
+    html += '<div class="day-tab' + activeClass + '" onclick="switchDay(this,\'day-' + i + '\')">';
+    html += '<span class="day-tab-num">D' + (i + 1) + '</span>';
+    html += '<span class="day-tab-label">' + day.label + '</span>';
+    html += '</div>';
+  });
+  html += '</div>';
+  plan.days.forEach((day, i) => {
+    const activeClass = i === 0 ? ' active' : '';
+    html += '<div class="day-panel' + activeClass + '" id="day-' + i + '">';
+    html += '<div class="day-weather-bar">' + day.weather + '</div>';
+    html += '<div class="timeline">';
+    day.items.forEach(item => {
+      if (item.transit) {
+        html += buildTransitHTML(item.transit);
+      } else {
+        html += buildTimelineItemHTML(item);
+      }
+    });
+    html += '</div>';
+    html += '<div class="day-cost-bar"><span>Day ' + (i + 1) + ' 花费</span><span>¥' + day.cost + '</span></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '<button class="gen-btn" onclick="openShareModal()">📤 生成攻略并分享</button>';
+  html += '<div style="height:70px"></div>';
+  return html;
+}
+
+function updateShareModal(plan) {
+  const spSub = document.querySelector('.sp-sub');
+  if (spSub) spSub.textContent = 'Little Pony · ' + plan.subtitle;
+  const shareBody = document.getElementById('share-body');
+  if (shareBody) shareBody.innerHTML = plan.shareBody.replace(/\n/g, '<br>');
+}
+
+function renderDetail(city, planIndex) {
+  currentDetail = { city, planIndex: planIndex || 0 };
+  const plans = detailData[city] || detailData['default'];
+  const plan = plans[planIndex] || plans[0];
+  const hero = document.getElementById('detail-hero-img');
+  hero.style.backgroundImage = 'url(' + plan.heroImg + ')';
+  const titleArea = document.getElementById('detail-title-area');
+  titleArea.innerHTML = '<h2>' + plan.title + '</h2><div class="sub">' + plan.subtitle + '</div>';
+  const content = document.querySelector('.detail-content');
+  content.innerHTML = buildDetailHTML(plan);
+  allPaidItems = plan.paidItems || [];
+  const dbbTotal = document.querySelector('.dbb-total');
+  if (dbbTotal) dbbTotal.textContent = '¥' + plan.totalCost.toLocaleString();
+  updateShareModal(plan);
+}
+
+function openDetail(city, planIndex) {
+  renderDetail(city, planIndex);
+  switchScreen('detail');
+}
+
+function generateAndShowResults() {
+  const dest = chatState.destination;
+  const data = resultData[dest] || resultData['default'];
+
+  document.getElementById('result-title').textContent = data.title;
+
+  const prefLabel = chatState.preferences.length > 0 ? chatState.preferences[0] : '休闲度假';
+
+  const list = document.getElementById('result-list');
+  list.innerHTML = data.plans.map((p, i) => `
+    <div class="result-card fade-in" style="animation-delay:${i * 0.1}s" onclick="openDetail('${dest}',${i})">
+      <div class="result-hero" style="background-image:url(https://images.unsplash.com/${p.img}?w=600&h=280&fit=crop)">
+        <div class="overlay"></div>
+        <div class="title">${p.name}</div>
+        <span class="crowd-tag" style="background:${p.tagClass==='good'?'rgba(0,184,148,.85)':p.tagClass==='hot'?'rgba(255,107,107,.85)':'rgba(253,203,110,.9)'};color:${p.tagClass==='crowd'?'#6b5000':'#fff'}">${p.tag}</span>
+      </div>
+      <div class="result-info">
+        <div class="tags" style="padding:0;margin-bottom:8px">
+          <span class="tag active" style="padding:4px 10px;font-size:11px">${prefLabel}</span>
+        </div>
+        <div class="desc">${p.desc}</div>
+        <div class="stats">
+          <div class="stat"><span class="val">${p.crowd}</span><span class="label">人流</span></div>
+          <div class="stat"><span class="val">${p.cost}</span><span class="label">预算</span></div>
+          <div class="stat"><span class="val">${p.days}</span><span class="label">行程</span></div>
+        </div>
+      </div>
+      <div class="result-actions">
+        <button onclick="event.stopPropagation();openDetail('${dest}',${i})">📋 查看详情</button>
+        <button class="buy" onclick="event.stopPropagation();showToast('一键预订功能开发中')">🎫 一键订票</button>
+      </div>
+    </div>
+  `).join('');
+
+  switchScreen('result');
+}
+
+// ===== SCREEN MANAGEMENT =====
+const navHiddenScreens = ['detail', 'chat'];
+
+function updateNavVisibility(screenId) {
+  const nav = document.getElementById('bottom-nav');
+  const detailBar = document.querySelector('.detail-bottom-bar');
+  const hideNav = navHiddenScreens.includes(screenId);
+  nav.style.display = hideNav ? 'none' : 'flex';
+  if (detailBar) {
+    detailBar.classList.toggle('show', screenId === 'detail');
+  }
+}
+
+function switchScreen(id) {
+  const prev = document.getElementById('screen-' + currentScreen);
+  const next = document.getElementById('screen-' + id);
+
+  if (!next) return;
+
+  prev.classList.add('slide-left');
+  prev.classList.remove('hidden');
+  next.classList.remove('hidden', 'slide-left');
+
+  screenStack.push(currentScreen);
+  currentScreen = id;
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const tab = document.querySelector(`.nav-item[data-tab="${id}"]`);
+  if (tab) tab.classList.add('active');
+
+  next.scrollTop = 0;
+
+  updateNavVisibility(id);
+
+  // Start chat when entering chat screen
+  if (id === 'chat' && currentChatStep < 0) {
+    setTimeout(startChat, 300);
+  }
+}
+
+function goBack() {
+  if (screenStack.length === 0) {
+    switchScreen('home');
+    return;
+  }
+  const prevId = screenStack.pop();
+  const prev = document.getElementById('screen-' + prevId);
+  const curr = document.getElementById('screen-' + currentScreen);
+
+  curr.classList.add('hidden');
+  prev.classList.remove('slide-left', 'hidden');
+  currentScreen = prevId;
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const tab = document.querySelector(`.nav-item[data-tab="${currentScreen}"]`);
+  if (tab) tab.classList.add('active');
+
+  updateNavVisibility(currentScreen);
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    if (s.id !== 'screen-' + id) s.classList.add('hidden');
+  });
+  const target = document.getElementById('screen-' + id);
+  target.classList.remove('hidden', 'slide-left');
+
+  screenStack.length = 0;
+  currentScreen = id;
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector(`.nav-item[data-tab="${id}"]`).classList.add('active');
+
+  updateNavVisibility(id);
+}
+
+// ===== TIP CARD TOGGLE =====
+function toggleTip(el) {
+  const card = el.parentElement;
+  card.classList.toggle('collapsed');
+  const toggle = el.querySelector('.tip-toggle');
+  toggle.textContent = card.classList.contains('collapsed') ? '展开' : '收起';
+}
+
+// ===== DAY TAB SWITCH =====
+function switchDay(tabEl, panelId) {
+  tabEl.parentElement.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(panelId).classList.add('active');
+}
+
+// ===== UI INTERACTIONS =====
+
+// ===== SHARE MODAL =====
+function openShareModal() {
+  document.getElementById('share-modal').classList.add('show');
+}
+function closeShareModal(e) {
+  if (e.target === document.getElementById('share-modal')) {
+    document.getElementById('share-modal').classList.remove('show');
+  }
+}
+
+// ===== TOAST =====
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ===== TICKET PURCHASE =====
+let allPaidItems = [];
+
+let batchChecked = {};
+
+function buySingleTicket(name, type, price) {
+  const modal = document.getElementById('single-ticket-modal');
+  const content = document.getElementById('single-ticket-content');
+  content.innerHTML = `
+    <div style="background:var(--bg);border-radius:12px;padding:16px;margin-bottom:16px">
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">${name}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;color:var(--text-secondary)">${type}</span>
+        <span style="font-size:22px;font-weight:800;color:var(--accent)">¥${price}</span>
+      </div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:10px">选择数量</div>
+      <div style="display:flex;align-items:center;gap:16px;justify-content:center">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border:1px solid #e0e0e0" onclick="adjustQty(-1)">−</div>
+        <span id="ticket-qty" style="font-size:20px;font-weight:700;min-width:30px;text-align:center">1</span>
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border:1px solid #e0e0e0" onclick="adjustQty(1)">+</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid #f0f0f0;margin-bottom:16px">
+      <span style="font-size:14px">小计</span>
+      <span id="ticket-subtotal" style="font-size:20px;font-weight:800;color:var(--accent)">¥${price}</span>
+    </div>
+    <button style="width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(108,92,231,.35)" onclick="confirmSingleBuy('${name}','${type}',${price})">确认购买</button>
+  `;
+  modal.classList.add('show');
+  window._singleTicketPrice = price;
+  window._singleTicketQty = 1;
+}
+
+function adjustQty(delta) {
+  window._singleTicketQty = Math.max(1, (window._singleTicketQty || 1) + delta);
+  document.getElementById('ticket-qty').textContent = window._singleTicketQty;
+  document.getElementById('ticket-subtotal').textContent = '¥' + (window._singleTicketPrice * window._singleTicketQty);
+}
+
+function confirmSingleBuy(name, type, price) {
+  const qty = window._singleTicketQty || 1;
+  const total = price * qty;
+  closeModal('single-ticket-modal');
+  showToast(`已购买 ${name} x${qty}，共 ¥${total}`);
+}
+
+function openBatchTicketModal() {
+  const modal = document.getElementById('batch-ticket-modal');
+  const list = document.getElementById('batch-ticket-list');
+  batchChecked = {};
+  allPaidItems.forEach((item, i) => { batchChecked[i] = true; });
+
+  list.innerHTML = allPaidItems.map((item, i) => `
+    <div class="ticket-item">
+      <div class="ticket-check checked" id="batch-check-${i}" onclick="toggleBatchItem(${i})">✓</div>
+      <div class="ticket-info">
+        <h4>${item.name}</h4>
+        <p>Day ${item.day} · ${item.type}</p>
+      </div>
+      <div class="ticket-price">¥${item.price}</div>
+    </div>
+  `).join('');
+
+  updateBatchTotal();
+  modal.classList.add('show');
+}
+
+function toggleBatchItem(index) {
+  batchChecked[index] = !batchChecked[index];
+  const el = document.getElementById('batch-check-' + index);
+  if (batchChecked[index]) {
+    el.classList.add('checked');
+    el.textContent = '✓';
+  } else {
+    el.classList.remove('checked');
+    el.textContent = '';
+  }
+  updateBatchTotal();
+}
+
+function updateBatchTotal() {
+  let total = 0;
+  allPaidItems.forEach((item, i) => {
+    if (batchChecked[i]) total += item.price;
+  });
+  document.getElementById('batch-total-price').textContent = '¥' + total;
+}
+
+function confirmBatchBuy() {
+  const selected = allPaidItems.filter((_, i) => batchChecked[i]);
+  if (selected.length === 0) {
+    showToast('请至少选择一项');
+    return;
+  }
+  const total = selected.reduce((s, item) => s + item.price, 0);
+  closeModal('batch-ticket-modal');
+  showToast(`已购买 ${selected.length} 项，共 ¥${total}`);
+}
+
+function closeTicketModal(e, modalId) {
+  if (e.target === document.getElementById(modalId)) {
+    closeModal(modalId);
+  }
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.remove('show');
+}
+
+// ===== NAVIGATION =====
+function openNav(mode, from, to) {
+  const modeMap = {
+    '步行': '步行导航',
+    '打车': '打车出行',
+    '公交': '公交出行',
+    '地铁': '地铁出行'
+  };
+  const action = modeMap[mode] || '导航';
+  showToast(`${action}：${from} → ${to}`);
+}
+
+// ===== CLOCK =====
+function updateTime() {
+  const now = new Date();
+  const h = now.getHours().toString().padStart(2, '0');
+  const m = now.getMinutes().toString().padStart(2, '0');
+  document.querySelectorAll('.status-bar .time').forEach(el => el.textContent = h + ':' + m);
+}
+updateTime();
+setInterval(updateTime, 30000);
+</script>
+</body>
+</html>
