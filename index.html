@@ -36,10 +36,20 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
 .header .logo .pony{font-size:24px;-webkit-text-fill-color:initial}
 
 /* Search */
-.search-box{margin:0 20px 16px;background:var(--card);border-radius:12px;display:flex;align-items:center;padding:12px 16px;box-shadow:var(--shadow)}
+.search-box{margin:0 20px 16px;background:var(--card);border-radius:12px;display:flex;align-items:center;padding:12px 16px;box-shadow:var(--shadow);border:1.5px solid transparent;transition:border-color .2s}
+.search-box:focus-within{border-color:var(--primary)}
 .search-box svg{width:20px;height:20px;color:var(--text-secondary);margin-right:10px;flex-shrink:0}
-.search-box input{border:none;outline:none;font-size:14px;flex:1;background:transparent;color:var(--text)}
+.search-box input{border:none;outline:none;font-size:14px;flex:1;background:transparent;color:var(--text);min-width:0}
 .search-box input::placeholder{color:var(--text-secondary)}
+.home-send-btn{width:32px;height:32px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .15s}
+.home-send-btn:active{transform:scale(.9)}
+
+/* Location Bar */
+.location-bar{display:flex;align-items:center;gap:3px;padding:4px 10px;border-radius:16px;background:rgba(108,92,231,.08);cursor:pointer;transition:background .2s}
+.location-bar:active{background:rgba(108,92,231,.16)}
+.location-icon{font-size:13px}
+.location-text{font-size:13px;font-weight:600;color:var(--primary)}
+.location-arrow{font-size:14px;color:var(--primary);font-weight:700}
 
 /* Section */
 .section{margin-bottom:20px}
@@ -399,7 +409,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
 /* Hide bottom nav on detail screen - controlled by JS */
 
 /* Chat styles */
-.chat-container{display:flex;flex-direction:column;height:calc(100vh - 180px);height:calc(100dvh - 180px)}
+#screen-chat{display:flex;flex-direction:column;overflow:hidden;padding-bottom:0}
+#screen-chat .plan-header{flex-shrink:0}
+#screen-chat .chat-quick-replies{flex-shrink:0;max-height:120px;overflow-y:auto}
+#screen-chat .chat-input-bar{flex-shrink:0}
+.chat-container{display:flex;flex-direction:column;flex:1;min-height:0}
 .chat-messages{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px}
 .chat-messages::-webkit-scrollbar{display:none}
 .chat-bubble{max-width:85%;padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.6;animation:fadeIn .3s ease}
@@ -408,11 +422,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
 .chat-bubble.bot .bot-avatar .avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff}
 .chat-bubble.bot .bot-avatar .name{font-size:12px;color:var(--text-secondary);font-weight:500}
 .chat-bubble.user{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
-.chat-quick-replies{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 16px}
+.chat-quick-replies{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 8px}
 .chat-quick-reply{padding:8px 16px;border-radius:20px;font-size:13px;font-weight:500;background:var(--card);color:var(--primary);border:1.5px solid var(--primary);cursor:pointer;transition:all .2s;box-shadow:0 1px 4px rgba(108,92,231,.1)}
 .chat-quick-reply:active{background:var(--primary);color:#fff}
 .chat-quick-reply.selected{background:var(--primary);color:#fff}
-.chat-input-bar{display:flex;gap:10px;padding:12px 20px;background:var(--card);border-top:1px solid #f0f0f0;position:absolute;bottom:80px;left:0;right:0}
+.chat-input-bar{display:flex;gap:10px;padding:12px 20px;background:var(--card);border-top:1px solid #f0f0f0;flex-shrink:0}
 .chat-input-bar input{flex:1;padding:10px 16px;border-radius:20px;border:1.5px solid #e0e0e0;font-size:14px;outline:none;background:var(--bg)}
 .chat-input-bar input:focus{border-color:var(--primary)}
 .chat-input-bar .send-btn{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(108,92,231,.3);transition:transform .2s}
@@ -441,12 +455,20 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
 
     <div class="header">
       <div class="logo"><span class="pony">🐴</span><span>Little Pony</span></div>
-      <div style="font-size:22px;cursor:pointer" onclick="showToast('消息中心开发中')">🔔</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="location-bar" onclick="showToast('定位功能开发中')">
+          <span class="location-icon">📍</span>
+          <span class="location-text" id="current-city">杭州</span>
+          <span class="location-arrow">›</span>
+        </div>
+        <div style="font-size:22px;cursor:pointer" onclick="showToast('消息中心开发中')">🔔</div>
+      </div>
     </div>
 
-    <div class="search-box" onclick="switchScreen('chat')">
+    <div class="search-box">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" placeholder="跟小马聊聊你的出行计划..." readonly style="cursor:pointer">
+      <input type="text" id="home-input" placeholder="告诉我你想去哪、什么时候出发..." onkeydown="if(event.key==='Enter')handleHomeInput()">
+      <button class="home-send-btn" onclick="handleHomeInput()">→</button>
     </div>
 
     <!-- Special Offer -->
@@ -465,8 +487,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
         <div class="quick-item" onclick="switchScreen('food')"><div class="icon icon-food">🍜</div><span>特色饮食</span></div>
         <div class="quick-item" onclick="switchScreen('photo')"><div class="icon icon-photo">📷</div><span>旅拍道具</span></div>
         <div class="quick-item" onclick="switchScreen('clothes')"><div class="icon icon-clothes">👗</div><span>穿衣建议</span></div>
-        <div class="quick-item" onclick="showToast('避坑指南已融入推荐卡片')"><div class="icon icon-guide">📖</div><span>避坑指南</span></div>
-        <div class="quick-item" onclick="showToast('人流热力已融入推荐卡片')"><div class="icon icon-avoid">🔥</div><span>人流热力</span></div>
+
       </div>
     </div>
 
@@ -475,7 +496,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
       <div class="section-title">近期推荐 <span class="more">查看全部 ›</span></div>
       <div class="card-scroll">
         <div class="card" onclick="openDetail('杭州',0)">
-          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1534190239940-9ba8944ea261?w=400&h=200&fit=crop)">
+          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?w=400&h=200&fit=crop)">
             <span class="badge good">适宜出行</span>
           </div>
           <div class="card-body">
@@ -484,13 +505,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
             <div class="meta"><span>💰 ¥1,238起</span><span>⏱️ 3天</span><span>👥 2人</span></div>
             <div class="card-tags">
               <span class="card-tag weather">☀️ 28°C 晴</span>
-              <span class="card-tag crowd-low">🟢 人流适中</span>
-              <span class="card-tag avoid">⚠️ 灵隐黑车绕路</span>
             </div>
           </div>
         </div>
         <div class="card" onclick="openDetail('北京',0)">
-          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=400&h=200&fit=crop)">
+          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=400&h=200&fit=crop)">
             <span class="badge hot">🔥 热门</span>
           </div>
           <div class="card-body">
@@ -499,13 +518,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
             <div class="meta"><span>💰 ¥3,800起</span><span>⏱️ 5天</span><span>👥 2人</span></div>
             <div class="card-tags">
               <span class="card-tag weather">⛅ 26°C 多云</span>
-              <span class="card-tag crowd-high">🔴 故宫需抢票</span>
-              <span class="card-tag avoid">⚠️ 远离低价一日游团</span>
             </div>
           </div>
         </div>
         <div class="card" onclick="openDetail('成都',0)">
-          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=400&h=200&fit=crop)">
+          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1588252910189-9c9f5535646b?w=400&h=200&fit=crop)">
             <span class="badge crowd">较拥挤</span>
           </div>
           <div class="card-body">
@@ -514,8 +531,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
             <div class="meta"><span>💰 ¥2,600起</span><span>⏱️ 4天</span><span>👥 2人</span></div>
             <div class="card-tags">
               <span class="card-tag weather">🌧️ 22°C 阵雨</span>
-              <span class="card-tag crowd-mid">🟡 宽窄巷下午挤</span>
-              <span class="card-tag avoid">⚠️ 景区出租车不打表</span>
             </div>
           </div>
         </div>
@@ -527,7 +542,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
       <div class="section-title">未来1个月推荐 <span class="more">更多 ›</span></div>
       <div class="card-scroll">
         <div class="card" onclick="openDetail('大理',0)">
-          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=200&fit=crop)">
+          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1659466248885-8b7a03205661?w=400&h=200&fit=crop)">
             <span class="badge good">适宜出行</span>
           </div>
           <div class="card-body">
@@ -536,13 +551,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
             <div class="meta"><span>💰 ¥3,200起</span><span>⏱️ 5天</span></div>
             <div class="card-tags">
               <span class="card-tag weather">🌤️ 24°C 舒适</span>
-              <span class="card-tag crowd-mid">🟡 古城晚间人多</span>
-              <span class="card-tag avoid">⚠️ 银饰别在古城买</span>
             </div>
           </div>
         </div>
         <div class="card" onclick="openDetail('青岛',0)">
-          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400&h=200&fit=crop)">
+          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1627868153411-624a8dce0a12?w=400&h=200&fit=crop)">
             <span class="badge good">夏日限定</span>
           </div>
           <div class="card-body">
@@ -551,8 +564,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
             <div class="meta"><span>💰 ¥2,200起</span><span>⏱️ 3天</span></div>
             <div class="card-tags">
               <span class="card-tag weather">☀️ 25°C 海风</span>
-              <span class="card-tag crowd-low">🟢 6月人少</span>
-              <span class="card-tag avoid">⚠️ 营口路海鲜先问价</span>
             </div>
           </div>
         </div>
@@ -931,7 +942,8 @@ const chatState = {
   groupSize: 2,
   budget: 5000,
   specialNeeds: [],
-  visitedSpots: ''
+  visitedSpots: '',
+  rawInput: ''
 };
 
 const chatFlow = [
@@ -1103,6 +1115,7 @@ let multiSelections = [];
 
 function startChat() {
   currentChatStep = -1;
+  smartChatActive = false;
   multiSelections = [];
   document.getElementById('chat-messages').innerHTML = '';
   document.getElementById('chat-quick-replies').innerHTML = '';
@@ -1218,6 +1231,15 @@ function handleMultiSelectDone(step) {
   advanceChat();
 }
 
+function addBotBubble(text) {
+  const msgContainer = document.getElementById('chat-messages');
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble bot fade-in';
+  bubble.innerHTML = '<div class="bot-avatar"><div class="avatar">🐴</div><div class="name">Little Pony</div></div><div class="bubble-text">' + text.replace(/\n/g, '<br>') + '</div>';
+  msgContainer.appendChild(bubble);
+  msgContainer.scrollTop = msgContainer.scrollHeight;
+}
+
 function addUserBubble(text) {
   const msgContainer = document.getElementById('chat-messages');
   const bubble = document.createElement('div');
@@ -1234,51 +1256,1403 @@ function sendChatMessage() {
 
   addUserBubble(text);
   input.value = '';
+  document.getElementById('chat-quick-replies').innerHTML = '';
 
-  const step = chatFlow[currentChatStep];
-  if (step && step.handler) {
-    step.handler(text);
+  if (smartChatActive) {
+    handleSmartFreeText(text);
+  } else {
+    const step = chatFlow[currentChatStep];
+    if (step && step.handler) {
+      step.handler(text);
+    }
+    advanceChat();
+  }
+}
+
+// ===== SMART CHAT (Context-aware) =====
+let smartChatActive = false;
+let smartChatRound = 0;
+
+const cityDB = {
+  '杭州': { type:'江南水乡', features:['西湖','灵隐寺','龙井茶','九溪','西溪湿地','河坊街'], food:['西湖醋鱼','龙井虾仁','东坡肉','片儿川','定胜糕'], weather:'☀️ 28°C 晴', img:'photo-1526481280693-3bfa7568e0f3', dailyCost:400 },
+  '北京': { type:'皇城古都', features:['故宫','长城','颐和园','胡同','天坛','国家博物馆'], food:['烤鸭','炸酱面','涮羊肉','卤煮','豆汁'], weather:'⛅ 26°C 多云', img:'photo-1509023464722-18d996393ca8', dailyCost:700 },
+  '成都': { type:'天府之国', features:['熊猫基地','宽窄巷子','锦里','太古里','武侯祠','都江堰'], food:['火锅','担担面','串串香','兔头','甜水面'], weather:'🌧️ 22°C 阵雨', img:'photo-1588252910189-9c9f5535646b', dailyCost:550 },
+  '大理': { type:'风花雪月', features:['洱海','苍山','双廊','喜洲','古城','崇圣寺三塔'], food:['饵丝','乳扇','酸辣鱼','鲜花饼','烤乳扇'], weather:'🌤️ 24°C 舒适', img:'photo-1659466248885-8b7a03205661', dailyCost:600 },
+  '厦门': { type:'海上花园', features:['鼓浪屿','南普陀','环岛路','曾厝垵','沙坡尾','集美学村'], food:['沙茶面','海蛎煎','姜母鸭','花生汤','土笋冻'], weather:'☀️ 27°C 海风', img:'photo-1721794525689-d2bd76190f1e', dailyCost:550 },
+  '西安': { type:'千年古都', features:['兵马俑','城墙','大雁塔','回民街','陕历博','华清池'], food:['肉夹馍','凉皮','泡馍','biangbiang面','甑糕'], weather:'⛅ 25°C 晴', img:'photo-1710141925256-652f9ace7782', dailyCost:500 },
+  '青岛': { type:'海滨啤酒', features:['栈桥','八大关','啤酒博物馆','崂山','五四广场','金沙滩'], food:['海鲜','啤酒','鲅鱼饺子','辣炒蛤蜊','海菜凉粉'], weather:'☀️ 25°C 海风', img:'photo-1627868153411-624a8dce0a12', dailyCost:600 },
+  '三亚': { type:'热带海岛', features:['亚龙湾','天涯海角','南山寺','蜈支洲岛','椰梦长廊','呀诺达'], food:['椰子鸡','文昌鸡','海鲜大餐','清补凉','抱罗粉'], weather:'☀️ 32°C 热带', img:'photo-1503641926155-5c17619b79d0', dailyCost:800 },
+  '丽江': { type:'纳西古城', features:['丽江古城','玉龙雪山','束河古镇','蓝月谷','泸沽湖','黑龙潭'], food:['腊排骨','鸡豆凉粉','纳西烤鱼','丽江粑粑','米灌肠'], weather:'🌤️ 22°C 凉爽', img:'photo-1692963507663-9edee478f46c', dailyCost:500 },
+  '重庆': { type:'山城火锅', features:['洪崖洞','解放碑','磁器口','长江索道','李子坝','武隆天坑'], food:['火锅','小面','酸辣粉','抄手','烤鱼'], weather:'🌧️ 28°C 湿热', img:'photo-1716146705025-dadcab92b491', dailyCost:500 },
+  '南京': { type:'六朝古都', features:['中山陵','夫子庙','明孝陵','玄武湖','总统府','牛首山'], food:['盐水鸭','鸭血粉丝','小笼包','牛肉锅贴','糖芋苗'], weather:'⛅ 27°C 多云', img:'photo-1510001618818-4b4e3d86bf0f', dailyCost:500 },
+  '长沙': { type:'网红美食城', features:['橘子洲','岳麓山','太平老街','IFS','湖南省博','马王堆'], food:['臭豆腐','小龙虾','茶颜悦色','糖油粑粑','剁椒鱼头'], weather:'🌧️ 29°C 湿热', img:'photo-1508804185872-d7badad00f7d', dailyCost:450 },
+  '苏州': { type:'园林水乡', features:['拙政园','虎丘','周庄','平江路','金鸡湖','留园'], food:['松鼠桂鱼','大闸蟹','碧螺春','苏式汤面','桂花糕'], weather:'⛅ 26°C 多云', img:'photo-1528181304800-259b08848526', dailyCost:500 },
+  '桂林': { type:'山水甲天下', features:['漓江','阳朔','象鼻山','龙脊梯田','两江四湖','银子岩'], food:['桂林米粉','啤酒鱼','荔浦芋扣肉','田螺酿','油茶'], weather:'🌧️ 25°C 阵雨', img:'photo-1689825650048-55d2216868f7', dailyCost:450 },
+  '拉萨': { type:'雪域圣城', features:['布达拉宫','大昭寺','八廓街','纳木错','羊湖','色拉寺'], food:['酥油茶','糌粑','藏面','牦牛肉','甜茶'], weather:'☀️ 18°C 高原', img:'photo-1556355549-6a9b0d79f59d', dailyCost:600 },
+  '昆明': { type:'春城花海', features:['滇池','石林','翠湖','官渡古镇','西山','斗南花市'], food:['过桥米线','汽锅鸡','鲜花饼','烤豆腐','小锅米线'], weather:'☀️ 22°C 春城', img:'photo-1626359909709-8067b64e1655', dailyCost:400 },
+  '哈尔滨': { type:'冰城雪乡', features:['冰雪大世界','中央大街','圣索菲亚','太阳岛','虎林园','亚布力'], food:['锅包肉','马迭尔冰棍','红肠','铁锅炖','杀猪菜'], weather:'❄️ -15°C 冰雪', img:'photo-1675522108963-c1ea024abb8a', dailyCost:500 },
+  '新疆': { type:'丝路秘境', features:['天山天池','喀纳斯','那拉提草原','赛里木湖','吐鲁番','独库公路'], food:['大盘鸡','烤羊肉串','手抓饭','馕','拉条子'], weather:'☀️ 22°C 干爽', img:'photo-1708789936160-8e3486358fdf', dailyCost:500 },
+  '西藏': { type:'雪域高原', features:['布达拉宫','纳木错','羊卓雍措','珠峰大本营','林芝桃花','冈仁波齐'], food:['酥油茶','糌粑','藏面','牦牛肉','甜茶'], weather:'☀️ 15°C 高原', img:'photo-1556355549-6a9b0d79f59d', dailyCost:650 },
+  '云南': { type:'彩云之南', features:['大理古城','丽江','泸沽湖','香格里拉','西双版纳','元阳梯田'], food:['过桥米线','汽锅鸡','鲜花饼','包浆豆腐','傣味'], weather:'🌤️ 22°C 四季如春', img:'photo-1633964528699-58ada2816ce1', dailyCost:450 }
+};
+// Auto-generate city profile for unknown destinations
+function getOrInitCity(city) {
+  if (cityDB[city]) return cityDB[city];
+  // Infer profile from city name and common knowledge
+  const name = city;
+  let type = '旅行胜地', weather = '⛅ 25°C 适宜出行', dailyCost = 500, img = 'photo-1476514525535-07fb3b4ae5f1';
+  let features = [name + '古城', name + '风景区', name + '特色街区', name + '博物馆', name + '公园', name + '观景台'];
+  let food = [name + '特色菜', '当地小吃', '农家菜', '烧烤', '特色面食'];
+
+  // Region-based inference
+  if (/伊犁|阿勒泰|喀什|吐鲁番|库尔勒|哈密|克拉玛依|塔城|博乐/.test(name)) {
+    type = '西域秘境'; weather = '☀️ 22°C 干爽'; dailyCost = 500;
+    features = ['那拉提草原','喀纳斯湖','赛里木湖','天山','巴音布鲁克','禾木村'];
+    food = ['大盘鸡','烤羊肉串','手抓饭','馕','拉条子','烤包子'];
+    img = 'photo-1708789936160-8e3486358fdf';
+  } else if (/九寨|黄龙|峨眉|乐山|稻城|康定|理塘|色达|都江堰|青城/.test(name)) {
+    type = '蜀地山水'; weather = '⛅ 22°C 凉爽'; dailyCost = 450;
+    features = [name+'景区','原始森林','高山海子','藏族村寨','瀑布群','雪山观景'];
+    food = ['火锅','担担面','串串香','回锅肉','豆花','钵钵鸡'];
+    img = 'photo-1588252910189-9c9f5535646b';
+  } else if (/张家界|凤凰|武陵|衡山|韶山|岳阳/.test(name)) {
+    type = '湘楚胜地'; weather = '⛅ 26°C 温润'; dailyCost = 400;
+    features = ['国家森林公园','天门山','玻璃栈道','古镇','溶洞','峡谷'];
+    food = ['臭豆腐','小龙虾','剁椒鱼头','腊肉','血豆腐','米粉'];
+    img = 'photo-1508804185872-d7badad00f7d';
+  } else if (/香格里拉|丽江|腾冲|芒市|瑞丽|西双版纳|普洱|临沧/.test(name)) {
+    type = '彩云秘境'; weather = '🌤️ 22°C 四季如春'; dailyCost = 450;
+    features = ['古城','雪山','高原湖泊','藏族文化','热带雨林','梯田'];
+    food = ['过桥米线','汽锅鸡','鲜花饼','傣味','烤豆腐','米干'];
+    img = 'photo-1633964528699-58ada2816ce1';
+  } else if (/黄山|宏村|西递|徽州|九华|婺源/.test(name)) {
+    type = '徽派山水'; weather = '⛅ 24°C 清凉'; dailyCost = 400;
+    features = ['黄山','古村落','徽派建筑','云海','温泉','竹海'];
+    food = ['臭鳜鱼','毛豆腐','徽州饼','笋干烧肉','石头馃','一品锅'];
+    img = 'photo-1528181304800-259b08848526';
+  } else if (/敦煌|嘉峪关|张掖|兰州|天水|武威/.test(name)) {
+    type = '丝路走廊'; weather = '☀️ 20°C 干燥'; dailyCost = 400;
+    features = ['莫高窟','鸣沙山','丹霞地貌','古城遗址','长城遗址','石窟'];
+    food = ['牛肉面','烤全羊','酿皮','灰豆子','手抓羊肉','杏皮水'];
+    img = 'photo-1708789936160-8e3486358fdf';
+  } else if (/威海|烟台|日照|连云港|舟山|北海/.test(name)) {
+    type = '海滨度假'; weather = '☀️ 26°C 海风'; dailyCost = 500;
+    features = ['海滨浴场','灯塔','海鲜市场','环海路','渔港','海岛'];
+    food = ['海鲜','鱼饺','海菜凉粉','烤鱿鱼','鲅鱼饺子','海鲜面'];
+    img = 'photo-1627868153411-624a8dce0a12';
+  } else if (/乌镇|周庄|同里|南浔|西塘|甪直/.test(name)) {
+    type = '水乡古镇'; weather = '⛅ 25°C 温润'; dailyCost = 400;
+    features = ['古镇景区','河道','古桥','民俗馆','园林','夜景'];
+    food = ['白水鱼','酱鸭','糕点','米酒','粽子','河鲜'];
+    img = 'photo-1526481280693-3bfa7568e0f3';
+  } else if (/呼伦贝尔|锡林郭勒|鄂尔多斯|满洲里|阿尔山/.test(name)) {
+    type = '草原天堂'; weather = '☀️ 20°C 爽朗'; dailyCost = 500;
+    features = ['大草原','蒙古包','骑马','湖泊','森林','边境风光'];
+    food = ['手把肉','奶茶','烤全羊','奶豆腐','莜面','风干牛肉'];
+    img = 'photo-1551986782-d0169b3f8fa7';
+  } else if (/长白山|延吉|丹东|锦州|盘锦|葫芦岛/.test(name)) {
+    type = '东北风光'; weather = '⛅ 22°C 凉爽'; dailyCost = 400;
+    features = ['天池','温泉','森林','边境','湿地','民俗村'];
+    food = ['冷面','烤肉','锅包肉','石锅饭','打糕','米肠'];
+    img = 'photo-1675522108963-c1ea024abb8a';
+  } else if (/阳朔|龙脊|黄果树|荔波|梵净山|镇远/.test(name)) {
+    type = '山水秘境'; weather = '🌧️ 24°C 温润'; dailyCost = 400;
+    features = ['喀斯特山水','溶洞','瀑布','梯田','古镇','漂流'];
+    food = ['米粉','啤酒鱼','酸汤鱼','糯米饭','腊肉','油茶'];
+    img = 'photo-1689825650048-55d2216868f7';
+  } else if (/平遥|五台|云冈|壶口|雁门|晋祠/.test(name)) {
+    type = '晋商文化'; weather = '⛅ 23°C 干爽'; dailyCost = 350;
+    features = ['古城','古建','石窟','大院','寺庙','民俗'];
+    food = ['刀削面','莜面栲栳','平遥牛肉','碗托','过油肉','汾酒'];
+    img = 'photo-1509023464722-18d996393ca8';
+  } else if (/庐山|景德镇|三清山|龙虎山|井冈山|婺源/.test(name)) {
+    type = '赣鄱胜景'; weather = '⛅ 25°C 湿润'; dailyCost = 350;
+    features = ['名山','古窑','道教圣地','瀑布','古镇','花海'];
+    food = ['粉蒸肉','瓦罐汤','拌粉','瓷泥煨鸡','碱水粑','酒糟鱼'];
+    img = 'photo-1689825650048-55d2216868f7';
+  } else if (/青海湖|茶卡|格尔木|可可西里|祁连|门源/.test(name)) {
+    type = '高原明珠'; weather = '☀️ 18°C 高原'; dailyCost = 500;
+    features = ['盐湖','草原','雪山','藏族文化','油菜花海','星空'];
+    food = ['手抓羊肉','酿皮','酸奶','面片','糌粑','酥油茶'];
+    img = 'photo-1556355549-6a9b0d79f59d';
+  }
+  // --- International rules ---
+  else if (/欧洲|西欧|法国|意大利|英国|德国|西班牙|瑞士|荷兰|奥地利|希腊|葡萄牙|爱尔兰|比利时|巴黎|罗马|伦敦|柏林|巴塞罗那|慕尼黑|威尼斯|佛罗伦萨|布拉格|阿姆斯特丹|维也纳/.test(name)) {
+    type = '欧陆风情'; weather = '⛅ 20°C 温和'; dailyCost = 1500;
+    features = ['埃菲尔铁塔','卢浮宫','罗马斗兽场','圣家堂','大本钟','新天鹅堡'];
+    food = ['法式甜点','意大利面','西班牙海鲜饭','英式下午茶','德国猪肘','瑞士巧克力'];
+    img = 'photo-1502602898657-3e91760cbb34';
+  } else if (/东南亚|泰国|越南|柬埔寨|老挝|缅甸|马来西亚|印尼|菲律宾|曼谷|清迈|河内|胡志明|暹粒|吉隆坡|巴厘岛|长滩岛/.test(name)) {
+    type = '东南亚风情'; weather = '☀️ 30°C 热带'; dailyCost = 600;
+    features = ['大皇宫','吴哥窟','下龙湾','水上市场','佛塔','海岛'];
+    food = ['冬阴功','越南粉','咖喱','芒果糯米饭','烤肉串','椰子冻'];
+    img = 'photo-1517411032315-54ef2cb783bb';
+  } else if (/日本|东京|大阪|京都|北海道|冲绳|奈良|富士|名古屋|福冈|箱根|镰仓/.test(name)) {
+    type = '和风秘境'; weather = '⛅ 20°C 温润'; dailyCost = 1200;
+    features = ['浅草寺','富士山','金阁寺','大阪城','奈良鹿公园','温泉街'];
+    food = ['寿司','拉面','天妇罗','抹茶甜点','和牛','居酒屋'];
+    img = 'photo-1693858325816-b7a7c1066838';
+  } else if (/韩国|首尔|釜山|济州|仁川|明洞|弘大/.test(name)) {
+    type = '韩流之旅'; weather = '⛅ 18°C 四季分明'; dailyCost = 1000;
+    features = ['景福宫','明洞','济州岛','北村韩屋','南山塔','乐天世界'];
+    food = ['韩式烤肉','泡菜','炸鸡','石锅拌饭','参鸡汤','部队锅'];
+    img = 'photo-1570191913384-7b4ff11716e7';
+  } else if (/美国|纽约|洛杉矶|夏威夷|拉斯维加斯|旧金山|西雅图|芝加哥|华盛顿|波士顿|黄石|大峡谷/.test(name)) {
+    type = '美利坚探索'; weather = '⛅ 22°C 多样'; dailyCost = 1800;
+    features = ['自由女神','大峡谷','时代广场','黄石公园','金门大桥','迪士尼'];
+    food = ['汉堡','牛排','BBQ','芝士蛋糕','龙虾卷','Taco'];
+    img = 'photo-1486299267070-83823f5448dd';
+  } else if (/澳洲|澳大利亚|新西兰|悉尼|墨尔本|奥克兰|大堡礁|凯恩斯|黄金海岸/.test(name)) {
+    type = '南半球探险'; weather = '☀️ 24°C 阳光'; dailyCost = 1500;
+    features = ['悉尼歌剧院','大堡礁','大洋路','黄金海岸','企鹅岛','蓝山'];
+    food = ['牛排','海鲜','袋鼠肉','肉派','Flat White','青口贝'];
+    img = 'photo-1525625293386-3f8f99389edd';
+  } else if (/迪拜|阿联酋|沙特|卡塔尔|阿布扎比/.test(name)) {
+    type = '中东奢华'; weather = '☀️ 38°C 炎热'; dailyCost = 2000;
+    features = ['哈利法塔','沙漠冲沙','黄金市场','棕榈岛','清真寺','水上乐园'];
+    food = ['烤肉','鹰嘴豆泥','阿拉伯甜点','骆驼奶','沙瓦尔玛','藏红花饭'];
+    img = 'photo-1512453979798-5ea266f8880c';
+  } else if (/印度|尼泊尔|斯里兰卡|孟买|新德里|加尔各答|科伦坡/.test(name)) {
+    type = '南亚秘境'; weather = '☀️ 32°C 炎热'; dailyCost = 400;
+    features = ['泰姬陵','恒河','瑜伽圣地','琥珀堡','佛塔','茶园'];
+    food = ['咖喱','烤馕','Biryani','奶茶','Dosa','Samosa'];
+    img = 'photo-1564507592333-c60657eea523';
+  } else if (/非洲|埃及|摩洛哥|肯尼亚|南非|坦桑尼亚|乌干达|卢旺达|马达加斯加|塞伦盖蒂|马赛马拉|东非|西非|北非|开罗|开普敦|卡萨布兰卡|马拉喀什/.test(name)) {
+    type = '非洲探奇'; weather = '☀️ 30°C 干热'; dailyCost = 800;
+    features = ['金字塔','撒哈拉沙漠','动物大迁徙','好望角','蓝白小镇','尼罗河'];
+    food = ['烤肉','Couscous','塔吉锅','烤玉米','Mango汁','薄饼'];
+    img = 'photo-1551986782-d0169b3f8fa7';
+  } else if (/冰岛|挪威|芬兰|瑞典|丹麦|赫尔辛基|奥斯陆|斯德哥尔摩|哥本哈根|特罗姆瑟/.test(name)) {
+    type = '北欧极光'; weather = '❄️ 5°C 清冷'; dailyCost = 1800;
+    features = ['极光','冰川','峡湾','圣诞老人村','蓝湖','北欧设计'];
+    food = ['三文鱼','肉丸','开放三明治','驯鹿肉','蓝莓派','热红酒'];
+    img = 'photo-1566296314736-6eaac1ca0cb9';
+  } else if (/马尔代夫|塞班|斐济|大溪地|帕劳|毛里求斯/.test(name)) {
+    type = '海岛天堂'; weather = '☀️ 28°C 热带'; dailyCost = 2500;
+    features = ['水上别墅','浮潜','私人沙滩','海底餐厅','日落巡航','水疗'];
+    food = ['海鲜大餐','椰子蟹','热带水果','BBQ','鸡尾酒','生鱼片'];
+    img = 'photo-1518684079-3c830dcef090';
+  } else if (/新加坡/.test(name)) {
+    type = '花园城市'; weather = '🌧️ 30°C 热带'; dailyCost = 1000;
+    features = ['鱼尾狮','滨海湾金沙','圣淘沙','环球影城','植物园','牛车水'];
+    food = ['海南鸡饭','辣椒螃蟹','肉骨茶','叻沙','咖椰吐司','沙爹'];
+    img = 'photo-1525625293386-3f8f99389edd';
+  } else if (/土耳其|伊斯坦布尔|卡帕多奇亚|安塔利亚/.test(name)) {
+    type = '横跨欧亚'; weather = '⛅ 22°C 温和'; dailyCost = 700;
+    features = ['蓝色清真寺','热气球','棉花堡','大巴扎','地下水宫','地中海海岸'];
+    food = ['烤肉','土耳其咖啡','果仁蜜饼','土耳其披萨','红茶','酸奶'];
+    img = 'photo-1551918120-9739cb430c6d';
+  } else if (/巴西|阿根廷|秘鲁|墨西哥|智利|里约|布宜诺斯|利马|墨西哥城|坎昆/.test(name)) {
+    type = '拉美风情'; weather = '☀️ 28°C 热情'; dailyCost = 900;
+    features = ['基督像','马丘比丘','伊瓜苏瀑布','坎昆海滩','科帕卡巴纳','金字塔'];
+    food = ['Taco','烤肉','Ceviche','Empanada','莫吉托','龙舌兰'];
+    img = 'photo-1489392191049-fc10c97e64b6';
+  } else if (/俄罗斯|莫斯科|圣彼得堡|贝加尔/.test(name)) {
+    type = '俄式壮美'; weather = '❄️ 0°C 寒冷'; dailyCost = 1000;
+    features = ['红场','克里姆林宫','冬宫','贝加尔湖','芭蕾','洋葱头教堂'];
+    food = ['鱼子酱','罗宋汤','俄式饺子','伏特加','大列巴','烤肉串'];
+    img = 'photo-1662009867642-933d25d401fe';
+  } else if (/南美|中美|拉丁美洲|巴西|阿根廷|秘鲁|墨西哥|智利|哥伦比亚|古巴|巴拿马|里约|布宜诺斯|利马|墨西哥城|坎昆/.test(name)) {
+    type = '拉美风情'; weather = '☀️ 28°C 热情'; dailyCost = 900;
+    features = ['基督像','马丘比丘','伊瓜苏瀑布','坎昆海滩','科帕卡巴纳','金字塔'];
+    food = ['Taco','烤肉','Ceviche','Empanada','莫吉托','龙舌兰'];
+    img = 'photo-1489392191049-fc10c97e64b6';
+  } else if (/中东|西亚|沙特|卡塔尔|阿曼|约旦|黎巴嫩|以色列|伊朗/.test(name)) {
+    type = '中东风情'; weather = '☀️ 36°C 干热'; dailyCost = 1500;
+    features = ['佩特拉古城','死海','沙漠','清真寺','集市','古文明遗址'];
+    food = ['烤肉','鹰嘴豆泥','沙瓦尔玛','藏红花饭','阿拉伯甜点','薄荷茶'];
+    img = 'photo-1567266565446-d9c40ccf59a4';
+  } else if (/中亚|乌兹别克斯坦|哈萨克斯坦|吉尔吉斯|塔吉克斯坦|土库曼斯坦|撒马尔罕/.test(name)) {
+    type = '丝路古国'; weather = '☀️ 25°C 干爽'; dailyCost = 400;
+    features = ['丝路古城','清真寺','沙漠','游牧文化','中亚集市','古塔'];
+    food = ['抓饭','烤肉串','馕','拉格曼','奶茶','干果'];
+    img = 'photo-1503806837798-ea0ce2e6402e';
+  } else if (/东欧|波兰|捷克|匈牙利|罗马尼亚|保加利亚|克罗地亚|塞尔维亚|布拉格|布达佩斯|华沙/.test(name)) {
+    type = '东欧秘境'; weather = '⛅ 18°C 温和'; dailyCost = 800;
+    features = ['古城','城堡','温泉','教堂','多瑙河','老城广场'];
+    food = ['炖牛肉','饺子','啤酒','烟囱卷','古拉什','克里姆'];
+    img = 'photo-1528127269322-539801943592';
+  } else if (/北美/.test(name)) {
+    type = '北美之旅'; weather = '⛅ 22°C 多样'; dailyCost = 1600;
+    features = ['国家公园','大峡谷','城市天际线','瀑布','公路旅行','迪士尼'];
+    food = ['汉堡','牛排','BBQ','松饼','龙虾卷','苹果派'];
+    img = 'photo-1486299267070-83823f5448dd';
+  } else if (/南极/.test(name)) {
+    type = '极地探险'; weather = '❄️ -20°C 极寒'; dailyCost = 5000;
+    features = ['企鹅','冰川','极地科考站','冰山','极昼','鲸鱼'];
+    food = ['极地补给','罐头食品','热饮','船餐'];
+    img = 'photo-1566296314736-6eaac1ca0cb9';
+  } else if (/加拿大|温哥华|多伦多|蒙特利尔|班夫|落基山/.test(name)) {
+    type = '枫叶之国'; weather = '⛅ 18°C 清爽'; dailyCost = 1400;
+    features = ['班夫国家公园','尼亚加拉瀑布','枫叶大道','CN塔','落基山脉','极光'];
+    food = ['Poutine','枫糖浆','龙虾','烟熏肉','Tim Hortons','奶油塔'];
+    img = 'photo-1513326738677-b964603b136d';
   }
 
+  const profile = { type, features, food, weather, img, dailyCost };
+  cityDB[city] = profile; // Cache for reuse
+  return profile;
+}
+
+
+function parseTravelIntent(text) {
+  const intent = { destination: '', preferences: [], groupSize: '', budget: 0, timeRange: '', rawText: text, topics: [], negatedDest: '' };
+
+  // --- Destination extraction ---
+  // Direct city name match
+  for (const [city, info] of Object.entries(cityDB)) {
+    const keywords = [city, ...info.features];
+    if (keywords.some(k => text.includes(k))) { intent.destination = city; break; }
+  }
+  // 1.5 Direct international country/region name match (before fuzzyMap)
+  if (!intent.destination) {
+    const intlNames = ['欧洲','西欧','非洲','南非','北非','东非','西非','南美','北美','中美','中东','中亚','西亚','东欧','北欧','南极','法国','意大利','英国','德国','西班牙','瑞士','荷兰','奥地利','希腊','葡萄牙','爱尔兰','比利时','巴黎','罗马','伦敦','柏林','巴塞罗那','慕尼黑','威尼斯','佛罗伦萨','布拉格','阿姆斯特丹','维也纳','东南亚','泰国','越南','柬埔寨','老挝','缅甸','马来西亚','印尼','菲律宾','曼谷','清迈','河内','胡志明','暹粒','吉隆坡','巴厘岛','长滩岛','日本','东京','大阪','京都','北海道','冲绳','奈良','富士','名古屋','福冈','箱根','镰仓','韩国','首尔','釜山','济州','仁川','美国','纽约','洛杉矶','夏威夷','拉斯维加斯','旧金山','西雅图','芝加哥','华盛顿','波士顿','黄石','大峡谷','澳洲','澳大利亚','新西兰','悉尼','墨尔本','奥克兰','大堡礁','凯恩斯','黄金海岸','迪拜','阿联酋','沙特','卡塔尔','阿布扎比','印度','尼泊尔','斯里兰卡','孟买','新德里','埃及','摩洛哥','肯尼亚','南非','坦桑尼亚','开罗','开普敦','卡萨布兰卡','冰岛','挪威','芬兰','瑞典','丹麦','马尔代夫','塞班','斐济','大溪地','帕劳','毛里求斯','新加坡','土耳其','伊斯坦布尔','巴西','阿根廷','秘鲁','墨西哥','智利','俄罗斯','莫斯科','圣彼得堡','贝加尔','加拿大','温哥华','多伦多','蒙特利尔','班夫','肯尼亚','坦桑尼亚','乌干达','卢旺达','马达加斯加','塞伦盖蒂','马赛马拉','塞伦盖蒂大草原','撒哈拉'];
+    for (const name of intlNames) {
+      if (text.includes(name)) { intent.destination = name; break; }
+    }
+  }
+  // Fuzzy: "海边" → 三亚/青岛/厦门, "古城" → 丽江/西安/大理, "高原" → 拉萨/西藏, "热带" → 三亚
+  if (!intent.destination) {
+    const fuzzyMap = [
+      { keywords: ['海边','海岛','沙滩','看海','大海','海景'], cities: ['三亚','青岛','厦门'] },
+      { keywords: ['古城','古镇','古街','老街'], cities: ['丽江','西安','大理','苏州'] },
+      { keywords: ['高原','雪山','冰川'], cities: ['拉萨','西藏','丽江'] },
+      { keywords: ['热带','椰树','潜水'], cities: ['三亚'] },
+      { keywords: ['草原','骑马','蒙古包'], cities: ['新疆'] },
+      { keywords: ['雪','滑雪','冰'], cities: ['哈尔滨','丽江'] },
+      { keywords: ['江南','水乡','园林'], cities: ['苏州','杭州'] },
+      { keywords: ['火锅','辣','麻辣'], cities: ['成都','重庆'] },
+      { keywords: ['熊猫'], cities: ['成都'] },
+      { keywords: ['故宫','皇城','长城','天安门'], cities: ['北京'] },
+      { keywords: ['西湖','灵隐','龙井'], cities: ['杭州'] },
+      { keywords: ['洱海','苍山','双廊'], cities: ['大理'] },
+      { keywords: ['鼓浪屿','曾厝垵'], cities: ['厦门'] },
+      { keywords: ['兵马俑','回民街','大雁塔'], cities: ['西安'] },
+      { keywords: ['栈桥','八大关','崂山'], cities: ['青岛'] },
+      { keywords: ['漓江','阳朔','象鼻山'], cities: ['桂林'] },
+      { keywords: ['布达拉宫','纳木错'], cities: ['拉萨'] },
+      { keywords: ['滇池','石林','昆明'], cities: ['昆明'] },
+      { keywords: ['橘子洲','岳麓'], cities: ['长沙'] },
+      { keywords: ['中山陵','夫子庙','玄武湖'], cities: ['南京'] },
+      { keywords: ['拙政园','虎丘','周庄'], cities: ['苏州'] },
+      { keywords: ['洪崖洞','解放碑','磁器口'], cities: ['重庆'] },
+      { keywords: ['天池','喀纳斯','那拉提','伊犁'], cities: ['新疆'] },
+      { keywords: ['珠峰','林芝','冈仁波齐'], cities: ['西藏'] },
+      { keywords: ['版纳','香格里拉','泸沽湖'], cities: ['云南'] },
+      // International experience keywords
+      { keywords: ['极光','北极光','aurora'], cities: ['冰岛'] },
+      { keywords: ['城堡','童话','中世纪','宫殿','古堡'], cities: ['法国'] },
+      { keywords: ['薰衣草','普罗旺斯','葡萄酒庄'], cities: ['法国'] },
+      { keywords: ['樱花','赏樱','枫叶','红叶'], cities: ['日本'] },
+      { keywords: ['浮潜','水肺','深潜'], cities: ['马尔代夫'] },
+      { keywords: ['金字塔','法老','尼罗河'], cities: ['埃及'] },
+      { keywords: ['袋鼠','考拉','大堡礁'], cities: ['澳洲'] },
+      { keywords: ['自由女神','好莱坞','时代广场'], cities: ['美国'] },
+      { keywords: ['斗牛','弗拉明戈','tapas'], cities: ['西班牙'] },
+      { keywords: ['免税','代购','血拼'], cities: ['韩国'] },
+      { keywords: ['庙宇','僧侣','吴哥'], cities: ['柬埔寨'] },
+      { keywords: ['热带雨林','丛林探险'], cities: ['东南亚'] },
+      { keywords: ['热气球','棉花堡'], cities: ['土耳其'] },
+      { keywords: ['峡湾','冰川'], cities: ['冰岛'] },
+      { keywords: ['桑巴','足球','狂欢节'], cities: ['巴西'] },
+      { keywords: ['伏特加','红场','克里姆林'], cities: ['俄罗斯'] },
+      { keywords: ['枫叶','枫糖','班夫'], cities: ['加拿大'] },
+      { keywords: ['水上别墅','蜜月海岛'], cities: ['马尔代夫'] },
+      { keywords: ['狮子','大象','动物大迁徙','safari','草原游猎','猎豹','长颈鹿'], cities: ['肯尼亚'] },
+      { keywords: ['撒哈拉','沙漠玫瑰'], cities: ['埃及'] },
+      { keywords: ['企鹅','南极','冰川探险'], cities: ['南非'] },
+    ];
+    for (const group of fuzzyMap) {
+      if (group.keywords.some(k => text.includes(k))) { intent.destination = group.cities[0]; break; }
+    }
+  }
+  // 3. Pattern-based: extract ANY place name from "去XX玩/旅游/..." patterns
+  if (!intent.destination) {
+    const patterns = [
+      /[想去飞到]?去(.+?)(玩|旅游|旅行|度假|度蜜月|蜜月|看看|逛逛|走走|放松|出行|转转|一趟|结婚|游学)/,
+      /想到(.+?)(玩|旅游|旅行|度假|看看|逛逛|走走|放松|出行)/,
+      /计划.*?去(.+?)(玩|旅游|旅行|度假|看看|逛逛)?[，。！？\s]/,
+      /目的地.*?是?(.+?)[，。！？\s]/,
+      /去(.{2,6}?)[的得啊吧呢]?[，。！？\s]/,
+      /想去(.{2,6}?)[的得啊吧呢]?[，。！？\s]/,
+      /^(.{2,6}?)(有什么|怎么样|好不好|好玩|推荐|攻略|值得|特色|必去|费用|天气|美食|住宿|交通)/,
+      /^(.{2,6}?)[的得]?(有什么|怎么样|好不好|好玩|推荐)/,
+      /^([^\s，。！？、]{2,8}?)(旅游|旅行|度假|度蜜月|蜜月|游学|出差)/,
+    ];
+    for (const p of patterns) {
+      const m = text.match(p);
+      if (m && m[1]) {
+        let place = m[1].replace(/^[去到飞想]/,'').replace(/[一下几些]*$/,'').replace(/\d+[天日人晚元块千万亿]+$/,'').trim();
+        if (place && place.length >= 2 && !/哪里|哪儿|哪|什么|那边|那里|一个|某个|别的|其他|外面|远方|去看|去看极|去玩|去吃|去逛|去转|看极光|看风景/.test(place)) {
+          intent.destination = place;
+          break;
+        }
+      }
+    }
+  }
+  // 4. Last resort: "去/到/飞 + place" without verb after
+  if (!intent.destination) {
+    const sm = text.match(/[想去飞到]([^\s，。！？、]{2,6})/);
+    if (sm) {
+      const place = sm[1].replace(/^[去到飞想看逛玩吃]/,'').replace(/[一下几些]*$/,'').replace(/\d+[天日人晚元块千万亿]+$/,'').trim();
+      if (place && place.length >= 2 && !/哪里|哪儿|什么|那边|那里|一个|某个|别的|其他|外面|远方|去看|去玩|去吃|去逛|去转|看极光|看风景/.test(place)) {
+        intent.destination = place;
+      }
+    }
+  }
+
+  // --- Negation: exclude destinations the user explicitly rejected ---
+  if (intent.destination) {
+    // Detect "不想去XX(了)" "别去XX(了)" "不去XX(了)" "不要去XX(了)" "算了不去XX" etc.
+    const negPatterns = [
+      /不想(?:要)?去([^\s，。！？、]+?)(?:了|啦|了啦)?[，。！？\s]/,
+      /别去([^\s，。！？、]+?)(?:了|啦)?[，。！？\s]/,
+      /不去([^\s，。！？、]+?)(?:了|啦)?[，。！？\s]/,
+      /不要去([^\s，。！？、]+?)(?:了|啦)?[，。！？\s]/,
+      /算了.*?不去([^\s，。！？、]+?)(?:了|啦)?/,
+      /不想(?:要)?去([^\s，。！？、]+?)$/,
+      /别去([^\s，。！？、]+?)$/,
+      /不去([^\s，。！？、]+?)$/,
+    ];
+    const negated = [];
+    for (const np of negPatterns) {
+      const nm = text.match(np);
+      if (nm && nm[1]) {
+        let negPlace = nm[1].replace(/^[去到飞想]/,'').replace(/[一下几些的了啦]*$/,'').trim();
+        if (negPlace && negPlace.length <= 6) negated.push(negPlace);
+      }
+    }
+    // If current destination is negated, clear it and store what was negated
+    if (negated.some(n => intent.destination.includes(n) || n.includes(intent.destination))) {
+      intent.negatedDest = intent.destination;
+      intent.destination = '';
+    }
+  }
+  // --- If destination was negated, look for a new one in the POSITIVE part of the text ---
+  if (!intent.destination) {
+    // Strip the negated part from the text to avoid re-matching it
+    let positiveText = text;
+    for (const nd of [intent.negatedDest]) {
+      if (nd) positiveText = positiveText.replace(new RegExp('不?想?去?' + nd + '[了啦]*'), '');
+    }
+    // "不想去法国了，想去土耳其" → "，想去土耳其" → re-scan for the positive destination
+    const posPatterns = [
+      /(?:想|要|准备|计划)(?:去|到)(.+?)(?:玩|旅游|旅行|度假|度蜜月|蜜月|看看|逛逛|走走|放松|出行|[，。！？\s])/,
+      /(?:想|要)(?:去|到)(.+?)$/,
+      /(?:改去|换去|改为|换成)(.+?)(?:[，。！？\s]|$)/,
+      /[，。！？\s]去([^\s，。！？、]{2,8}?)(?:[，。！？\s]|$)/,
+      /去([^\s，。！？、]{2,8}?)(?:玩|旅游|旅行|度假|度蜜月|蜜月)/,
+    ];
+    for (const pp of posPatterns) {
+      const pm = positiveText.match(pp);
+      if (pm && pm[1]) {
+        let newDest = pm[1].replace(/^[去到飞想]/,'').replace(/[一下几些的了啦]*$/,'').trim();
+        if (newDest && newDest.length >= 2) {
+          intent.destination = newDest;
+          break;
+        }
+      }
+    }
+  }
+
+  // --- Alias mapping: sub-regions map to parent destination ---
+  if (intent.destination) {
+    const aliases = {
+      '南法': '法国', '北法': '法国', '普罗旺斯': '法国', '蔚蓝海岸': '法国', '尼斯': '法国', '马赛': '法国', '里昂': '法国', '波尔多': '法国',
+      '南意': '意大利', '北意': '意大利', '托斯卡纳': '意大利', '米兰': '意大利', '威尼斯': '意大利', '罗马': '意大利', '佛罗伦萨': '意大利', '那不勒斯': '意大利',
+      '南德': '德国', '北德': '德国', '巴伐利亚': '德国', '慕尼黑': '德国', '柏林': '德国', '汉堡': '德国', '法兰克福': '德国',
+      '英格兰': '英国', '苏格兰': '英国', '伦敦': '英国', '爱丁堡': '英国', '曼彻斯特': '英国',
+      '关东': '日本', '关西': '日本', '北海道': '日本', '冲绳': '日本', '东京': '日本', '大阪': '日本', '京都': '日本',
+      '济州岛': '韩国', '首尔': '韩国', '釜山': '韩国',
+      '安达卢西亚': '西班牙', '巴塞罗那': '西班牙', '马德里': '西班牙',
+      '加州': '美国', '纽约': '美国', '洛杉矶': '美国', '夏威夷': '美国',
+      '皇后镇': '新西兰', '奥克兰': '新西兰',
+      '卡帕多奇亚': '土耳其', '伊斯坦布尔': '土耳其',
+      '九寨沟': '四川',
+    };
+    if (aliases[intent.destination]) {
+      intent.destination = aliases[intent.destination];
+    }
+  }
+
+  // --- Group size ---
+  const groupMatch = text.match(/(\d+)\s*人|全家|一家人|情侣|夫妻|独自|自己|单人|亲子|带.*妈|带.*父母|带.*孩子|带.*小孩|带.*老人|和.*朋友|和.*同学|和.*闺蜜|和.*兄弟/);
+  if (groupMatch) {
+    const g = groupMatch[0];
+    if (/独自|自己|单人|一个人/.test(g)) intent.groupSize = '1';
+    else if (/情侣|夫妻|两个人|俩/.test(g)) intent.groupSize = '2';
+    else if (/全家|一家|亲子|带.*孩子|带.*小孩|带.*爸妈|带.*父母|带.*老人/.test(g)) intent.groupSize = '3-4';
+    else if (/朋友|同学|闺蜜|兄弟/.test(g)) intent.groupSize = '3-4';
+    else if (groupMatch[1]) intent.groupSize = groupMatch[1];
+  }
+
+  // --- Budget ---
+  const budgetMatch = text.match(/(\d+)\s*[千kK]|(\d+)\s*万|预算\s*(\d+)|(\d+)\s*元|预算.*?(\d+)/);
+  if (budgetMatch) {
+    const m = budgetMatch[0];
+    if (/万/.test(m)) intent.budget = parseInt(budgetMatch[2] || budgetMatch[5]) * 10000;
+    else if (/[千kK]/.test(m)) intent.budget = parseInt(budgetMatch[1]) * 1000;
+    else intent.budget = parseInt(budgetMatch[3] || budgetMatch[4] || budgetMatch[5]);
+  }
+  // Budget intent without number: "便宜""省钱""穷游""不差钱""贵点也行"
+  if (!intent.budget) {
+    if (/穷游|省钱|便宜|节省|实惠|学生党/.test(text)) intent.budget = 1500;
+    if (/不差钱|土豪|贵.*也行|品质|奢华|高端/.test(text)) intent.budget = 8000;
+  }
+
+  // --- Days ---
+  const dayMatch = text.match(/(\d+)\s*[天日]|周末|小长假|长假|黄金周|五一|十一|春节/);
+  if (dayMatch) {
+    const d = dayMatch[0];
+    if (/周末/.test(d)) intent.timeRange = '2';
+    else if (/小长假|五一|十一/.test(d)) intent.timeRange = '3';
+    else if (/长假|黄金周|春节/.test(d)) intent.timeRange = '7';
+    else if (dayMatch[1]) intent.timeRange = dayMatch[1];
+  }
+  // Time hints without number
+  if (!intent.timeRange) {
+    if (/当天来回|一日游|一天/.test(text)) intent.timeRange = '1';
+    if (/短途|短假/.test(text)) intent.timeRange = '2';
+    if (/深度|慢慢玩|不赶/.test(text)) intent.timeRange = '5';
+    if (/长途|远行/.test(text)) intent.timeRange = '7';
+  }
+
+  // --- Preferences (much broader matching) ---
+  const prefKeywords = {
+    '美食': ['美食','吃货','好吃','小吃','餐厅','吃','探店','喝','尝','特色菜','地道','当地菜','烹饪','食材','夜市','大排档','烧烤','火锅','串串','面','米线','饺子','海鲜'],
+    '文化': ['文化','历史','古迹','博物馆','古城','古都','遗址','文物','寺庙','教堂','纪念馆','非遗','传统','民俗','人文','古建筑'],
+    '自然': ['自然','山水','风景','户外','徒步','草原','海岛','森林','瀑布','湖泊','湿地','峡谷','星空','日出','日落','云海','花海','田野','梯田'],
+    '休闲': ['休闲','放松','度假','温泉','慢','躺平','发呆','悠闲','养生','spa','按摩','静','清静','远离','避世','放空','慢生活'],
+    '拍照': ['拍照','打卡','旅拍','出片','网红','ins风','摄影','风景照','人像','vlog','视频','航拍','大片','造型']
+  };
+  for (const [pref, keywords] of Object.entries(prefKeywords)) {
+    if (keywords.some(k => text.includes(k))) intent.preferences.push(pref);
+  }
+  // Preference from activity descriptions
+  if (/逛街|购物|买买买|免税/.test(text) && !intent.preferences.includes('休闲')) intent.preferences.push('休闲');
+  if (/潜水|冲浪|攀岩|蹦极|漂流|滑翔/.test(text) && !intent.preferences.includes('自然')) intent.preferences.push('自然');
+  if (/喝咖啡|下午茶|看书|文艺|书店|展览/.test(text) && !intent.preferences.includes('休闲')) intent.preferences.push('休闲');
+
+  // --- Topics: what is the user asking about? ---
+  if (/天气|下雨|气温|温度|冷|热|穿|带.*衣|外套|防晒|雨伞|帽子|墨镜|裙子|短袖|长袖/.test(text)) intent.topics.push('weather');
+  if (/吃|喝|美食|小吃|餐厅|馆子|夜市|大排档|推荐.*吃|什么好吃|必吃|特色.*吃|好不好吃/.test(text)) intent.topics.push('food');
+  if (/住|酒店|民宿|住宿|旅馆|宾馆|订房|房型|位置.*住|推荐.*住|哪里住/.test(text)) intent.topics.push('hotel');
+  if (/怎么去|怎么走|交通|路线|地铁|公交|打车|租车|高铁|飞机|机场|火车站|自驾|导航/.test(text)) intent.topics.push('transport');
+  if (/钱|花.*费|多少|贵|便宜|费用|花费|日均|门票.*钱|预算|门票|免费|性价比|划算/.test(text)) intent.topics.push('cost');
+  if (/安全|注意|小心|危险|避坑|坑|被骗|宰客|防盗|保险/.test(text)) intent.topics.push('safety');
+  if (/玩|景点|去哪|推荐.*去|必去|打卡|逛|值得|看看|有什么|景色|风景|名胜/.test(text)) intent.topics.push('features');
+  if (/行程|安排|怎么玩|攻略|计划|第一天|第二天|路线|规划|天.*安排|日程/.test(text)) intent.topics.push('itinerary');
+
+  return intent;
+}
+
+function getMissingFields() {
+  const missing = [];
+  if (!chatState.destination) missing.push('destination');
+  if (!chatState.groupSize) missing.push('groupSize');
+  if (!chatState.budget) missing.push('budget');
+  if (!chatState.timeRange) missing.push('timeRange');
+  if (chatState.preferences.length === 0) missing.push('preferences');
+  return missing;
+}
+
+function getNextQuestion(missing) {
+  const field = missing[0];
+  const questions = {
+    destination: {
+      msg: '你想去哪里呀？可以告诉我城市名，或者描述你想要的感觉～',
+      quickReplies: [
+        {text:'杭州',value:'杭州'},{text:'北京',value:'北京'},{text:'成都',value:'成都'},
+        {text:'大理',value:'大理'},{text:'三亚',value:'三亚'},{text:'新疆',value:'新疆'},{text:'其他城市',value:'_other'}
+      ]
+    },
+    preferences: {
+      msg: '你偏好什么类型的旅行？可以多选～',
+      quickReplies: [
+        {text:'🌅 自然风光',value:'自然'},{text:'🏛️ 历史文化',value:'文化'},
+        {text:'🍜 美食探店',value:'美食'},{text:'🧘 休闲度假',value:'休闲'},{text:'📷 打卡拍照',value:'拍照'}
+      ],
+      multiSelect: true
+    },
+    groupSize: {
+      msg: '几个人一起去？',
+      quickReplies: [
+        {text:'🧍 独自出发',value:'1'},{text:'👫 2人',value:'2'},
+        {text:'👨‍👩‍👧 3-4人',value:'3-4'},{text:'👨‍👩‍👧‍👦 5人+',value:'5+'}
+      ]
+    },
+    budget: {
+      msg: '预算大概多少？',
+      quickReplies: [
+        {text:'💰 1千以内',value:'1000'},{text:'💰 1-3千',value:'3000'},
+        {text:'💰 3-5千',value:'5000'},{text:'💰 5千以上',value:'8000'}
+      ]
+    },
+    timeRange: {
+      msg: '计划玩几天？',
+      quickReplies: [
+        {text:'1-2天',value:'2'},{text:'3-4天',value:'4'},
+        {text:'5-7天',value:'7'},{text:'一周以上',value:'10'}
+      ]
+    }
+  };
+  return questions[field] || null;
+}
+
+function startSmartChat(intent) {
+  currentChatStep = -1;
+  smartChatActive = true;
+  smartChatRound = 0;
+  multiSelections = [];
+  const msgContainer = document.getElementById('chat-messages');
+  const qrContainer = document.getElementById('chat-quick-replies');
+  msgContainer.innerHTML = '';
+  qrContainer.innerHTML = '';
+
+  addUserBubble(chatState.rawInput);
+
+  const extracted = [];
+  if (intent.destination) extracted.push('📍 ' + intent.destination);
+  if (intent.preferences.length) extracted.push('🎯 ' + intent.preferences.join('、'));
+  if (intent.groupSize) extracted.push('👥 ' + intent.groupSize + '人');
+  if (intent.budget) extracted.push('💰 ¥' + intent.budget);
+  if (intent.timeRange) extracted.push('📅 ' + intent.timeRange + '天');
+
+  let ackMsg = '你好呀！我是小马 🐴，你的出行小助手～\n\n';
+  if (extracted.length > 0) {
+    ackMsg += '已了解你的需求：' + extracted.join(' · ');
+    if (intent.destination) {
+      const _cityInfo = getOrInitCity(intent.destination);
+      const info = _cityInfo;
+      ackMsg += '\n\n' + intent.destination + '（' + info.type + '）— ' + info.weather + '，日均¥' + info.dailyCost;
+
+    }
+  } else {
+    ackMsg += '告诉我你想去哪、什么时候出发，我来帮你规划～';
+  }
+
+  // Only ask for destination if missing — everything else gets defaults
+  if (!chatState.destination) {
+    ackMsg += '\n\n你想去哪里呀？告诉我城市名就行～';
+    addBotBubble(ackMsg);
+    setTimeout(() => askNextQuestion(['destination']), 800);
+  } else {
+    // Destination known, fill defaults for the rest and show action buttons
+    ackMsg += '\n\n你可以问我天气、美食、住宿等任何问题，也可以直接让我出方案～';
+    addBotBubble(ackMsg);
+    setTimeout(() => showFollowUpActions(), 800);
+  }
+}
+
+function askNextQuestion(missing) {
+  if (!missing || missing.length === 0) {
+    generateFromSmartChat();
+    return;
+  }
+  const q = getNextQuestion(missing);
+  if (!q) { generateFromSmartChat(); return; }
+
+  const msgContainer = document.getElementById('chat-messages');
+  const qrContainer = document.getElementById('chat-quick-replies');
+
+  const typing = document.createElement('div');
+  typing.className = 'chat-bubble bot typing';
+  typing.innerHTML = '<div class="bot-avatar"><div class="avatar">🐴</div><div class="name">Little Pony</div></div><div class="bubble-text"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+  msgContainer.appendChild(typing);
+  msgContainer.scrollTop = msgContainer.scrollHeight;
+
+  const delay = 600 + Math.random() * 400;
+  setTimeout(() => {
+    typing.remove();
+    addBotBubble(q.msg);
+
+    qrContainer.innerHTML = '';
+    if (q.quickReplies) {
+      q.quickReplies.forEach(qr => {
+        const btn = document.createElement('button');
+        btn.className = 'chat-quick-reply';
+        btn.textContent = qr.text;
+        btn.dataset.value = qr.value;
+        btn.dataset.field = missing[0];
+        if (q.multiSelect) {
+          btn.onclick = () => {
+            if (!multiSelections.includes(qr.value)) {
+              multiSelections.push(qr.value);
+              btn.classList.add('selected');
+            } else {
+              multiSelections = multiSelections.filter(s => s !== qr.value);
+              btn.classList.remove('selected');
+            }
+          };
+        } else {
+          btn.onclick = () => handleSmartQuickReply(qr.value, qr.text, missing[0]);
+        }
+        qrContainer.appendChild(btn);
+      });
+    }
+    if (q.multiSelect) {
+      const doneBtn = document.createElement('button');
+      doneBtn.className = 'chat-quick-reply next-btn';
+      doneBtn.textContent = '选好了 →';
+      doneBtn.style.background = 'linear-gradient(135deg,var(--primary),var(--primary-dark))';
+      doneBtn.style.color = '#fff';
+      doneBtn.style.border = 'none';
+      doneBtn.onclick = () => handleSmartMultiDone(missing[0]);
+      qrContainer.appendChild(doneBtn);
+    }
+
+    const inputBar = document.querySelector('.chat-input-bar');
+    if (inputBar) {
+      inputBar.style.display = 'flex';
+      const chatInput = document.getElementById('chat-input');
+      if (chatInput) chatInput.placeholder = '输入你想说的...';
+    }
+  }, delay);
+}
+
+function handleSmartQuickReply(value, text, field) {
+  addUserBubble(text);
   document.getElementById('chat-quick-replies').innerHTML = '';
-  advanceChat();
+  applyField(field, value);
+  addBotBubble('已记录！还可以继续补充信息，或者让我出方案～');
+  showFollowUpActions();
+}
+
+function handleSmartMultiDone(field) {
+  if (multiSelections.length === 0) { showToast('请至少选一项'); return; }
+  const selected = [...multiSelections];
+  multiSelections = [];
+  const texts = selected.map(s => {
+    const qrEl = document.querySelector(`.chat-quick-reply[data-value="${s}"]`);
+    return qrEl ? qrEl.textContent : s;
+  });
+  addUserBubble(texts.join('、'));
+  document.getElementById('chat-quick-replies').innerHTML = '';
+  applyField(field, selected);
+  addBotBubble('已记录！还可以继续补充信息，或者让我出方案～');
+  showFollowUpActions();
+}
+
+function handleSmartFreeText(text) {
+  const intent = parseTravelIntent(text);
+  let reply = '';
+  let wantGenerate = false;
+
+  // Merge newly parsed info into chatState (always, even if asking a question)
+  const infoUpdated = mergeIntentToState(intent);
+
+  // === Priority 1: User explicitly wants to generate a plan ===
+  if (/出方案|给我.*方案|推荐.*方案|生成|规划吧|出个计划|重新规划|重新推荐|再来一个|换个方案|其他方案/.test(text)) {
+    if (!chatState.destination) {
+      reply = '好的！不过我还需要知道你想去哪里，才能帮你规划～\n告诉我目的地吧！';
+    } else {
+      fillDefaults();
+      wantGenerate = true;
+      reply = '好的，马上为你规划！';
+    }
+  }
+  // === Priority 2: User wants to change destination (new destination extracted) ===
+  else if (/换个?地方|换个?目的|不去.*了|不想.*去了?|别去了?|算了|放弃.*去|改去|换去|想去别|换个?城市|换.*路线|换个?方向/.test(text) && intent.destination) {
+    const oldDest = chatState.destination;
+    chatState.destination = intent.destination;
+    reply = '好的，目的地已更新为' + intent.destination + '！';
+    if (oldDest) reply += '（原：' + oldDest + '）';
+    reply += '\n\n' + buildCityIntro(intent.destination);
+    reply += '\n\n需要我出个方案吗？';
+  }
+  // === Priority 2.5: User negated current destination + asks for theme-based recommendations ===
+  else if (/不想.*去了?|不去.*了|别去了?|算了|放弃/.test(text) && !intent.destination) {
+    const oldDest = chatState.destination;
+    chatState.destination = '';
+    reply = '好的，不去' + (oldDest || '那里') + '了～';
+    // Check if the user mentioned a theme/preference for the new destination
+    const themeMatch = text.match(/丝绸之路|丝路|古城|海边|热带|高原|草原|雪山|海岛|森林|沙漠/);
+    if (themeMatch) {
+      const theme = themeMatch[0];
+      const themeRecommendations = {
+        '丝绸之路': '丝绸之路沿线推荐：土耳其、埃及、摩洛哥、乌兹别克斯坦，都充满丝路风情！',
+        '丝路': '丝路沿线推荐：土耳其、埃及、摩洛哥，各有独特的异域风情！',
+        '古城': '喜欢古城的话，推荐：丽江、西安、布拉格、伊斯坦布尔，各有韵味～',
+        '海边': '想看海的话，推荐：三亚、马尔代夫、巴厘岛、冲绳，风景绝美！',
+        '热带': '热带度假推荐：三亚、巴厘岛、普吉岛、马尔代夫，阳光沙滩～',
+        '高原': '高原风光推荐：西藏、青海、玻利维亚、秘鲁，壮阔震撼！',
+        '草原': '草原推荐：呼伦贝尔、伊犁、内蒙古，辽阔自由～',
+        '雪山': '雪山推荐：丽江玉龙雪山、瑞士阿尔卑斯、尼泊尔，壮观！',
+        '海岛': '海岛推荐：马尔代夫、巴厘岛、普吉岛、塞班，各有特色～',
+        '森林': '森林推荐：西双版纳、张家界、亚马逊，自然生态之旅～',
+        '沙漠': '沙漠推荐：敦煌鸣沙山、撒哈拉、迪拜，神秘壮美～',
+      };
+      reply += '\n\n' + (themeRecommendations[theme] || '你想要什么样的体验呢？告诉我，我来推荐～');
+    } else {
+      reply += '\n\n你想要什么样的体验呢？比如：海边、古城、自然、美食、放松...告诉我，我来推荐！';
+    }
+  }
+  // === Priority 3: Answer based on topics detected in parseTravelIntent ===
+  else if (intent.topics.length > 0) {
+    // Build reply based on first detected topic
+    const topic = intent.topics[0];
+    switch (topic) {
+      case 'weather': reply = buildWeatherReply(text); break;
+      case 'food': reply = buildFoodReply(text); break;
+      case 'hotel': reply = buildHotelReply(text); break;
+      case 'transport': reply = buildTransportReply(text); break;
+      case 'cost': reply = buildCostReply(text); break;
+      case 'safety': reply = buildSafetyReply(text); break;
+      case 'features': reply = buildFeaturesReply(text); break;
+      case 'itinerary': reply = buildItineraryReply(text); break;
+    }
+  }
+  // === Priority 4: New travel info was extracted — acknowledge and offer ===
+  else if (infoUpdated) {
+    reply = '好的，已记录：' + infoUpdated + '！';
+    if (chatState.destination) {
+      reply += '\n\n' + buildCityIntro(chatState.destination);
+      reply += '\n\n你可以问我任何问题，也可以让我出方案～';
+    }
+  }
+  // === Priority 5: Social / conversational ===
+  else if (/你好|嗨|hi|hello|hey|早|晚上好|下午好/.test(text)) {
+    reply = '你好呀！我是小马 🐴，你的出行小助手～\n' + (chatState.destination ? buildContextSummary() + '\n' : '') + '有什么想了解的，尽管问我！';
+  }
+  else if (/谢|thanks|thank|感谢|辛苦/.test(text)) {
+    reply = ['不客气！祝你旅途愉快 🎉', '随时找我聊～祝玩得开心！🌟', '有问题再问我哦～🐴'][Math.floor(Math.random() * 3)];
+  }
+  else if (/不满意|不好|太差|烂|垃圾|不行|失望/.test(text)) {
+    reply = '抱歉没能让你满意 😅 你可以告诉我具体哪里不满意，我来调整～';
+  }
+  // === Priority 6: Intelligent fallback — try to understand contextually ===
+  else {
+    reply = buildSmartReply(text, intent);
+  }
+
+  if (reply) addBotBubble(reply);
+
+  setTimeout(() => {
+    if (wantGenerate) {
+      generateFromSmartChat();
+    } else {
+      showFollowUpActions();
+    }
+  }, 600);
+}
+
+// Smart fallback: analyze the full text against context to generate a meaningful reply
+function buildSmartReply(text, intent) {
+  const city = chatState.destination;
+  const info = city ? getOrInitCity(city) : null;
+  const t = text.toLowerCase();
+
+  // User describing a desire/vibe without explicit keywords
+  // "我想去海边放松" → destination from fuzzy match + preference
+  if (intent.destination && intent.destination !== chatState.destination) {
+    chatState.destination = intent.destination;
+    return '听起来不错！' + intent.destination + '是个好选择～\n\n' + buildCityIntro(intent.destination) + '\n\n你想了解什么？或者让我出个方案？';
+  }
+
+  // "带爸妈出去玩" / "和闺蜜旅行" → group size inferred
+  if (intent.groupSize && !chatState.groupSize) {
+    chatState.groupSize = intent.groupSize;
+  }
+
+  // "想放松一下" / "想出去走走" → preference inferred
+  if (intent.preferences.length > 0 && chatState.preferences.length === 0) {
+    chatState.preferences = intent.preferences;
+  }
+
+  // If we picked up any new info, acknowledge it
+  if (intent.destination || intent.preferences.length > 0 || intent.groupSize || intent.budget || intent.timeRange) {
+    const parts = [];
+    if (intent.destination) parts.push('📍 ' + intent.destination);
+    if (intent.preferences.length) parts.push('🎯 ' + intent.preferences.join('、'));
+    if (intent.groupSize) parts.push('👥 ' + intent.groupSize + '人');
+    if (intent.budget) parts.push('💰 ¥' + intent.budget);
+    if (intent.timeRange) parts.push('📅 ' + intent.timeRange + '天');
+    let r = '了解！已记录你的想法：' + parts.join(' · ');
+    if (city || intent.destination) {
+      const c = intent.destination || city;
+      r += '\n\n你可以问我关于' + c + '的任何问题，或者让我出个方案～';
+    }
+    return r;
+  }
+
+  // User asking for recommendation without specific topic
+  if (/推荐|建议|怎么样|好不好|值不?值得|应不应该|适合|合适/.test(t)) {
+    if (city && info) {
+      return city + '很值得去！' + info.type + '，' + info.features.slice(0, 2).join('和') + '是最大亮点。' + info.weather + '，日均¥' + info.dailyCost + '。\n\n想了解天气、美食、住宿还是交通？都可以问我～';
+    }
+    return '你想去哪里？或者告诉我你想要什么样的体验（海边/古城/自然/美食...），我来推荐～';
+  }
+
+  // User feeling undecided
+  if (/无聊|没意思|不知道|随便|都行|没想好|纠结/.test(t)) {
+    if (city && info) {
+      return '在' + city + '不会无聊的！试试' + info.features[Math.floor(Math.random() * info.features.length)] + '，' + info.food[0] + '也很值得一试～\n\n想让我帮你安排行程吗？';
+    }
+    return '没想好去哪？告诉我你想要什么样的体验——海边、古城、自然、美食、放松...我来推荐！';
+  }
+
+  // Comparison
+  if (/比较|对比|哪个|还是|还是去/.test(t)) {
+    if (city && info) {
+      const cities = Object.keys(cityDB);
+      const similar = cities.filter(c => c !== city && cityDB[c].type === info.type);
+      if (similar.length > 0) {
+        return '和' + city + '风格类似的城市还有：' + similar.slice(0, 3).join('、') + '，各有特色，要不要我帮你对比一下？';
+      }
+    }
+    return '想对比哪些城市？告诉我，我帮你分析～';
+  }
+
+  // Completely unclear — friendly prompt with context
+  if (city && info) {
+    return '关于' + city + '，你还想了解什么？\n可以问我：天气怎么样、有什么好吃的、住哪方便、怎么去、花多少钱...\n或者直接让我出方案～';
+  }
+  return '有什么出行想法都可以告诉我～比如"我想去海边放松3天"或者"成都美食推荐"，我来帮你规划！';
+}
+
+// Fill reasonable defaults for missing optional fields so we can generate a plan
+function fillDefaults() {
+  if (!chatState.groupSize) chatState.groupSize = '2';
+  if (!chatState.budget) chatState.budget = getOrInitCity(chatState.destination).dailyCost * (parseInt(chatState.timeRange) || 3);
+  if (!chatState.timeRange) chatState.timeRange = '3';
+  if (chatState.preferences.length === 0) chatState.preferences = ['休闲'];
+}
+
+// ===== CONTEXT-AWARE REPLY BUILDERS =====
+
+function buildContextSummary() {
+  const parts = [];
+  if (chatState.destination) parts.push('📍 目的地：' + chatState.destination);
+  if (chatState.timeRange) parts.push('📅 ' + chatState.timeRange + '天');
+  if (chatState.groupSize) parts.push('👥 ' + chatState.groupSize + '人');
+  if (chatState.budget) parts.push('💰 预算¥' + chatState.budget.toLocaleString());
+  if (chatState.preferences.length) parts.push('🎯 ' + chatState.preferences.join('、'));
+  return parts.length > 0 ? '当前计划：' + parts.join(' · ') : '';
+}
+
+function buildCityIntro(city) {
+  const info = getOrInitCity(city);
+  if (!info) return city + '是个不错的选择！';
+  return city + '（' + info.type + '）— ' + info.weather + '，\n特色景点：' + info.features.slice(0, 4).join('、') + '\n特色美食：' + info.food.slice(0, 3).join('、') + '\n日均花费约¥' + info.dailyCost;
+}
+
+function buildWeatherReply(text) {
+  const city = extractCityFromText(text) || chatState.destination;
+  const info = city ? getOrInitCity(city) : null;
+  if (!city) return '你想了解哪里的天气呢？告诉我目的地，我帮你查～';
+
+  const days = parseInt(chatState.timeRange) || 3;
+  let reply = city + '目前' + info.weather;
+  if (info.weather.includes('热') || info.weather.includes('☀️')) {
+    reply += '\n\n☀️ 天气较热，建议：';
+    reply += '\n· 穿轻薄透气衣物，带防晒霜和遮阳帽';
+    reply += '\n· 多喝水，避免正午长时间户外活动';
+  } else if (info.weather.includes('雨') || info.weather.includes('🌧️')) {
+    reply += '\n\n🌧️ 有雨，建议：';
+    reply += '\n· 带雨伞/雨衣，穿防滑鞋';
+    reply += '\n· 可以准备室内备选行程';
+  } else if (info.weather.includes('冷') || info.weather.includes('❄️')) {
+    reply += '\n\n❄️ 天气寒冷，建议：';
+    reply += '\n· 穿厚外套+保暖内衣，戴手套围巾';
+    reply += '\n· 备暖宝宝，手机注意保暖防掉电';
+  } else {
+    reply += '\n\n🌤️ 气候舒适，建议：';
+    reply += '\n· 轻薄长袖+薄外套即可';
+    reply += '\n· 早晚温差可能较大，带件外套备用';
+  }
+  if (chatState.groupSize === '1') reply += '\n\n独自出行更要关注天气变化，安全第一！';
+  return reply;
+}
+
+function buildFoodReply(text) {
+  const city = extractCityFromText(text) || chatState.destination;
+  const info = city ? getOrInitCity(city) : null;
+  if (!city) return '你想了解哪里的美食？告诉我目的地～';
+
+  const isBudget = chatState.budget && chatState.budget < 2000;
+  let reply = city + '必吃榜单来啦 🤤\n\n';
+  reply += '🔥 必尝特色：\n';
+  info.food.forEach((f, i) => reply += (i + 1) + '. ' + f + '\n');
+  reply += '\n📍 推荐觅食地：';
+  const foodSpots = info.features.filter(f => /街|巷|路|市|镇/.test(f));
+  if (foodSpots.length) reply += foodSpots.join('、');
+  else reply += info.features[0] + '周边';
+
+  if (isBudget) reply += '\n\n💡 省钱tips：景区周边价格偏高，走远2-3条街往往更实惠～';
+  if (chatState.preferences.includes('美食')) reply += '\n\n作为吃货，建议至少留半天专门逛吃！';
+  return reply;
+}
+
+function buildHotelReply(text) {
+  const city = extractCityFromText(text) || chatState.destination;
+  const info = city ? getOrInitCity(city) : null;
+  if (!city) return '你想住哪里？告诉我目的地～';
+
+  let reply = city + '住宿建议：\n\n';
+  if (info) {
+    reply += '📍 推荐区域：' + info.features[0] + '周边\n';
+    reply += '· 住景点附近出行方便，步行可达\n';
+    reply += '· ' + info.features[1] + '附近性价比更高\n\n';
+    const dailyCost = info.dailyCost;
+    reply += '💰 参考价格：\n';
+    reply += '· 经济型：¥' + Math.round(dailyCost * 0.3) + '-¥' + Math.round(dailyCost * 0.5) + '/晚\n';
+    reply += '· 舒适型：¥' + Math.round(dailyCost * 0.5) + '-¥' + Math.round(dailyCost * 0.8) + '/晚\n';
+    reply += '· 高端型：¥' + Math.round(dailyCost * 0.8) + '+/晚';
+  } else {
+    reply += '建议住在景点集中的区域，出行更方便。预算充足选特色民宿体验感更好～';
+  }
+
+  if (chatState.groupSize === '1') reply += '\n\n独自出行推荐青旅或民宿，有机会认识旅伴～';
+  else if (chatState.groupSize === '3-4' || chatState.groupSize === '5+') reply += '\n\n多人出行可以选民宿/公寓，分摊下来更划算～';
+  return reply;
+}
+
+function buildTransportReply(text) {
+  const city = extractCityFromText(text) || chatState.destination;
+  const info = city ? getOrInitCity(city) : null;
+  if (!city) return '你想了解哪里的交通？告诉我目的地～';
+
+  let reply = '';
+  if (/高铁|火车/.test(text)) {
+    reply = city + '高铁出行：\n';
+    if (info) reply += '· 可乘高铁直达，建议提前购票\n· 节假日票紧张，至少提前3天购买\n· 二等座舒适性价比高';
+    else reply += '建议通过12306查询具体车次和票价，节假日提前购票～';
+  } else if (/飞机|机场/.test(text)) {
+    reply = city + '飞行出行：\n';
+    if (info) reply += '· 机场到市区约40-60分钟\n· 建议提前2小时到机场\n· 机票提前2周买通常更便宜';
+    else reply += '建议通过航班APP查询票价，提前订更优惠～';
+  } else {
+    reply = city + '市内交通：\n\n';
+    if (info) {
+      reply += '🚇 地铁/公交：覆盖主要景点，单程2-5元\n';
+      reply += '🚗 打车/网约车：景点间约10-30元\n';
+      reply += '🚴 共享单车：短途骑行很方便\n\n';
+      reply += '💡 建议：景点间近的步行+骑行，远的打车，比纯打车省一半～';
+    } else {
+      reply += '建议打车+公共交通结合，性价比最高～';
+    }
+  }
+  return reply;
+}
+
+function buildCostReply(text) {
+  const city = extractCityFromText(text) || chatState.destination;
+  const info = city ? getOrInitCity(city) : null;
+  if (!city) return '你想了解哪里的花费？告诉我目的地～';
+
+  const days = parseInt(chatState.timeRange) || 3;
+  const group = chatState.groupSize || '2';
+  let reply = city + '花费参考（' + days + '天）：\n\n';
+  reply += '💰 人均预算：\n';
+  reply += '· 住宿：¥' + Math.round(info.dailyCost * 0.35) + '/晚 × ' + days + '晚 = ¥' + Math.round(info.dailyCost * 0.35 * days) + '\n';
+  reply += '· 餐饮：¥' + Math.round(info.dailyCost * 0.25) + '/天 × ' + days + '天 = ¥' + Math.round(info.dailyCost * 0.25 * days) + '\n';
+  reply += '· 门票：约 ¥' + Math.round(info.dailyCost * 0.2 * days) + '\n';
+  reply += '· 交通：约 ¥' + Math.round(info.dailyCost * 0.15 * days) + '\n';
+  const total = Math.round(info.dailyCost * days);
+  reply += '\n📊 合计约：¥' + total.toLocaleString() + '/人';
+
+  if (chatState.budget) {
+    const diff = chatState.budget - total;
+    if (diff > 0) reply += '\n\n✅ 在你的¥' + chatState.budget.toLocaleString() + '预算内，还剩¥' + diff.toLocaleString() + '可以买买买！';
+    else if (diff < 0) reply += '\n\n⚠️ 超出预算¥' + Math.abs(diff).toLocaleString() + '，可以减少天数或选择性价比方案～';
+    else reply += '\n\n✅ 刚好在预算线上～';
+  }
+  return reply;
+}
+
+function buildSafetyReply(text) {
+  const city = extractCityFromText(text) || chatState.destination;
+  let reply = '出行安全提示：\n\n';
+  reply += '🔒 财物安全：贵重物品贴身放，景区注意防盗\n';
+  reply += '📱 通讯准备：提前下载离线地图，保存紧急电话\n';
+  reply += '💧 健康安全：带常用药品，注意饮食卫生\n';
+  reply += '📋 证件保管：身份证/护照拍照备份，分开存放';
+
+  if (city) {
+    const info = getOrInitCity(city);
+    if (info) {
+      if (info.type.includes('高原') || city === '拉萨' || city === '西藏') {
+        reply += '\n\n🏔️ 高原地区特别注意：\n· 提前服用红景天，到达后不要剧烈运动\n· 多喝水，少洗澡，注意保暖防感冒\n· 如有严重高反及时就医';
+      }
+      if (info.type.includes('海') || info.type.includes('岛')) {
+        reply += '\n\n🏖️ 海边特别注意：\n· 注意潮汐时间，不要去无人海域\n· 水上项目确认安全设施\n· 防晒！防晒！防晒！';
+      }
+      if (info.weather.includes('雨') || info.weather.includes('湿')) {
+        reply += '\n\n🌧️ 雨季注意：\n· 随身带伞，关注天气预报\n· 山区注意防滑和山洪\n· 室内备选行程很重要';
+      }
+    }
+  }
+  if (chatState.groupSize === '1') reply += '\n\n独自出行请把行程告诉家人朋友，保持联系～';
+  return reply;
+}
+
+function buildFeaturesReply(text) {
+  const city = extractCityFromText(text) || chatState.destination;
+  const info = city ? getOrInitCity(city) : null;
+  if (!city) return '你想去哪里玩？告诉我目的地，我帮你推荐～';
+
+  const prefs = chatState.preferences.length > 0 ? chatState.preferences : ['休闲'];
+  let reply = city + '必玩推荐 🎯\n\n';
+
+  reply += '🌟 经典必去：\n';
+  info.features.slice(0, 3).forEach((f, i) => reply += (i + 1) + '. ' + f + '\n');
+
+  reply += '\n💎 小众推荐：\n';
+  info.features.slice(3).forEach((f, i) => reply += (i + 1) + '. ' + f + '\n');
+
+  if (prefs.includes('美食')) reply += '\n🍜 吃货路线：边逛边吃，' + info.features[0] + '附近美食最多～';
+  if (prefs.includes('拍照')) reply += '\n📸 拍照路线：日出/日落时段出片率最高～';
+  if (prefs.includes('文化')) reply += '\n🏛️ 文化路线：博物馆+古城区安排一整天～';
+  if (prefs.includes('自然')) reply += '\n🌿 自然路线：早去人少景美，记得带水和防晒～';
+
+  reply += '\n\n想要我出个详细行程吗？';
+  return reply;
+}
+
+function buildItineraryReply(text) {
+  const city = chatState.destination;
+  if (!city) return '告诉我你想去哪里，我来安排行程～';
+
+  const info = getOrInitCity(city);
+  const days = parseInt(chatState.timeRange) || 3;
+
+  let reply = city + days + '天行程建议：\n\n';
+  const featuresPerDay = splitFeatures(info.features, Math.min(days, info.features.length));
+  for (let d = 0; d < Math.min(days, featuresPerDay.length); d++) {
+    const dayFeatures = featuresPerDay[d];
+    reply += '📅 Day ' + (d + 1) + '：\n';
+    if (dayFeatures[0]) reply += '  上午：' + dayFeatures[0] + '\n';
+    if (dayFeatures[1]) reply += '  下午：' + dayFeatures[1] + '\n';
+    reply += '  午餐：' + info.food[d % info.food.length] + '\n';
+    if (dayFeatures[2]) reply += '  晚上：' + dayFeatures[2] + '\n';
+    else reply += '  晚上：逛' + (info.features.find(f => /街|巷|路/.test(f)) || '美食街') + '\n';
+    reply += '\n';
+  }
+  reply += '需要我生成完整方案吗？可以直接跳转到详情页查看～';
+  return reply;
+}
+
+function extractCityFromText(text) {
+  for (const [city, info] of Object.entries(cityDB)) {
+    const keywords = [city, ...info.features];
+    if (keywords.some(k => text.includes(k))) return city;
+  }
+  return '';
+}
+
+function mergeIntentToState(intent) {
+  const updated = [];
+  if (intent.negatedDest && chatState.destination === intent.negatedDest) { chatState.destination = ''; }
+  if (intent.destination && intent.destination !== chatState.destination) { chatState.destination = intent.destination; updated.push('📍 ' + intent.destination); }
+  if (intent.preferences.length > 0) {
+    const newPrefs = intent.preferences.filter(p => !chatState.preferences.includes(p));
+    if (newPrefs.length > 0) { chatState.preferences = chatState.preferences.concat(newPrefs); updated.push('🎯 ' + newPrefs.join('、')); }
+  }
+  if (intent.groupSize && !chatState.groupSize) { chatState.groupSize = intent.groupSize; updated.push('👥 ' + intent.groupSize + '人'); }
+  if (intent.budget && !chatState.budget) { chatState.budget = intent.budget; updated.push('💰 ¥' + intent.budget); }
+  if (intent.timeRange && !chatState.timeRange) { chatState.timeRange = intent.timeRange; updated.push('📅 ' + intent.timeRange + '天'); }
+  return updated.join(' · ');
+}
+
+function showFollowUpActions() {
+  const qrContainer = document.getElementById('chat-quick-replies');
+  qrContainer.innerHTML = '';
+  const actions = [];
+  const city = chatState.destination;
+  const info = city ? getOrInitCity(city) : null;
+
+  if (city) {
+    actions.push({ text: '出方案', value: '__generate' });
+    actions.push({ text: '有什么好玩', value: '__ask_features' });
+    actions.push({ text: '美食推荐', value: '__ask_food' });
+    actions.push({ text: '天气穿搭', value: '__ask_weather' });
+    actions.push({ text: '费用明细', value: '__ask_cost' });
+    actions.push({ text: '住宿推荐', value: '__ask_hotel' });
+  }
+  if (city) {
+    actions.push({ text: '换个目的地', value: '__change_dest' });
+  }
+  if (actions.length === 0) {
+    actions.push({ text: '推荐目的地', value: '__recommend' });
+  }
+
+  actions.forEach(a => {
+    const btn = document.createElement('button');
+    btn.className = 'chat-quick-reply';
+    btn.textContent = a.text;
+    btn.onclick = () => handleFollowUpAction(a.value);
+    qrContainer.appendChild(btn);
+  });
+}
+
+function handleFollowUpAction(value) {
+  const labels = {
+    '__generate': '出个方案', '__change_dest': '换个目的地',
+    '__ask_features': '有什么好玩的', '__ask_food': '推荐美食',
+    '__ask_weather': '天气怎么样', '__ask_cost': '费用明细',
+    '__ask_hotel': '住宿推荐', '__recommend': '推荐目的地'
+  };
+  addUserBubble(labels[value] || value.replace('__', ''));
+  document.getElementById('chat-quick-replies').innerHTML = '';
+
+  switch (value) {
+    case '__generate':
+      generateFromSmartChat();
+      break;
+    case '__change_dest':
+      chatState.destination = '';
+      addBotBubble('好的，告诉我你想去哪里？输入城市名或描述你想要的体验～');
+      showFollowUpActions();
+      break;
+    case '__ask_features':
+      addBotBubble(buildFeaturesReply('有什么好玩'));
+      showFollowUpActions();
+      break;
+    case '__ask_food':
+      addBotBubble(buildFoodReply('推荐美食'));
+      showFollowUpActions();
+      break;
+    case '__ask_weather':
+      addBotBubble(buildWeatherReply('天气怎么样'));
+      showFollowUpActions();
+      break;
+    case '__ask_cost':
+      addBotBubble(buildCostReply('费用明细'));
+      showFollowUpActions();
+      break;
+    case '__ask_hotel':
+      addBotBubble(buildHotelReply('住宿推荐'));
+      showFollowUpActions();
+      break;
+    case '__recommend':
+      addBotBubble('你想要什么样的旅行体验？\n🌅 自然风光 / 🏛️ 历史文化 / 🍜 美食探店 / 🧘 休闲度假 / 📷 打卡拍照\n告诉我你的偏好，我来推荐！');
+      break;
+  }
+}
+
+function applyField(field, value) {
+  if (field === 'destination') chatState.destination = value;
+  else if (field === 'groupSize') chatState.groupSize = value;
+  else if (field === 'budget') chatState.budget = parseInt(value) || 0;
+  else if (field === 'timeRange') chatState.timeRange = value;
+  else if (field === 'preferences') chatState.preferences = Array.isArray(value) ? value : [value];
+}
+
+function generateFromSmartChat(isRegenerate) {
+  document.getElementById('chat-quick-replies').innerHTML = '';
+
+  const typing = document.createElement('div');
+  typing.className = 'chat-bubble bot typing';
+  typing.innerHTML = '<div class="bot-avatar"><div class="avatar">🐴</div><div class="name">Little Pony</div></div><div class="bubble-text"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+  const msgContainer = document.getElementById('chat-messages');
+  msgContainer.appendChild(typing);
+  msgContainer.scrollTop = msgContainer.scrollHeight;
+
+  setTimeout(() => {
+    typing.remove();
+    const dest = chatState.destination || '推荐目的地';
+    const pref = chatState.preferences.length > 0 ? chatState.preferences.join('、') : '休闲度假';
+    const budget = chatState.budget ? '¥' + chatState.budget + '以内' : '';
+    const group = chatState.groupSize === '1' ? '单人' : (chatState.groupSize || '2') + '人';
+    const summaryMsg = (isRegenerate ? '已重新' : '已') + '规划好！为你精选了' + dest + '的出行方案 🎉\n偏好：' + pref + ' · ' + group + '出行' + (budget ? ' · 预算' + budget : '') + '\n\n👇 即将跳转到推荐页...';
+    addBotBubble(summaryMsg);
+    setTimeout(() => {
+      generateAndShowResults();
+      setTimeout(() => {
+        addBotBubble('方案已生成！你可以在结果页查看详情，也可以继续跟我聊：调整方案、换个目的地、或者问任何问题～');
+        showFollowUpActions();
+      }, 500);
+    }, 800);
+  }, 2000);
+}
+
+// ===== DYNAMIC RESULT/DETAIL GENERATION =====
+function generateDynamicResultData(city) {
+  const info = getOrInitCity(city);
+  const days = parseInt(chatState.timeRange) || 3;
+  const budget = chatState.budget || info.dailyCost * days;
+  const prefs = chatState.preferences.length > 0 ? chatState.preferences : ['休闲'];
+
+  const isFood = prefs.includes('美食');
+  const isNature = prefs.includes('自然');
+  const isCulture = prefs.includes('文化');
+  const isRelax = prefs.includes('休闲');
+  const isPhoto = prefs.includes('拍照');
+
+  const plans = [];
+
+  // Plan 1: Classic
+  const classicDays = Math.min(days, info.features.length);
+  const classicCost = info.dailyCost * classicDays;
+  const classicFeatures = info.features.slice(0, classicDays + 1).join('+');
+  let classicTag = '经典推荐';
+  if (isFood) classicTag = '吃货首选';
+  else if (isCulture) classicTag = '文化之旅';
+  else if (isNature) classicTag = '自然之选';
+  plans.push({
+    name: city + ' · ' + getPlanName(city, prefs, 'classic'),
+    img: info.img,
+    tag: classicTag,
+    tagClass: 'hot',
+    desc: classicDays + '天' + (classicDays-1) + '晚，' + classicFeatures + '，人均¥' + classicCost.toLocaleString(),
+    crowd: '适中',
+    cost: '¥' + classicCost.toLocaleString(),
+    days: classicDays + '天'
+  });
+
+  // Plan 2: Alternative (if enough days)
+  if (days >= 3) {
+    const altDays = Math.max(2, Math.floor(days * 0.7));
+    const altCost = Math.round(info.dailyCost * altDays * 0.85);
+    const altFeatures = info.features.slice(2, 2 + altDays).join('+');
+    const altTag = isRelax ? '慢游之选' : isPhoto ? '出片路线' : '深度体验';
+    plans.push({
+      name: city + ' · ' + getPlanName(city, prefs, 'alt'),
+      img: info.img,
+      tag: altTag,
+      tagClass: 'good',
+      desc: altDays + '天' + (altDays-1) + '晚，' + altFeatures + '，人均¥' + altCost.toLocaleString(),
+      crowd: '较少',
+      cost: '¥' + altCost.toLocaleString(),
+      days: altDays + '天'
+    });
+  }
+
+  // Plan 3: Budget (if budget is tight)
+  if (days <= 3 || budget < info.dailyCost * days) {
+    const budgetDays = Math.max(2, Math.floor(budget / info.dailyCost));
+    const budgetCost = Math.round(info.dailyCost * budgetDays * 0.7);
+    const budgetFeatures = info.features.slice(0, budgetDays).join('+');
+    plans.push({
+      name: city + ' · ' + getPlanName(city, prefs, 'budget'),
+      img: info.img,
+      tag: '性价比之选',
+      tagClass: 'good',
+      desc: budgetDays + '天' + (budgetDays-1) + '晚，' + budgetFeatures + '，人均¥' + budgetCost.toLocaleString(),
+      crowd: '适中',
+      cost: '¥' + budgetCost.toLocaleString(),
+      days: budgetDays + '天'
+    });
+  }
+
+  return { title: city + '出行建议', plans: plans };
+}
+
+function getPlanName(city, prefs, type) {
+  const info = getOrInitCity(city);
+  const names = {
+    classic: { '美食': '风味之旅', '文化': '人文之旅', '自然': '风光之旅', '休闲': '慢生活之旅', '拍照': '打卡之旅', default: '经典之旅' },
+    alt: { '美食': '隐藏美食路线', '文化': '深度人文路线', '自然': '秘境探索路线', '休闲': '躺平度假路线', '拍照': '小众出片路线', default: '深度体验路线' },
+    budget: { default: '轻量穷游路线' }
+  };
+  const map = names[type] || names.classic;
+  for (const p of prefs) { if (map[p]) return map[p]; }
+  return map.default || (info ? info.type + '之旅' : '出行方案');
+}
+
+function generateDynamicDetailData(city, planIndex) {
+  const info = getOrInitCity(city);
+  const days = parseInt(chatState.timeRange) || 3;
+  const prefs = chatState.preferences.length > 0 ? chatState.preferences : ['休闲'];
+  const isFood = prefs.includes('美食');
+  const dailyCost = info.dailyCost;
+
+  const daysArr = [];
+  const featuresPerDay = splitFeatures(info.features, Math.min(days, info.features.length));
+
+  for (let d = 0; d < Math.min(days, info.features.length); d++) {
+    const dayFeatures = featuresPerDay[d] || [];
+    const items = [];
+    const weatherIcons = ['☀️','⛅','🌤️'];
+    const weathers = [info.weather, info.weather.replace(/☀️|⛅|🌤️|🌧️|❄️/, weatherIcons[d % 3])];
+    const clothes = ['轻薄T恤+薄外套','透气衬衫+休闲裤','运动装+防晒'];
+
+    // Morning
+    if (dayFeatures[0]) {
+      items.push({ time: '09:00', activity: dayFeatures[0], cost: '¥' + Math.round(dailyCost * 0.25), note: info.type + '必游之地，建议提前预约', tags: [{ type: 'crowd-green', text: '🟢 上午人流较少' }, { type: 'tip', text: '📱 建议提前在线预约' }] });
+    }
+    // Lunch
+    if (isFood && info.food[d % info.food.length]) {
+      items.push({ time: '12:00', activity: '品尝' + info.food[d % info.food.length], cost: '¥' + Math.round(dailyCost * 0.2), note: '当地特色美食，值得一试', tags: [{ type: 'tip', text: '🍽️ ' + info.food.join('、') + ' 都是必吃' }] });
+    } else if (dayFeatures[0]) {
+      items.push({ transit: [{ mode: '步行', from: dayFeatures[0], to: dayFeatures[1] || '餐厅', time: '10min' }, { mode: '打车', from: dayFeatures[0], to: dayFeatures[1] || '餐厅', time: '5min' }] });
+      items.push({ time: '12:00', activity: info.food[d % info.food.length] + '午餐', cost: '¥' + Math.round(dailyCost * 0.15), note: '休息补充体力' });
+    }
+    // Afternoon
+    if (dayFeatures[1]) {
+      items.push({ transit: [{ mode: '公交', from: dayFeatures[0] || '', to: dayFeatures[1], time: '20min' }, { mode: '打车', from: dayFeatures[0] || '', to: dayFeatures[1], time: '8min' }] });
+      items.push({ time: '14:30', activity: dayFeatures[1], cost: dayFeatures[1].includes('街') || dayFeatures[1].includes('古镇') || dayFeatures[1].includes('路') ? '免费' : '¥' + Math.round(dailyCost * 0.2), note: info.type + '特色景点', tags: [{ type: 'tip', text: '📸 最佳拍照时间 16:00-18:00' }] });
+    }
+    // Evening food
+    items.push({ transit: [{ mode: '步行', from: dayFeatures[1] || '', to: '美食街', time: '10min' }, { mode: '打车', from: dayFeatures[1] || '', to: '美食街', time: '5min' }] });
+    items.push({ time: '18:00', activity: info.food[(d + 1) % info.food.length] + (d === days - 1 ? '告别晚餐' : '晚餐'), cost: '¥' + Math.round(dailyCost * 0.2), note: '当地特色，' + info.food.slice(0, 3).join('、') + '都值得尝试', tags: [{ type: 'tip', text: '💡 景区周边餐厅价格偏高，可走远一点' }] });
+
+    daysArr.push({
+      label: 'Day ' + (d + 1) + ' · ' + (dayFeatures[0] || info.type),
+      weather: weathers[d % 2] + ' · 👕 ' + clothes[d % 3],
+      cost: Math.round(dailyCost * 0.85),
+      items: items
+    });
+  }
+
+  const totalCost = daysArr.reduce((sum, d) => sum + d.cost, 0) + Math.round(dailyCost * 0.5);
+  const planNames = [getPlanName(city, prefs, 'classic'), getPlanName(city, prefs, 'alt'), getPlanName(city, prefs, 'budget')];
+
+  return {
+    title: city + ' · ' + planNames[planIndex] || planNames[0],
+    subtitle: days + '天' + (days-1) + '晚 · ' + prefs.join('/') + ' · ' + (chatState.groupSize || '2') + '人 · ¥' + totalCost.toLocaleString() + '起',
+    heroImg: 'https://images.unsplash.com/' + info.img + '?w=600&h=300&fit=crop',
+    totalCost: totalCost,
+    paidItems: [{ name: city + '酒店', type: '住宿', price: Math.round(dailyCost * 0.4 * days), day: 1 }, { name: info.food[0], type: '餐饮', price: Math.round(dailyCost * 0.3), day: 1 }, { name: info.features[0] + '门票', type: '门票', price: Math.round(dailyCost * 0.25), day: 1 }, { name: '往返交通', type: '交通', price: Math.round(dailyCost * 0.5), day: days }],
+    shareBody: '🏖️ ' + city + '出行方案\n💰 ¥' + totalCost + '/人 | ⏱️ ' + days + '天\n#LittlePony #' + city + '旅行',
+    days: daysArr
+  };
+}
+
+function splitFeatures(features, numDays) {
+  const result = [];
+  const perDay = Math.max(1, Math.ceil(features.length / numDays));
+  for (let d = 0; d < numDays; d++) {
+    result.push(features.slice(d * perDay, (d + 1) * perDay));
+  }
+  return result;
 }
 
 // ===== RESULT DATA =====
 const resultData = {
   '杭州': { title: '杭州出行建议', plans: [
-    { name:'西湖慢生活之旅', img:'photo-1534190239940-9ba8944ea261', tag:'适宜出行', tagClass:'good', desc:'3天2晚，白堤断桥→灵隐→九溪→西溪，人均¥1,238', crowd:'适中', cost:'¥1,238', days:'3天' },
+    { name:'西湖慢生活之旅', img:'photo-1526481280693-3bfa7568e0f3', tag:'适宜出行', tagClass:'good', desc:'3天2晚，白堤断桥→灵隐→九溪→西溪，人均¥1,238', crowd:'适中', cost:'¥1,238', days:'3天' },
     { name:'杭州文艺深度路线', img:'photo-1523580494863-6f3031224c94', tag:'人少小众', tagClass:'good', desc:'3天2晚，省博→南宋御街→美院象山→良渚，人均¥1,400', crowd:'稀少', cost:'¥1,400', days:'3天' },
-    { name:'杭州特种兵打卡', img:'photo-1534190239940-9ba8944ea261', tag:'效率拉满', tagClass:'hot', desc:'2天1晚，西湖环湖+灵隐+河坊街+湘湖，人均¥680', crowd:'较多', cost:'¥680', days:'2天' }
+    { name:'杭州特种兵打卡', img:'photo-1526481280693-3bfa7568e0f3', tag:'效率拉满', tagClass:'hot', desc:'2天1晚，西湖环湖+灵隐+河坊街+湘湖，人均¥680', crowd:'较多', cost:'¥680', days:'2天' }
   ]},
   '北京': { title: '北京出行建议', plans: [
-    { name:'皇城文化深度游', img:'photo-1547981609-4b6bfe67ca0b', tag:'🔥 热门', tagClass:'hot', desc:'5天4晚，故宫+长城+颐和园+胡同，人均¥3,800', crowd:'较多', cost:'¥3,800', days:'5天' },
-    { name:'北京美食打卡', img:'photo-1547981609-4b6bfe67ca0b', tag:'吃货之选', tagClass:'good', desc:'4天3晚，烤鸭+炸酱面+涮羊肉+卤煮，人均¥2,800', crowd:'适中', cost:'¥2,800', days:'4天' }
+    { name:'皇城文化深度游', img:'photo-1509023464722-18d996393ca8', tag:'🔥 热门', tagClass:'hot', desc:'5天4晚，故宫+长城+颐和园+胡同，人均¥3,800', crowd:'较多', cost:'¥3,800', days:'5天' },
+    { name:'北京美食打卡', img:'photo-1509023464722-18d996393ca8', tag:'吃货之选', tagClass:'good', desc:'4天3晚，烤鸭+炸酱面+涮羊肉+卤煮，人均¥2,800', crowd:'适中', cost:'¥2,800', days:'4天' }
   ]},
   '成都': { title: '成都出行建议', plans: [
-    { name:'熊猫美食之旅', img:'photo-1476514525535-07fb3b4ae5f1', tag:'吃货首选', tagClass:'hot', desc:'4天3晚，熊猫基地+宽窄巷+锦里+太古里，人均¥2,600', crowd:'适中', cost:'¥2,600', days:'4天' },
-    { name:'成都慢生活路线', img:'photo-1476514525535-07fb3b4ae5f1', tag:'休闲首选', tagClass:'good', desc:'3天2晚，人民公园茶馆+文殊院+东郊记忆，人均¥1,800', crowd:'稀少', cost:'¥1,800', days:'3天' }
+    { name:'熊猫美食之旅', img:'photo-1588252910189-9c9f5535646b', tag:'吃货首选', tagClass:'hot', desc:'4天3晚，熊猫基地+宽窄巷+锦里+太古里，人均¥2,600', crowd:'适中', cost:'¥2,600', days:'4天' },
+    { name:'成都慢生活路线', img:'photo-1588252910189-9c9f5535646b', tag:'休闲首选', tagClass:'good', desc:'3天2晚，人民公园茶馆+文殊院+东郊记忆，人均¥1,800', crowd:'稀少', cost:'¥1,800', days:'3天' }
   ]},
   '大理': { title: '大理出行建议', plans: [
-    { name:'风花雪月慢时光', img:'photo-1504280390367-361c6d9f38f4', tag:'最推荐', tagClass:'good', desc:'5天4晚，苍山索道+洱海环湖+双廊+喜洲，人均¥3,200', crowd:'适中', cost:'¥3,200', days:'5天' },
-    { name:'大理环海骑行', img:'photo-1504280390367-361c6d9f38f4', tag:'户外之选', tagClass:'good', desc:'4天3晚，洱海环骑+古城+沙溪古镇，人均¥2,500', crowd:'稀少', cost:'¥2,500', days:'4天' }
+    { name:'风花雪月慢时光', img:'photo-1659466248885-8b7a03205661', tag:'最推荐', tagClass:'good', desc:'5天4晚，苍山索道+洱海环湖+双廊+喜洲，人均¥3,200', crowd:'适中', cost:'¥3,200', days:'5天' },
+    { name:'大理环海骑行', img:'photo-1659466248885-8b7a03205661', tag:'户外之选', tagClass:'good', desc:'4天3晚，洱海环骑+古城+沙溪古镇，人均¥2,500', crowd:'稀少', cost:'¥2,500', days:'4天' }
   ]},
   '厦门': { title: '厦门出行建议', plans: [
-    { name:'海岛文艺之旅', img:'photo-1506929562872-bb421503ef21', tag:'热门推荐', tagClass:'hot', desc:'4天3晚，鼓浪屿+环岛路+沙坡尾+曾厝垵，人均¥2,800', crowd:'较多', cost:'¥2,800', days:'4天' },
-    { name:'厦门美食探店', img:'photo-1506929562872-bb421503ef21', tag:'吃货必去', tagClass:'good', desc:'3天2晚，八市+中山路+沙茶面+姜母鸭，人均¥1,600', crowd:'适中', cost:'¥1,600', days:'3天' }
+    { name:'海岛文艺之旅', img:'photo-1721794525689-d2bd76190f1e', tag:'热门推荐', tagClass:'hot', desc:'4天3晚，鼓浪屿+环岛路+沙坡尾+曾厝垵，人均¥2,800', crowd:'较多', cost:'¥2,800', days:'4天' },
+    { name:'厦门美食探店', img:'photo-1721794525689-d2bd76190f1e', tag:'吃货必去', tagClass:'good', desc:'3天2晚，八市+中山路+沙茶面+姜母鸭，人均¥1,600', crowd:'适中', cost:'¥1,600', days:'3天' }
   ]},
   '西安': { title: '西安出行建议', plans: [
-    { name:'千年古都深度游', img:'photo-1547981609-4b6bfe67ca0b', tag:'文化之旅', tagClass:'hot', desc:'4天3晚，兵马俑+城墙+陕历博+回民街，人均¥2,800', crowd:'较多', cost:'¥2,800', days:'4天' },
-    { name:'西安美食考古', img:'photo-1547981609-4b6bfe67ca0b', tag:'美食考古', tagClass:'good', desc:'3天2晚，肉夹馍+凉皮+泡馍+永兴坊，人均¥1,500', crowd:'适中', cost:'¥1,500', days:'3天' }
+    { name:'千年古都深度游', img:'photo-1710141925256-652f9ace7782', tag:'文化之旅', tagClass:'hot', desc:'4天3晚，兵马俑+城墙+陕历博+回民街，人均¥2,800', crowd:'较多', cost:'¥2,800', days:'4天' },
+    { name:'西安美食考古', img:'photo-1710141925256-652f9ace7782', tag:'美食考古', tagClass:'good', desc:'3天2晚，肉夹馍+凉皮+泡馍+永兴坊，人均¥1,500', crowd:'适中', cost:'¥1,500', days:'3天' }
   ]},
   '青岛': { title: '青岛出行建议', plans: [
-    { name:'海鲜啤酒之旅', img:'photo-1506929562872-bb421503ef21', tag:'夏日限定', tagClass:'good', desc:'3天2晚，栈桥+八大关+啤酒博物馆+营口路，人均¥2,200', crowd:'适中', cost:'¥2,200', days:'3天' },
-    { name:'青岛海岸线徒步', img:'photo-1506929562872-bb421503ef21', tag:'户外之选', tagClass:'good', desc:'3天2晚，奥帆中心→小麦岛→崂山，人均¥2,000', crowd:'稀少', cost:'¥2,000', days:'3天' }
+    { name:'海鲜啤酒之旅', img:'photo-1627868153411-624a8dce0a12', tag:'夏日限定', tagClass:'good', desc:'3天2晚，栈桥+八大关+啤酒博物馆+营口路，人均¥2,200', crowd:'适中', cost:'¥2,200', days:'3天' },
+    { name:'青岛海岸线徒步', img:'photo-1627868153411-624a8dce0a12', tag:'户外之选', tagClass:'good', desc:'3天2晚，奥帆中心→小麦岛→崂山，人均¥2,000', crowd:'稀少', cost:'¥2,000', days:'3天' }
   ]},
   'default': { title: '智能推荐', plans: [
-    { name:'杭州 · 西湖慢生活', img:'photo-1534190239940-9ba8944ea261', tag:'最匹配', tagClass:'good', desc:'3天2晚，白堤+灵隐+九溪+西溪，人均¥1,238', crowd:'适中', cost:'¥1,238', days:'3天' },
-    { name:'大理 · 风花雪月', img:'photo-1504280390367-361c6d9f38f4', tag:'深度推荐', tagClass:'good', desc:'5天4晚，苍山+洱海+双廊+喜洲，人均¥3,200', crowd:'稀少', cost:'¥3,200', days:'5天' },
-    { name:'成都 · 熊猫美食', img:'photo-1476514525535-07fb3b4ae5f1', tag:'热门之选', tagClass:'hot', desc:'4天3晚，熊猫基地+宽窄巷+锦里，人均¥2,600', crowd:'较多', cost:'¥2,600', days:'4天' }
+    { name:'杭州 · 西湖慢生活', img:'photo-1526481280693-3bfa7568e0f3', tag:'最匹配', tagClass:'good', desc:'3天2晚，白堤+灵隐+九溪+西溪，人均¥1,238', crowd:'适中', cost:'¥1,238', days:'3天' },
+    { name:'大理 · 风花雪月', img:'photo-1659466248885-8b7a03205661', tag:'深度推荐', tagClass:'good', desc:'5天4晚，苍山+洱海+双廊+喜洲，人均¥3,200', crowd:'稀少', cost:'¥3,200', days:'5天' },
+    { name:'成都 · 熊猫美食', img:'photo-1588252910189-9c9f5535646b', tag:'热门之选', tagClass:'hot', desc:'4天3晚，熊猫基地+宽窄巷+锦里，人均¥2,600', crowd:'较多', cost:'¥2,600', days:'4天' }
   ]}
 };
 
@@ -1288,7 +2662,7 @@ const detailData = {
     {
       title: '杭州 · 西湖慢生活之旅',
       subtitle: '3天2晚 · 休闲游 · 2人 · ¥1,238起',
-      heroImg: 'https://images.unsplash.com/photo-1534190239940-9ba8944ea261?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?w=600&h=300&fit=crop',
       totalCost: 1238,
       paidItems: [
         { name: '湖滨商圈酒店', type: '住宿', price: 480, day: 1 },
@@ -1387,7 +2761,7 @@ const detailData = {
     {
       title: '杭州 · 特种兵打卡',
       subtitle: '2天1晚 · 特种兵 · 2人 · ¥680起',
-      heroImg: 'https://images.unsplash.com/photo-1534190239940-9ba8944ea261?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?w=600&h=300&fit=crop',
       totalCost: 680,
       paidItems: [
         { name: '青旅/快捷酒店', type: '住宿', price: 150, day: 1 },
@@ -1425,7 +2799,7 @@ const detailData = {
     {
       title: '北京 · 皇城文化深度游',
       subtitle: '5天4晚 · 文化游 · 2人 · ¥3,800起',
-      heroImg: 'https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=600&h=300&fit=crop',
       totalCost: 3800,
       paidItems: [
         { name: '王府井酒店', type: '住宿', price: 500, day: 1 },
@@ -1493,7 +2867,7 @@ const detailData = {
     {
       title: '北京 · 美食打卡',
       subtitle: '4天3晚 · 美食游 · 2人 · ¥2,800起',
-      heroImg: 'https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=600&h=300&fit=crop',
       totalCost: 2800,
       paidItems: [
         { name: '前门酒店', type: '住宿', price: 400, day: 1 },
@@ -1549,7 +2923,7 @@ const detailData = {
     {
       title: '成都 · 熊猫美食之旅',
       subtitle: '4天3晚 · 休闲游 · 2人 · ¥2,600起',
-      heroImg: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1588252910189-9c9f5535646b?w=600&h=300&fit=crop',
       totalCost: 2600,
       paidItems: [
         { name: '春熙路酒店', type: '住宿', price: 450, day: 1 },
@@ -1601,7 +2975,7 @@ const detailData = {
     {
       title: '成都 · 慢生活路线',
       subtitle: '3天2晚 · 休闲游 · 2人 · ¥1,800起',
-      heroImg: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1588252910189-9c9f5535646b?w=600&h=300&fit=crop',
       totalCost: 1800,
       paidItems: [
         { name: '宽窄巷民宿', type: '住宿', price: 380, day: 1 },
@@ -1644,7 +3018,7 @@ const detailData = {
     {
       title: '大理 · 风花雪月慢时光',
       subtitle: '5天4晚 · 休闲游 · 2人 · ¥3,200起',
-      heroImg: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1659466248885-8b7a03205661?w=600&h=300&fit=crop',
       totalCost: 3200,
       paidItems: [
         { name: '古城客栈', type: '住宿', price: 400, day: 1 },
@@ -1704,7 +3078,7 @@ const detailData = {
     {
       title: '大理 · 环海骑行',
       subtitle: '4天3晚 · 户外游 · 2人 · ¥2,500起',
-      heroImg: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1659466248885-8b7a03205661?w=600&h=300&fit=crop',
       totalCost: 2500,
       paidItems: [
         { name: '古城客栈', type: '住宿', price: 350, day: 1 },
@@ -1757,7 +3131,7 @@ const detailData = {
     {
       title: '厦门 · 海岛文艺之旅',
       subtitle: '4天3晚 · 休闲游 · 2人 · ¥2,800起',
-      heroImg: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1721794525689-d2bd76190f1e?w=600&h=300&fit=crop',
       totalCost: 2800,
       paidItems: [
         { name: '中山路酒店', type: '住宿', price: 400, day: 1 },
@@ -1809,7 +3183,7 @@ const detailData = {
     {
       title: '厦门 · 美食探店',
       subtitle: '3天2晚 · 美食游 · 2人 · ¥1,600起',
-      heroImg: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1721794525689-d2bd76190f1e?w=600&h=300&fit=crop',
       totalCost: 1600,
       paidItems: [
         { name: '中山路快捷酒店', type: '住宿', price: 280, day: 1 },
@@ -1856,7 +3230,7 @@ const detailData = {
     {
       title: '西安 · 千年古都深度游',
       subtitle: '4天3晚 · 文化游 · 2人 · ¥2,800起',
-      heroImg: 'https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1710141925256-652f9ace7782?w=600&h=300&fit=crop',
       totalCost: 2800,
       paidItems: [
         { name: '钟楼附近酒店', type: '住宿', price: 400, day: 1 },
@@ -1906,7 +3280,7 @@ const detailData = {
     {
       title: '西安 · 美食考古',
       subtitle: '3天2晚 · 美食游 · 2人 · ¥1,500起',
-      heroImg: 'https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1710141925256-652f9ace7782?w=600&h=300&fit=crop',
       totalCost: 1500,
       paidItems: [
         { name: '南门快捷酒店', type: '住宿', price: 300, day: 1 },
@@ -1949,7 +3323,7 @@ const detailData = {
     {
       title: '青岛 · 海鲜啤酒之旅',
       subtitle: '3天2晚 · 休闲游 · 2人 · ¥2,200起',
-      heroImg: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1627868153411-624a8dce0a12?w=600&h=300&fit=crop',
       totalCost: 2200,
       paidItems: [
         { name: '栈桥附近酒店', type: '住宿', price: 380, day: 1 },
@@ -1992,7 +3366,7 @@ const detailData = {
     {
       title: '青岛 · 海岸线徒步',
       subtitle: '3天2晚 · 户外游 · 2人 · ¥2,000起',
-      heroImg: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1627868153411-624a8dce0a12?w=600&h=300&fit=crop',
       totalCost: 2000,
       paidItems: [
         { name: '奥帆中心酒店', type: '住宿', price: 400, day: 1 },
@@ -2033,7 +3407,7 @@ const detailData = {
     {
       title: '杭州 · 西湖慢生活之旅',
       subtitle: '3天2晚 · 休闲游 · 2人 · ¥1,238起',
-      heroImg: 'https://images.unsplash.com/photo-1534190239940-9ba8944ea261?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?w=600&h=300&fit=crop',
       totalCost: 1238,
       paidItems: [
         { name: '湖滨商圈酒店', type: '住宿', price: 480, day: 1 },
@@ -2161,7 +3535,12 @@ function updateShareModal(plan) {
 
 function renderDetail(city, planIndex) {
   currentDetail = { city, planIndex: planIndex || 0 };
-  const plans = detailData[city] || detailData['default'];
+  let plans = detailData[city];
+  if (!plans && getOrInitCity(city)) {
+    const dynamicData = generateDynamicDetailData(city, planIndex || 0);
+    if (dynamicData) plans = [dynamicData];
+  }
+  if (!plans) plans = detailData['default'];
   const plan = plans[planIndex] || plans[0];
   const hero = document.getElementById('detail-hero-img');
   hero.style.backgroundImage = 'url(' + plan.heroImg + ')';
@@ -2182,7 +3561,14 @@ function openDetail(city, planIndex) {
 
 function generateAndShowResults() {
   const dest = chatState.destination;
-  const data = resultData[dest] || resultData['default'];
+  let data = resultData[dest];
+
+  if (!data && getOrInitCity(dest)) {
+    data = generateDynamicResultData(dest);
+  }
+  if (!data) {
+    data = resultData['default'];
+  }
 
   document.getElementById('result-title').textContent = data.title;
 
@@ -2252,8 +3638,14 @@ function switchScreen(id) {
   updateNavVisibility(id);
 
   // Start chat when entering chat screen
-  if (id === 'chat' && currentChatStep < 0) {
-    setTimeout(startChat, 300);
+  if (id === 'chat') {
+    if (window._smartChatIntent) {
+      const intent = window._smartChatIntent;
+      window._smartChatIntent = null;
+      setTimeout(() => startSmartChat(intent), 300);
+    } else if (currentChatStep < 0) {
+      setTimeout(startChat, 300);
+    }
   }
 }
 
@@ -2329,6 +3721,22 @@ function showToast(msg) {
   t.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function handleHomeInput() {
+  const input = document.getElementById('home-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const intent = parseTravelIntent(text);
+  chatState.destination = intent.destination;
+  chatState.preferences = intent.preferences;
+  chatState.groupSize = intent.groupSize || '';
+  chatState.budget = intent.budget || 0;
+  chatState.timeRange = intent.timeRange || '';
+  chatState.rawInput = text;
+  window._smartChatIntent = intent;
+  switchScreen('chat');
+  input.value = '';
 }
 
 // ===== TICKET PURCHASE =====
