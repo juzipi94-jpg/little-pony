@@ -542,7 +542,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
       <div class="section-title">未来1个月推荐 <span class="more">更多 ›</span></div>
       <div class="card-scroll">
         <div class="card" onclick="openDetail('大理',0)">
-          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1659466248885-8b7a03205661?w=400&h=200&fit=crop)">
+          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1725378812977-cc475abfa5a2?w=400&h=200&fit=crop)">
             <span class="badge good">适宜出行</span>
           </div>
           <div class="card-body">
@@ -1277,23 +1277,23 @@ const cityDB = {
   '杭州': { type:'江南水乡', features:['西湖','灵隐寺','龙井茶','九溪','西溪湿地','河坊街'], food:['西湖醋鱼','龙井虾仁','东坡肉','片儿川','定胜糕'], weather:'☀️ 28°C 晴', img:'photo-1526481280693-3bfa7568e0f3', dailyCost:400 },
   '北京': { type:'皇城古都', features:['故宫','长城','颐和园','胡同','天坛','国家博物馆'], food:['烤鸭','炸酱面','涮羊肉','卤煮','豆汁'], weather:'⛅ 26°C 多云', img:'photo-1509023464722-18d996393ca8', dailyCost:700 },
   '成都': { type:'天府之国', features:['熊猫基地','宽窄巷子','锦里','太古里','武侯祠','都江堰'], food:['火锅','担担面','串串香','兔头','甜水面'], weather:'🌧️ 22°C 阵雨', img:'photo-1588252910189-9c9f5535646b', dailyCost:550 },
-  '大理': { type:'风花雪月', features:['洱海','苍山','双廊','喜洲','古城','崇圣寺三塔'], food:['饵丝','乳扇','酸辣鱼','鲜花饼','烤乳扇'], weather:'🌤️ 24°C 舒适', img:'photo-1659466248885-8b7a03205661', dailyCost:600 },
+  '大理': { type:'风花雪月', features:['洱海','苍山','双廊','喜洲','古城','崇圣寺三塔'], food:['饵丝','乳扇','酸辣鱼','鲜花饼','烤乳扇'], weather:'🌤️ 24°C 舒适', img:'photo-1725378812977-cc475abfa5a2', dailyCost:600 },
   '厦门': { type:'海上花园', features:['鼓浪屿','南普陀','环岛路','曾厝垵','沙坡尾','集美学村'], food:['沙茶面','海蛎煎','姜母鸭','花生汤','土笋冻'], weather:'☀️ 27°C 海风', img:'photo-1721794525689-d2bd76190f1e', dailyCost:550 },
   '西安': { type:'千年古都', features:['兵马俑','城墙','大雁塔','回民街','陕历博','华清池'], food:['肉夹馍','凉皮','泡馍','biangbiang面','甑糕'], weather:'⛅ 25°C 晴', img:'photo-1710141925256-652f9ace7782', dailyCost:500 },
   '青岛': { type:'海滨啤酒', features:['栈桥','八大关','啤酒博物馆','崂山','五四广场','金沙滩'], food:['海鲜','啤酒','鲅鱼饺子','辣炒蛤蜊','海菜凉粉'], weather:'☀️ 25°C 海风', img:'photo-1627868153411-624a8dce0a12', dailyCost:600 },
-  '三亚': { type:'热带海岛', features:['亚龙湾','天涯海角','南山寺','蜈支洲岛','椰梦长廊','呀诺达'], food:['椰子鸡','文昌鸡','海鲜大餐','清补凉','抱罗粉'], weather:'☀️ 32°C 热带', img:'photo-1503641926155-5c17619b79d0', dailyCost:800 },
-  '丽江': { type:'纳西古城', features:['丽江古城','玉龙雪山','束河古镇','蓝月谷','泸沽湖','黑龙潭'], food:['腊排骨','鸡豆凉粉','纳西烤鱼','丽江粑粑','米灌肠'], weather:'🌤️ 22°C 凉爽', img:'photo-1692963507663-9edee478f46c', dailyCost:500 },
-  '重庆': { type:'山城火锅', features:['洪崖洞','解放碑','磁器口','长江索道','李子坝','武隆天坑'], food:['火锅','小面','酸辣粉','抄手','烤鱼'], weather:'🌧️ 28°C 湿热', img:'photo-1716146705025-dadcab92b491', dailyCost:500 },
-  '南京': { type:'六朝古都', features:['中山陵','夫子庙','明孝陵','玄武湖','总统府','牛首山'], food:['盐水鸭','鸭血粉丝','小笼包','牛肉锅贴','糖芋苗'], weather:'⛅ 27°C 多云', img:'photo-1510001618818-4b4e3d86bf0f', dailyCost:500 },
-  '长沙': { type:'网红美食城', features:['橘子洲','岳麓山','太平老街','IFS','湖南省博','马王堆'], food:['臭豆腐','小龙虾','茶颜悦色','糖油粑粑','剁椒鱼头'], weather:'🌧️ 29°C 湿热', img:'photo-1508804185872-d7badad00f7d', dailyCost:450 },
-  '苏州': { type:'园林水乡', features:['拙政园','虎丘','周庄','平江路','金鸡湖','留园'], food:['松鼠桂鱼','大闸蟹','碧螺春','苏式汤面','桂花糕'], weather:'⛅ 26°C 多云', img:'photo-1528181304800-259b08848526', dailyCost:500 },
-  '桂林': { type:'山水甲天下', features:['漓江','阳朔','象鼻山','龙脊梯田','两江四湖','银子岩'], food:['桂林米粉','啤酒鱼','荔浦芋扣肉','田螺酿','油茶'], weather:'🌧️ 25°C 阵雨', img:'photo-1689825650048-55d2216868f7', dailyCost:450 },
-  '拉萨': { type:'雪域圣城', features:['布达拉宫','大昭寺','八廓街','纳木错','羊湖','色拉寺'], food:['酥油茶','糌粑','藏面','牦牛肉','甜茶'], weather:'☀️ 18°C 高原', img:'photo-1556355549-6a9b0d79f59d', dailyCost:600 },
-  '昆明': { type:'春城花海', features:['滇池','石林','翠湖','官渡古镇','西山','斗南花市'], food:['过桥米线','汽锅鸡','鲜花饼','烤豆腐','小锅米线'], weather:'☀️ 22°C 春城', img:'photo-1626359909709-8067b64e1655', dailyCost:400 },
-  '哈尔滨': { type:'冰城雪乡', features:['冰雪大世界','中央大街','圣索菲亚','太阳岛','虎林园','亚布力'], food:['锅包肉','马迭尔冰棍','红肠','铁锅炖','杀猪菜'], weather:'❄️ -15°C 冰雪', img:'photo-1675522108963-c1ea024abb8a', dailyCost:500 },
-  '新疆': { type:'丝路秘境', features:['天山天池','喀纳斯','那拉提草原','赛里木湖','吐鲁番','独库公路'], food:['大盘鸡','烤羊肉串','手抓饭','馕','拉条子'], weather:'☀️ 22°C 干爽', img:'photo-1708789936160-8e3486358fdf', dailyCost:500 },
-  '西藏': { type:'雪域高原', features:['布达拉宫','纳木错','羊卓雍措','珠峰大本营','林芝桃花','冈仁波齐'], food:['酥油茶','糌粑','藏面','牦牛肉','甜茶'], weather:'☀️ 15°C 高原', img:'photo-1556355549-6a9b0d79f59d', dailyCost:650 },
-  '云南': { type:'彩云之南', features:['大理古城','丽江','泸沽湖','香格里拉','西双版纳','元阳梯田'], food:['过桥米线','汽锅鸡','鲜花饼','包浆豆腐','傣味'], weather:'🌤️ 22°C 四季如春', img:'photo-1633964528699-58ada2816ce1', dailyCost:450 }
+  '三亚': { type:'热带海岛', features:['亚龙湾','天涯海角','南山寺','蜈支洲岛','椰梦长廊','呀诺达'], food:['椰子鸡','文昌鸡','海鲜大餐','清补凉','抱罗粉'], weather:'☀️ 32°C 热带', img:'photo-1710428447167-ef713a6f42b9', dailyCost:800 },
+  '丽江': { type:'纳西古城', features:['丽江古城','玉龙雪山','束河古镇','蓝月谷','泸沽湖','黑龙潭'], food:['腊排骨','鸡豆凉粉','纳西烤鱼','丽江粑粑','米灌肠'], weather:'🌤️ 22°C 凉爽', img:'photo-1677922069750-944be2b9ad20', dailyCost:500 },
+  '重庆': { type:'山城火锅', features:['洪崖洞','解放碑','磁器口','长江索道','李子坝','武隆天坑'], food:['火锅','小面','酸辣粉','抄手','烤鱼'], weather:'🌧️ 28°C 湿热', img:'photo-1620321281938-2522ba59a1df', dailyCost:500 },
+  '南京': { type:'六朝古都', features:['中山陵','夫子庙','明孝陵','玄武湖','总统府','牛首山'], food:['盐水鸭','鸭血粉丝','小笼包','牛肉锅贴','糖芋苗'], weather:'⛅ 27°C 多云', img:'photo-1589259411045-1841cec4f7a6', dailyCost:500 },
+  '长沙': { type:'网红美食城', features:['橘子洲','岳麓山','太平老街','IFS','湖南省博','马王堆'], food:['臭豆腐','小龙虾','茶颜悦色','糖油粑粑','剁椒鱼头'], weather:'🌧️ 29°C 湿热', img:'photo-1583143574609-b2e508237650', dailyCost:450 },
+  '苏州': { type:'园林水乡', features:['拙政园','虎丘','周庄','平江路','金鸡湖','留园'], food:['松鼠桂鱼','大闸蟹','碧螺春','苏式汤面','桂花糕'], weather:'⛅ 26°C 多云', img:'photo-1745114392692-ede344e12e34', dailyCost:500 },
+  '桂林': { type:'山水甲天下', features:['漓江','阳朔','象鼻山','龙脊梯田','两江四湖','银子岩'], food:['桂林米粉','啤酒鱼','荔浦芋扣肉','田螺酿','油茶'], weather:'🌧️ 25°C 阵雨', img:'photo-1773318901379-aac92fdf5611', dailyCost:450 },
+  '拉萨': { type:'雪域圣城', features:['布达拉宫','大昭寺','八廓街','纳木错','羊湖','色拉寺'], food:['酥油茶','糌粑','藏面','牦牛肉','甜茶'], weather:'☀️ 18°C 高原', img:'photo-1703842079863-20413f288d03', dailyCost:600 },
+  '昆明': { type:'春城花海', features:['滇池','石林','翠湖','官渡古镇','西山','斗南花市'], food:['过桥米线','汽锅鸡','鲜花饼','烤豆腐','小锅米线'], weather:'☀️ 22°C 春城', img:'photo-1724130344214-d66eab70b1d2', dailyCost:400 },
+  '哈尔滨': { type:'冰城雪乡', features:['冰雪大世界','中央大街','圣索菲亚','太阳岛','虎林园','亚布力'], food:['锅包肉','马迭尔冰棍','红肠','铁锅炖','杀猪菜'], weather:'❄️ -15°C 冰雪', img:'photo-1716308352490-271359910f14', dailyCost:500 },
+  '新疆': { type:'丝路秘境', features:['天山天池','喀纳斯','那拉提草原','赛里木湖','吐鲁番','独库公路'], food:['大盘鸡','烤羊肉串','手抓饭','馕','拉条子'], weather:'☀️ 22°C 干爽', img:'photo-1757069540493-8f74088b3269', dailyCost:500 },
+  '西藏': { type:'雪域高原', features:['布达拉宫','纳木错','羊卓雍措','珠峰大本营','林芝桃花','冈仁波齐'], food:['酥油茶','糌粑','藏面','牦牛肉','甜茶'], weather:'☀️ 15°C 高原', img:'photo-1703842079863-20413f288d03', dailyCost:650 },
+  '云南': { type:'彩云之南', features:['大理古城','丽江','泸沽湖','香格里拉','西双版纳','元阳梯田'], food:['过桥米线','汽锅鸡','鲜花饼','包浆豆腐','傣味'], weather:'🌤️ 22°C 四季如春', img:'photo-1776294984950-3f812aa0f797', dailyCost:450 }
 };
 // Auto-generate city profile for unknown destinations
 function getOrInitCity(city) {
@@ -1309,7 +1309,7 @@ function getOrInitCity(city) {
     type = '西域秘境'; weather = '☀️ 22°C 干爽'; dailyCost = 500;
     features = ['那拉提草原','喀纳斯湖','赛里木湖','天山','巴音布鲁克','禾木村'];
     food = ['大盘鸡','烤羊肉串','手抓饭','馕','拉条子','烤包子'];
-    img = 'photo-1708789936160-8e3486358fdf';
+    img = 'photo-1757069540493-8f74088b3269';
   } else if (/九寨|黄龙|峨眉|乐山|稻城|康定|理塘|色达|都江堰|青城/.test(name)) {
     type = '蜀地山水'; weather = '⛅ 22°C 凉爽'; dailyCost = 450;
     features = [name+'景区','原始森林','高山海子','藏族村寨','瀑布群','雪山观景'];
@@ -1319,22 +1319,22 @@ function getOrInitCity(city) {
     type = '湘楚胜地'; weather = '⛅ 26°C 温润'; dailyCost = 400;
     features = ['国家森林公园','天门山','玻璃栈道','古镇','溶洞','峡谷'];
     food = ['臭豆腐','小龙虾','剁椒鱼头','腊肉','血豆腐','米粉'];
-    img = 'photo-1508804185872-d7badad00f7d';
+    img = 'photo-1583143574609-b2e508237650';
   } else if (/香格里拉|丽江|腾冲|芒市|瑞丽|西双版纳|普洱|临沧/.test(name)) {
     type = '彩云秘境'; weather = '🌤️ 22°C 四季如春'; dailyCost = 450;
     features = ['古城','雪山','高原湖泊','藏族文化','热带雨林','梯田'];
     food = ['过桥米线','汽锅鸡','鲜花饼','傣味','烤豆腐','米干'];
-    img = 'photo-1633964528699-58ada2816ce1';
+    img = 'photo-1776294984950-3f812aa0f797';
   } else if (/黄山|宏村|西递|徽州|九华|婺源/.test(name)) {
     type = '徽派山水'; weather = '⛅ 24°C 清凉'; dailyCost = 400;
     features = ['黄山','古村落','徽派建筑','云海','温泉','竹海'];
     food = ['臭鳜鱼','毛豆腐','徽州饼','笋干烧肉','石头馃','一品锅'];
-    img = 'photo-1528181304800-259b08848526';
+    img = 'photo-1568454158153-6bf6cfda9070';
   } else if (/敦煌|嘉峪关|张掖|兰州|天水|武威/.test(name)) {
     type = '丝路走廊'; weather = '☀️ 20°C 干燥'; dailyCost = 400;
     features = ['莫高窟','鸣沙山','丹霞地貌','古城遗址','长城遗址','石窟'];
     food = ['牛肉面','烤全羊','酿皮','灰豆子','手抓羊肉','杏皮水'];
-    img = 'photo-1708789936160-8e3486358fdf';
+    img = 'photo-1507169820737-80f8c50e81f7';
   } else if (/威海|烟台|日照|连云港|舟山|北海/.test(name)) {
     type = '海滨度假'; weather = '☀️ 26°C 海风'; dailyCost = 500;
     features = ['海滨浴场','灯塔','海鲜市场','环海路','渔港','海岛'];
@@ -1349,17 +1349,17 @@ function getOrInitCity(city) {
     type = '草原天堂'; weather = '☀️ 20°C 爽朗'; dailyCost = 500;
     features = ['大草原','蒙古包','骑马','湖泊','森林','边境风光'];
     food = ['手把肉','奶茶','烤全羊','奶豆腐','莜面','风干牛肉'];
-    img = 'photo-1551986782-d0169b3f8fa7';
+    img = 'photo-1755789450537-6e1838cb3558';
   } else if (/长白山|延吉|丹东|锦州|盘锦|葫芦岛/.test(name)) {
     type = '东北风光'; weather = '⛅ 22°C 凉爽'; dailyCost = 400;
     features = ['天池','温泉','森林','边境','湿地','民俗村'];
     food = ['冷面','烤肉','锅包肉','石锅饭','打糕','米肠'];
-    img = 'photo-1675522108963-c1ea024abb8a';
+    img = 'photo-1716308352490-271359910f14';
   } else if (/阳朔|龙脊|黄果树|荔波|梵净山|镇远/.test(name)) {
     type = '山水秘境'; weather = '🌧️ 24°C 温润'; dailyCost = 400;
     features = ['喀斯特山水','溶洞','瀑布','梯田','古镇','漂流'];
     food = ['米粉','啤酒鱼','酸汤鱼','糯米饭','腊肉','油茶'];
-    img = 'photo-1689825650048-55d2216868f7';
+    img = 'photo-1773318901379-aac92fdf5611';
   } else if (/平遥|五台|云冈|壶口|雁门|晋祠/.test(name)) {
     type = '晋商文化'; weather = '⛅ 23°C 干爽'; dailyCost = 350;
     features = ['古城','古建','石窟','大院','寺庙','民俗'];
@@ -1369,49 +1369,49 @@ function getOrInitCity(city) {
     type = '赣鄱胜景'; weather = '⛅ 25°C 湿润'; dailyCost = 350;
     features = ['名山','古窑','道教圣地','瀑布','古镇','花海'];
     food = ['粉蒸肉','瓦罐汤','拌粉','瓷泥煨鸡','碱水粑','酒糟鱼'];
-    img = 'photo-1689825650048-55d2216868f7';
+    img = 'photo-1773318901379-aac92fdf5611';
   } else if (/青海湖|茶卡|格尔木|可可西里|祁连|门源/.test(name)) {
     type = '高原明珠'; weather = '☀️ 18°C 高原'; dailyCost = 500;
     features = ['盐湖','草原','雪山','藏族文化','油菜花海','星空'];
     food = ['手抓羊肉','酿皮','酸奶','面片','糌粑','酥油茶'];
-    img = 'photo-1556355549-6a9b0d79f59d';
+    img = 'photo-1703842079863-20413f288d03';
   }
   // --- International rules ---
   else if (/欧洲|西欧|法国|意大利|英国|德国|西班牙|瑞士|荷兰|奥地利|希腊|葡萄牙|爱尔兰|比利时|巴黎|罗马|伦敦|柏林|巴塞罗那|慕尼黑|威尼斯|佛罗伦萨|布拉格|阿姆斯特丹|维也纳/.test(name)) {
     type = '欧陆风情'; weather = '⛅ 20°C 温和'; dailyCost = 1500;
     features = ['埃菲尔铁塔','卢浮宫','罗马斗兽场','圣家堂','大本钟','新天鹅堡'];
     food = ['法式甜点','意大利面','西班牙海鲜饭','英式下午茶','德国猪肘','瑞士巧克力'];
-    img = 'photo-1502602898657-3e91760cbb34';
+    img = 'photo-1679231926688-ef9cdab5ed2f';
   } else if (/东南亚|泰国|越南|柬埔寨|老挝|缅甸|马来西亚|印尼|菲律宾|曼谷|清迈|河内|胡志明|暹粒|吉隆坡|巴厘岛|长滩岛/.test(name)) {
     type = '东南亚风情'; weather = '☀️ 30°C 热带'; dailyCost = 600;
     features = ['大皇宫','吴哥窟','下龙湾','水上市场','佛塔','海岛'];
     food = ['冬阴功','越南粉','咖喱','芒果糯米饭','烤肉串','椰子冻'];
-    img = 'photo-1517411032315-54ef2cb783bb';
+    img = 'photo-1563492065599-3520f775eeed';
   } else if (/日本|东京|大阪|京都|北海道|冲绳|奈良|富士|名古屋|福冈|箱根|镰仓/.test(name)) {
     type = '和风秘境'; weather = '⛅ 20°C 温润'; dailyCost = 1200;
     features = ['浅草寺','富士山','金阁寺','大阪城','奈良鹿公园','温泉街'];
     food = ['寿司','拉面','天妇罗','抹茶甜点','和牛','居酒屋'];
-    img = 'photo-1693858325816-b7a7c1066838';
+    img = 'photo-1490806843957-31f4c9a91c65';
   } else if (/韩国|首尔|釜山|济州|仁川|明洞|弘大/.test(name)) {
     type = '韩流之旅'; weather = '⛅ 18°C 四季分明'; dailyCost = 1000;
     features = ['景福宫','明洞','济州岛','北村韩屋','南山塔','乐天世界'];
     food = ['韩式烤肉','泡菜','炸鸡','石锅拌饭','参鸡汤','部队锅'];
-    img = 'photo-1570191913384-7b4ff11716e7';
+    img = 'photo-1666670750287-176e3218ce12';
   } else if (/美国|纽约|洛杉矶|夏威夷|拉斯维加斯|旧金山|西雅图|芝加哥|华盛顿|波士顿|黄石|大峡谷/.test(name)) {
     type = '美利坚探索'; weather = '⛅ 22°C 多样'; dailyCost = 1800;
     features = ['自由女神','大峡谷','时代广场','黄石公园','金门大桥','迪士尼'];
     food = ['汉堡','牛排','BBQ','芝士蛋糕','龙虾卷','Taco'];
-    img = 'photo-1486299267070-83823f5448dd';
+    img = 'photo-1588384153148-ebd739ac430c';
   } else if (/澳洲|澳大利亚|新西兰|悉尼|墨尔本|奥克兰|大堡礁|凯恩斯|黄金海岸/.test(name)) {
     type = '南半球探险'; weather = '☀️ 24°C 阳光'; dailyCost = 1500;
     features = ['悉尼歌剧院','大堡礁','大洋路','黄金海岸','企鹅岛','蓝山'];
     food = ['牛排','海鲜','袋鼠肉','肉派','Flat White','青口贝'];
-    img = 'photo-1525625293386-3f8f99389edd';
+    img = 'photo-1624138784614-87fd1b6528f8';
   } else if (/迪拜|阿联酋|沙特|卡塔尔|阿布扎比/.test(name)) {
     type = '中东奢华'; weather = '☀️ 38°C 炎热'; dailyCost = 2000;
     features = ['哈利法塔','沙漠冲沙','黄金市场','棕榈岛','清真寺','水上乐园'];
     food = ['烤肉','鹰嘴豆泥','阿拉伯甜点','骆驼奶','沙瓦尔玛','藏红花饭'];
-    img = 'photo-1512453979798-5ea266f8880c';
+    img = 'photo-1544092683-c0c9ebb368e5';
   } else if (/印度|尼泊尔|斯里兰卡|孟买|新德里|加尔各答|科伦坡/.test(name)) {
     type = '南亚秘境'; weather = '☀️ 32°C 炎热'; dailyCost = 400;
     features = ['泰姬陵','恒河','瑜伽圣地','琥珀堡','佛塔','茶园'];
@@ -1421,72 +1421,72 @@ function getOrInitCity(city) {
     type = '非洲探奇'; weather = '☀️ 30°C 干热'; dailyCost = 800;
     features = ['金字塔','撒哈拉沙漠','动物大迁徙','好望角','蓝白小镇','尼罗河'];
     food = ['烤肉','Couscous','塔吉锅','烤玉米','Mango汁','薄饼'];
-    img = 'photo-1551986782-d0169b3f8fa7';
+    img = 'photo-1575550959106-5a7defe28b56';
   } else if (/冰岛|挪威|芬兰|瑞典|丹麦|赫尔辛基|奥斯陆|斯德哥尔摩|哥本哈根|特罗姆瑟/.test(name)) {
     type = '北欧极光'; weather = '❄️ 5°C 清冷'; dailyCost = 1800;
     features = ['极光','冰川','峡湾','圣诞老人村','蓝湖','北欧设计'];
     food = ['三文鱼','肉丸','开放三明治','驯鹿肉','蓝莓派','热红酒'];
-    img = 'photo-1566296314736-6eaac1ca0cb9';
+    img = 'photo-1531366936337-7c912a4589a7';
   } else if (/马尔代夫|塞班|斐济|大溪地|帕劳|毛里求斯/.test(name)) {
     type = '海岛天堂'; weather = '☀️ 28°C 热带'; dailyCost = 2500;
     features = ['水上别墅','浮潜','私人沙滩','海底餐厅','日落巡航','水疗'];
     food = ['海鲜大餐','椰子蟹','热带水果','BBQ','鸡尾酒','生鱼片'];
-    img = 'photo-1518684079-3c830dcef090';
+    img = 'photo-1573843981267-be1999ff37cd';
   } else if (/新加坡/.test(name)) {
     type = '花园城市'; weather = '🌧️ 30°C 热带'; dailyCost = 1000;
     features = ['鱼尾狮','滨海湾金沙','圣淘沙','环球影城','植物园','牛车水'];
     food = ['海南鸡饭','辣椒螃蟹','肉骨茶','叻沙','咖椰吐司','沙爹'];
-    img = 'photo-1525625293386-3f8f99389edd';
+    img = 'photo-1552790920-0ba96dc99d01';
   } else if (/土耳其|伊斯坦布尔|卡帕多奇亚|安塔利亚/.test(name)) {
     type = '横跨欧亚'; weather = '⛅ 22°C 温和'; dailyCost = 700;
     features = ['蓝色清真寺','热气球','棉花堡','大巴扎','地下水宫','地中海海岸'];
     food = ['烤肉','土耳其咖啡','果仁蜜饼','土耳其披萨','红茶','酸奶'];
-    img = 'photo-1551918120-9739cb430c6d';
+    img = 'photo-1604156789095-3348604c0f43';
   } else if (/巴西|阿根廷|秘鲁|墨西哥|智利|里约|布宜诺斯|利马|墨西哥城|坎昆/.test(name)) {
     type = '拉美风情'; weather = '☀️ 28°C 热情'; dailyCost = 900;
     features = ['基督像','马丘比丘','伊瓜苏瀑布','坎昆海滩','科帕卡巴纳','金字塔'];
     food = ['Taco','烤肉','Ceviche','Empanada','莫吉托','龙舌兰'];
-    img = 'photo-1489392191049-fc10c97e64b6';
+    img = 'photo-1518639192441-8fce0a366e2e';
   } else if (/俄罗斯|莫斯科|圣彼得堡|贝加尔/.test(name)) {
     type = '俄式壮美'; weather = '❄️ 0°C 寒冷'; dailyCost = 1000;
     features = ['红场','克里姆林宫','冬宫','贝加尔湖','芭蕾','洋葱头教堂'];
     food = ['鱼子酱','罗宋汤','俄式饺子','伏特加','大列巴','烤肉串'];
-    img = 'photo-1662009867642-933d25d401fe';
+    img = 'photo-1662679790388-e7b60d008ea0';
   } else if (/南美|中美|拉丁美洲|巴西|阿根廷|秘鲁|墨西哥|智利|哥伦比亚|古巴|巴拿马|里约|布宜诺斯|利马|墨西哥城|坎昆/.test(name)) {
     type = '拉美风情'; weather = '☀️ 28°C 热情'; dailyCost = 900;
     features = ['基督像','马丘比丘','伊瓜苏瀑布','坎昆海滩','科帕卡巴纳','金字塔'];
     food = ['Taco','烤肉','Ceviche','Empanada','莫吉托','龙舌兰'];
-    img = 'photo-1489392191049-fc10c97e64b6';
+    img = 'photo-1518639192441-8fce0a366e2e';
   } else if (/中东|西亚|沙特|卡塔尔|阿曼|约旦|黎巴嫩|以色列|伊朗/.test(name)) {
     type = '中东风情'; weather = '☀️ 36°C 干热'; dailyCost = 1500;
     features = ['佩特拉古城','死海','沙漠','清真寺','集市','古文明遗址'];
     food = ['烤肉','鹰嘴豆泥','沙瓦尔玛','藏红花饭','阿拉伯甜点','薄荷茶'];
-    img = 'photo-1567266565446-d9c40ccf59a4';
+    img = 'photo-1549396535-c11d5c55b9df';
   } else if (/中亚|乌兹别克斯坦|哈萨克斯坦|吉尔吉斯|塔吉克斯坦|土库曼斯坦|撒马尔罕/.test(name)) {
     type = '丝路古国'; weather = '☀️ 25°C 干爽'; dailyCost = 400;
     features = ['丝路古城','清真寺','沙漠','游牧文化','中亚集市','古塔'];
     food = ['抓饭','烤肉串','馕','拉格曼','奶茶','干果'];
-    img = 'photo-1503806837798-ea0ce2e6402e';
+    img = 'photo-1744177332411-9a57cd922af7';
   } else if (/东欧|波兰|捷克|匈牙利|罗马尼亚|保加利亚|克罗地亚|塞尔维亚|布拉格|布达佩斯|华沙/.test(name)) {
     type = '东欧秘境'; weather = '⛅ 18°C 温和'; dailyCost = 800;
     features = ['古城','城堡','温泉','教堂','多瑙河','老城广场'];
     food = ['炖牛肉','饺子','啤酒','烟囱卷','古拉什','克里姆'];
-    img = 'photo-1528127269322-539801943592';
+    img = 'photo-1518471152222-d42e38ce6873';
   } else if (/北美/.test(name)) {
     type = '北美之旅'; weather = '⛅ 22°C 多样'; dailyCost = 1600;
     features = ['国家公园','大峡谷','城市天际线','瀑布','公路旅行','迪士尼'];
     food = ['汉堡','牛排','BBQ','松饼','龙虾卷','苹果派'];
-    img = 'photo-1486299267070-83823f5448dd';
+    img = 'photo-1588384153148-ebd739ac430c';
   } else if (/南极/.test(name)) {
     type = '极地探险'; weather = '❄️ -20°C 极寒'; dailyCost = 5000;
     features = ['企鹅','冰川','极地科考站','冰山','极昼','鲸鱼'];
     food = ['极地补给','罐头食品','热饮','船餐'];
-    img = 'photo-1566296314736-6eaac1ca0cb9';
+    img = 'photo-1531366936337-7c912a4589a7';
   } else if (/加拿大|温哥华|多伦多|蒙特利尔|班夫|落基山/.test(name)) {
     type = '枫叶之国'; weather = '⛅ 18°C 清爽'; dailyCost = 1400;
     features = ['班夫国家公园','尼亚加拉瀑布','枫叶大道','CN塔','落基山脉','极光'];
     food = ['Poutine','枫糖浆','龙虾','烟熏肉','Tim Hortons','奶油塔'];
-    img = 'photo-1513326738677-b964603b136d';
+    img = 'photo-1587381419916-78fc843a36f8';
   }
 
   const profile = { type, features, food, weather, img, dailyCost };
@@ -2634,8 +2634,8 @@ const resultData = {
     { name:'成都慢生活路线', img:'photo-1588252910189-9c9f5535646b', tag:'休闲首选', tagClass:'good', desc:'3天2晚，人民公园茶馆+文殊院+东郊记忆，人均¥1,800', crowd:'稀少', cost:'¥1,800', days:'3天' }
   ]},
   '大理': { title: '大理出行建议', plans: [
-    { name:'风花雪月慢时光', img:'photo-1659466248885-8b7a03205661', tag:'最推荐', tagClass:'good', desc:'5天4晚，苍山索道+洱海环湖+双廊+喜洲，人均¥3,200', crowd:'适中', cost:'¥3,200', days:'5天' },
-    { name:'大理环海骑行', img:'photo-1659466248885-8b7a03205661', tag:'户外之选', tagClass:'good', desc:'4天3晚，洱海环骑+古城+沙溪古镇，人均¥2,500', crowd:'稀少', cost:'¥2,500', days:'4天' }
+    { name:'风花雪月慢时光', img:'photo-1725378812977-cc475abfa5a2', tag:'最推荐', tagClass:'good', desc:'5天4晚，苍山索道+洱海环湖+双廊+喜洲，人均¥3,200', crowd:'适中', cost:'¥3,200', days:'5天' },
+    { name:'大理环海骑行', img:'photo-1725378812977-cc475abfa5a2', tag:'户外之选', tagClass:'good', desc:'4天3晚，洱海环骑+古城+沙溪古镇，人均¥2,500', crowd:'稀少', cost:'¥2,500', days:'4天' }
   ]},
   '厦门': { title: '厦门出行建议', plans: [
     { name:'海岛文艺之旅', img:'photo-1721794525689-d2bd76190f1e', tag:'热门推荐', tagClass:'hot', desc:'4天3晚，鼓浪屿+环岛路+沙坡尾+曾厝垵，人均¥2,800', crowd:'较多', cost:'¥2,800', days:'4天' },
@@ -2651,7 +2651,7 @@ const resultData = {
   ]},
   'default': { title: '智能推荐', plans: [
     { name:'杭州 · 西湖慢生活', img:'photo-1526481280693-3bfa7568e0f3', tag:'最匹配', tagClass:'good', desc:'3天2晚，白堤+灵隐+九溪+西溪，人均¥1,238', crowd:'适中', cost:'¥1,238', days:'3天' },
-    { name:'大理 · 风花雪月', img:'photo-1659466248885-8b7a03205661', tag:'深度推荐', tagClass:'good', desc:'5天4晚，苍山+洱海+双廊+喜洲，人均¥3,200', crowd:'稀少', cost:'¥3,200', days:'5天' },
+    { name:'大理 · 风花雪月', img:'photo-1725378812977-cc475abfa5a2', tag:'深度推荐', tagClass:'good', desc:'5天4晚，苍山+洱海+双廊+喜洲，人均¥3,200', crowd:'稀少', cost:'¥3,200', days:'5天' },
     { name:'成都 · 熊猫美食', img:'photo-1588252910189-9c9f5535646b', tag:'热门之选', tagClass:'hot', desc:'4天3晚，熊猫基地+宽窄巷+锦里，人均¥2,600', crowd:'较多', cost:'¥2,600', days:'4天' }
   ]}
 };
@@ -3018,7 +3018,7 @@ const detailData = {
     {
       title: '大理 · 风花雪月慢时光',
       subtitle: '5天4晚 · 休闲游 · 2人 · ¥3,200起',
-      heroImg: 'https://images.unsplash.com/photo-1659466248885-8b7a03205661?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1725378812977-cc475abfa5a2?w=600&h=300&fit=crop',
       totalCost: 3200,
       paidItems: [
         { name: '古城客栈', type: '住宿', price: 400, day: 1 },
@@ -3078,7 +3078,7 @@ const detailData = {
     {
       title: '大理 · 环海骑行',
       subtitle: '4天3晚 · 户外游 · 2人 · ¥2,500起',
-      heroImg: 'https://images.unsplash.com/photo-1659466248885-8b7a03205661?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1725378812977-cc475abfa5a2?w=600&h=300&fit=crop',
       totalCost: 2500,
       paidItems: [
         { name: '古城客栈', type: '住宿', price: 350, day: 1 },
