@@ -87,7 +87,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
 .card-tag.avoid{background:#fff0f0;color:#d63031}
 
 /* Quick Grid */
-.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:0 20px}
+.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 20px}
 .quick-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
 .quick-item .icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;transition:transform .2s}
 .quick-item:active .icon{transform:scale(.9)}
@@ -385,7 +385,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
 .dbb-actions{display:flex;gap:8px;flex:1}
 .dbb-btn{flex:1;padding:8px 0;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:transform .15s}
 .dbb-btn:active{transform:scale(.95)}
-.dbb-collect{background:#f0f0f0;color:var(--text)}
 .dbb-share{background:var(--bg);color:var(--primary);border:1.5px solid var(--primary)}
 .dbb-buy{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;box-shadow:0 2px 10px rgba(108,92,231,.3)}
 
@@ -441,6 +440,19 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
 
 /* Responsive hint */
 @media(min-width:431px){.app{border-left:1px solid #e0e0e0;border-right:1px solid #e0e0e0}}
+/* Spot thumbnail */
+.spot-thumb{width:100%;height:120px;border-radius:10px;background-size:cover;background-position:center;margin-top:10px;cursor:pointer;position:relative;overflow:hidden;flex-shrink:0}
+.spot-thumb::after{content:'⛶';position:absolute;bottom:6px;right:8px;font-size:13px;background:rgba(0,0,0,.45);color:#fff;padding:2px 7px;border-radius:6px;line-height:1.4}
+
+/* Image lightbox */
+.img-lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:600;display:none;align-items:center;justify-content:center;flex-direction:column;padding:20px}
+.img-lightbox.show{display:flex}
+.img-lightbox .lb-img{width:100%;max-width:390px;max-height:75vh;border-radius:14px;object-fit:contain;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.img-lightbox .lb-close{color:rgba(255,255,255,.7);font-size:13px;margin-top:18px;cursor:pointer;border:1px solid rgba(255,255,255,.3);padding:6px 20px;border-radius:20px}
+
+/* Hero cross-fade */
+.detail-hero{transition:opacity .25s ease}
+
 </style>
 </head>
 <body>
@@ -509,7 +521,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
           </div>
         </div>
         <div class="card" onclick="openDetail('北京',0)">
-          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=400&h=200&fit=crop)">
+          <div class="card-img" style="background-image:url(https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=400&h=200&fit=crop)">
             <span class="badge hot">🔥 热门</span>
           </div>
           <div class="card-body">
@@ -792,15 +804,15 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
       <div class="section-title">🛍️ 一键购买穿搭</div>
       <div class="product-scroll">
         <div class="product-card" onclick="showToast('已加入购物车')">
-          <div class="p-img" style="background-color:#f0e6ff"></div>
+          <div class="p-img" style="background-image:url(https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=280&h=180&fit=crop)"></div>
           <div class="p-info"><h4>防晒冰丝外套</h4><div class="price">¥79 <small>¥129</small></div></div>
         </div>
         <div class="product-card" onclick="showToast('已加入购物车')">
-          <div class="p-img" style="background-color:#e6f7ff"></div>
+          <div class="p-img" style="background-image:url(https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=280&h=180&fit=crop)"></div>
           <div class="p-info"><h4>透气运动鞋</h4><div class="price">¥199 <small>¥359</small></div></div>
         </div>
         <div class="product-card" onclick="showToast('已加入购物车')">
-          <div class="p-img" style="background-color:#fff3e0"></div>
+          <div class="p-img" style="background-image:url(https://images.unsplash.com/photo-1521369909029-2afed882baee?w=280&h=180&fit=crop)"></div>
           <div class="p-info"><h4>折叠防晒帽</h4><div class="price">¥39 <small>¥69</small></div></div>
         </div>
       </div>
@@ -921,6 +933,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','P
         <button class="ticket-buy-btn" onclick="confirmBatchBuy()">确认购买</button>
       </div>
     </div>
+  </div>
+
+  <!-- SPOT IMAGE LIGHTBOX -->
+  <div class="img-lightbox" id="spot-lightbox" onclick="closeSpotImg()">
+    <img class="lb-img" id="lightbox-img" src="" alt="">
+    <div class="lb-close">✕ 关闭</div>
   </div>
 </div>
 
@@ -1269,13 +1287,61 @@ function sendChatMessage() {
   }
 }
 
+
+// ===== SPOT IMAGE DB =====
+const spotImageKeywords = [
+  { kw:['长城','八达岭'],            img:'photo-1508804185872-d7badad00f7d' },
+  { kw:['故宫','皇城','天安门','景山'], img:'photo-1547981609-4b6bfe67ca0b' },
+  { kw:['颐和园','圆明园','国家博物馆','天坛'], img:'photo-1547981609-4b6bfe67ca0b' },
+  { kw:['西湖','断桥','白堤','平湖','孤山','西泠','灵隐','九溪','西溪'], img:'photo-1526481280693-3bfa7568e0f3' },
+  { kw:['洱海','苍山','双廊','喜洲','崇圣寺'],  img:'photo-1725378812977-cc475abfa5a2' },
+  { kw:['布达拉','纳木错','羊卓雍措','八廓'],    img:'photo-1703842079863-20413f288d03' },
+  { kw:['鼓浪屿','环岛路','沙坡尾','曾厝垵'],   img:'photo-1721794525689-d2bd76190f1e' },
+  { kw:['兵马俑','回民街','城墙','大雁塔','陕历博','华清池'], img:'photo-1710141925256-652f9ace7782' },
+  { kw:['栈桥','八大关','啤酒博物馆','崂山','奥帆','小麦岛'], img:'photo-1627868153411-624a8dce0a12' },
+  { kw:['熊猫','宽窄','锦里','太古里','武侯','都江堰'],        img:'photo-1588252910189-9c9f5535646b' },
+  { kw:['洪崖洞','磁器口','解放碑','李子坝','武隆'],           img:'photo-1620321281938-2522ba59a1df' },
+  { kw:['漓江','阳朔','象鼻山','龙脊'],                        img:'photo-1773318901379-aac92fdf5611' },
+  { kw:['玉龙','丽江','束河','蓝月','泸沽'],                   img:'photo-1677922069750-944be2b9ad20' },
+  { kw:['滇池','石林','昆明','翠湖'],                          img:'photo-1724130344214-d66eab70b1d2' },
+  { kw:['橘子洲','岳麓','IFS'],                                img:'photo-1583143574609-b2e508237650' },
+  { kw:['中山陵','夫子庙','玄武湖'],                           img:'photo-1589259411045-1841cec4f7a6' },
+  { kw:['拙政园','虎丘','苏州'],                               img:'photo-1745114392692-ede344e12e34' },
+  { kw:['黄山','宏村','西递'],                                 img:'photo-1568454158153-6bf6cfda9070' },
+  { kw:['莫高窟','鸣沙山','敦煌','月牙泉'],                    img:'photo-1507169820737-80f8c50e81f7' },
+  { kw:['草原','蒙古包','呼伦贝尔'],                           img:'photo-1755789450537-6e1838cb3558' },
+  { kw:['亚龙湾','天涯海角','蜈支洲','南山'],                  img:'photo-1710428447167-ef713a6f42b9' },
+  { kw:['天山','喀纳斯','那拉提','赛里木'],                    img:'photo-1757069540493-8f74088b3269' },
+  { kw:['元阳梯田','西双版纳','香格里拉'],                     img:'photo-1776294984950-3f812aa0f797' },
+  { kw:['冰雪大世界','中央大街','圣索菲亚'],                   img:'photo-1716308352490-271359910f14' },
+  { kw:['南迦巴瓦','雅鲁藏布','鲁朗','巴松','林芝'],           img:'photo-1703842079863-20413f288d03' },
+];
+
+function getSpotImage(name) {
+  if (!name) return null;
+  for (const g of spotImageKeywords) {
+    if (g.kw.some(k => name.includes(k))) {
+      return 'https://images.unsplash.com/' + g.img + '?w=400&h=200&fit=crop';
+    }
+  }
+  return null;
+}
+
+function openSpotImg(url) {
+  document.getElementById('lightbox-img').src = url.replace('w=400&h=200','w=800&h=500');
+  document.getElementById('spot-lightbox').classList.add('show');
+}
+function closeSpotImg() {
+  document.getElementById('spot-lightbox').classList.remove('show');
+}
+
 // ===== SMART CHAT (Context-aware) =====
 let smartChatActive = false;
 let smartChatRound = 0;
 
 const cityDB = {
   '杭州': { type:'江南水乡', features:['西湖','灵隐寺','龙井茶','九溪','西溪湿地','河坊街'], food:['西湖醋鱼','龙井虾仁','东坡肉','片儿川','定胜糕'], weather:'☀️ 28°C 晴', img:'photo-1526481280693-3bfa7568e0f3', dailyCost:400 },
-  '北京': { type:'皇城古都', features:['故宫','长城','颐和园','胡同','天坛','国家博物馆'], food:['烤鸭','炸酱面','涮羊肉','卤煮','豆汁'], weather:'⛅ 26°C 多云', img:'photo-1509023464722-18d996393ca8', dailyCost:700 },
+  '北京': { type:'皇城古都', features:['故宫','长城','颐和园','胡同','天坛','国家博物馆'], food:['烤鸭','炸酱面','涮羊肉','卤煮','豆汁'], weather:'⛅ 26°C 多云', img:'photo-1547981609-4b6bfe67ca0b', dailyCost:700 },
   '成都': { type:'天府之国', features:['熊猫基地','宽窄巷子','锦里','太古里','武侯祠','都江堰'], food:['火锅','担担面','串串香','兔头','甜水面'], weather:'🌧️ 22°C 阵雨', img:'photo-1588252910189-9c9f5535646b', dailyCost:550 },
   '大理': { type:'风花雪月', features:['洱海','苍山','双廊','喜洲','古城','崇圣寺三塔'], food:['饵丝','乳扇','酸辣鱼','鲜花饼','烤乳扇'], weather:'🌤️ 24°C 舒适', img:'photo-1725378812977-cc475abfa5a2', dailyCost:600 },
   '厦门': { type:'海上花园', features:['鼓浪屿','南普陀','环岛路','曾厝垵','沙坡尾','集美学村'], food:['沙茶面','海蛎煎','姜母鸭','花生汤','土笋冻'], weather:'☀️ 27°C 海风', img:'photo-1721794525689-d2bd76190f1e', dailyCost:550 },
@@ -1292,7 +1358,8 @@ const cityDB = {
   '昆明': { type:'春城花海', features:['滇池','石林','翠湖','官渡古镇','西山','斗南花市'], food:['过桥米线','汽锅鸡','鲜花饼','烤豆腐','小锅米线'], weather:'☀️ 22°C 春城', img:'photo-1724130344214-d66eab70b1d2', dailyCost:400 },
   '哈尔滨': { type:'冰城雪乡', features:['冰雪大世界','中央大街','圣索菲亚','太阳岛','虎林园','亚布力'], food:['锅包肉','马迭尔冰棍','红肠','铁锅炖','杀猪菜'], weather:'❄️ -15°C 冰雪', img:'photo-1716308352490-271359910f14', dailyCost:500 },
   '新疆': { type:'丝路秘境', features:['天山天池','喀纳斯','那拉提草原','赛里木湖','吐鲁番','独库公路'], food:['大盘鸡','烤羊肉串','手抓饭','馕','拉条子'], weather:'☀️ 22°C 干爽', img:'photo-1757069540493-8f74088b3269', dailyCost:500 },
-  '西藏': { type:'雪域高原', features:['布达拉宫','纳木错','羊卓雍措','珠峰大本营','林芝桃花','冈仁波齐'], food:['酥油茶','糌粑','藏面','牦牛肉','甜茶'], weather:'☀️ 15°C 高原', img:'photo-1703842079863-20413f288d03', dailyCost:650 },
+  '西藏': { type:'雪域高原', features:['布达拉宫','纳木错','羊卓雍措','珠峰大本营','冈仁波齐','日喀则'], food:['酥油茶','糌粑','藏面','牦牛肉','甜茶'], weather:'☀️ 15°C 高原', img:'photo-1703842079863-20413f288d03', dailyCost:650 },
+  '林芝': { type:'藏东秘境', features:['南迦巴瓦峰','雅鲁藏布大峡谷','鲁朗林海','巴松措','比日神山','林芝桃花节'], food:['石锅鸡','酥油茶','糌粑','藏面','青稞酒'], weather:'🌤️ 16°C 温润高原', img:'photo-1703842079863-20413f288d03', dailyCost:650 },
   '云南': { type:'彩云之南', features:['大理古城','丽江','泸沽湖','香格里拉','西双版纳','元阳梯田'], food:['过桥米线','汽锅鸡','鲜花饼','包浆豆腐','傣味'], weather:'🌤️ 22°C 四季如春', img:'photo-1776294984950-3f812aa0f797', dailyCost:450 }
 };
 // Auto-generate city profile for unknown destinations
@@ -1364,7 +1431,7 @@ function getOrInitCity(city) {
     type = '晋商文化'; weather = '⛅ 23°C 干爽'; dailyCost = 350;
     features = ['古城','古建','石窟','大院','寺庙','民俗'];
     food = ['刀削面','莜面栲栳','平遥牛肉','碗托','过油肉','汾酒'];
-    img = 'photo-1509023464722-18d996393ca8';
+    img = 'photo-1547981609-4b6bfe67ca0b';
   } else if (/庐山|景德镇|三清山|龙虎山|井冈山|婺源/.test(name)) {
     type = '赣鄱胜景'; weather = '⛅ 25°C 湿润'; dailyCost = 350;
     features = ['名山','古窑','道教圣地','瀑布','古镇','花海'];
@@ -1537,7 +1604,8 @@ function parseTravelIntent(text) {
       { keywords: ['拙政园','虎丘','周庄'], cities: ['苏州'] },
       { keywords: ['洪崖洞','解放碑','磁器口'], cities: ['重庆'] },
       { keywords: ['天池','喀纳斯','那拉提','伊犁'], cities: ['新疆'] },
-      { keywords: ['珠峰','林芝','冈仁波齐'], cities: ['西藏'] },
+      { keywords: ['珠峰','冈仁波齐','日喀则'], cities: ['西藏'] },
+      { keywords: ['南迦巴瓦','雅鲁藏布','鲁朗','巴松措'], cities: ['林芝'] },
       { keywords: ['版纳','香格里拉','泸沽湖'], cities: ['云南'] },
       // International experience keywords
       { keywords: ['极光','北极光','aurora'], cities: ['冰岛'] },
@@ -2626,8 +2694,8 @@ const resultData = {
     { name:'杭州特种兵打卡', img:'photo-1526481280693-3bfa7568e0f3', tag:'效率拉满', tagClass:'hot', desc:'2天1晚，西湖环湖+灵隐+河坊街+湘湖，人均¥680', crowd:'较多', cost:'¥680', days:'2天' }
   ]},
   '北京': { title: '北京出行建议', plans: [
-    { name:'皇城文化深度游', img:'photo-1509023464722-18d996393ca8', tag:'🔥 热门', tagClass:'hot', desc:'5天4晚，故宫+长城+颐和园+胡同，人均¥3,800', crowd:'较多', cost:'¥3,800', days:'5天' },
-    { name:'北京美食打卡', img:'photo-1509023464722-18d996393ca8', tag:'吃货之选', tagClass:'good', desc:'4天3晚，烤鸭+炸酱面+涮羊肉+卤煮，人均¥2,800', crowd:'适中', cost:'¥2,800', days:'4天' }
+    { name:'皇城文化深度游', img:'photo-1547981609-4b6bfe67ca0b', tag:'🔥 热门', tagClass:'hot', desc:'5天4晚，故宫+长城+颐和园+胡同，人均¥3,800', crowd:'较多', cost:'¥3,800', days:'5天' },
+    { name:'北京美食打卡', img:'photo-1547981609-4b6bfe67ca0b', tag:'吃货之选', tagClass:'good', desc:'4天3晚，烤鸭+炸酱面+涮羊肉+卤煮，人均¥2,800', crowd:'适中', cost:'¥2,800', days:'4天' }
   ]},
   '成都': { title: '成都出行建议', plans: [
     { name:'熊猫美食之旅', img:'photo-1588252910189-9c9f5535646b', tag:'吃货首选', tagClass:'hot', desc:'4天3晚，熊猫基地+宽窄巷+锦里+太古里，人均¥2,600', crowd:'适中', cost:'¥2,600', days:'4天' },
@@ -2799,7 +2867,7 @@ const detailData = {
     {
       title: '北京 · 皇城文化深度游',
       subtitle: '5天4晚 · 文化游 · 2人 · ¥3,800起',
-      heroImg: 'https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=600&h=300&fit=crop',
       totalCost: 3800,
       paidItems: [
         { name: '王府井酒店', type: '住宿', price: 500, day: 1 },
@@ -2867,7 +2935,7 @@ const detailData = {
     {
       title: '北京 · 美食打卡',
       subtitle: '4天3晚 · 美食游 · 2人 · ¥2,800起',
-      heroImg: 'https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=600&h=300&fit=crop',
+      heroImg: 'https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=600&h=300&fit=crop',
       totalCost: 2800,
       paidItems: [
         { name: '前门酒店', type: '住宿', price: 400, day: 1 },
@@ -3484,10 +3552,12 @@ function buildTimelineItemHTML(item) {
       }
     });
   }
+  const thumbUrl = getSpotImage(item.activity);
   let html = '<div class="timeline-item">';
   html += '<div class="time">' + item.time + '</div>';
   html += '<div class="activity"><span class="activity-name">' + item.activity + '</span><span class="item-cost">' + item.cost + '</span>' + buyTagHTML + '</div>';
   if (item.note) html += '<div class="note">' + item.note + '</div>';
+  if (thumbUrl) html += '<div class="spot-thumb" style="background-image:url(' + thumbUrl + ')" onclick="openSpotImg(\'' + thumbUrl + '\')"></div>';
   if (otherTagsHTML) html += '<div class="spot-tags">' + otherTagsHTML + '</div>';
   html += '</div>';
   return html;
@@ -3498,7 +3568,7 @@ function buildDetailHTML(plan) {
   html += '<div class="day-tabs">';
   plan.days.forEach((day, i) => {
     const activeClass = i === 0 ? ' active' : '';
-    html += '<div class="day-tab' + activeClass + '" onclick="switchDay(this,\'day-' + i + '\')">';
+    html += '<div class="day-tab' + activeClass + '" onclick="switchDay(this,\'day-' + i + '\',' + i + ')">';
     html += '<span class="day-tab-num">D' + (i + 1) + '</span>';
     html += '<span class="day-tab-label">' + day.label + '</span>';
     html += '</div>';
@@ -3694,11 +3764,41 @@ function toggleTip(el) {
 }
 
 // ===== DAY TAB SWITCH =====
-function switchDay(tabEl, panelId) {
+function switchDay(tabEl, panelId, dayIndex) {
   tabEl.parentElement.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
   tabEl.classList.add('active');
   document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
   document.getElementById(panelId).classList.add('active');
+  // Update hero image for this day
+  if (currentDetail && typeof dayIndex === 'number') {
+    const { city, planIndex } = currentDetail;
+    let plans = detailData[city];
+    if (!plans && getOrInitCity(city)) {
+      const dyn = generateDynamicDetailData(city, planIndex || 0);
+      if (dyn) plans = [dyn];
+    }
+    if (!plans) plans = detailData['default'];
+    const plan = (plans && plans[planIndex]) || (plans && plans[0]);
+    if (plan && plan.days && plan.days[dayIndex]) {
+      const day = plan.days[dayIndex];
+      let newHero = null;
+      for (const item of day.items) {
+        if (!item.transit && item.activity) {
+          newHero = getSpotImage(item.activity);
+          if (newHero) break;
+        }
+      }
+      if (!newHero) newHero = plan.heroImg;
+      if (newHero) {
+        const heroEl = document.getElementById('detail-hero-img');
+        heroEl.style.opacity = '0.2';
+        setTimeout(() => {
+          heroEl.style.backgroundImage = 'url(' + newHero + ')';
+          heroEl.style.opacity = '1';
+        }, 250);
+      }
+    }
+  }
 }
 
 // ===== UI INTERACTIONS =====

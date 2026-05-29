@@ -1,12 +1,31 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # Little Pony（小马出行）项目说明
 
 ## 项目概述
 Little Pony（小马出行）是一个 H5 页面载体的小工具，面向15-60岁有出行计划的人群。
 
+## 常用命令
+
+```bash
+# 本地开发服务器（推荐，端口 3000）
+npm run dev
+# 或
+npm start
+
+# 备用（Python，端口 8080）
+python3 -m http.server 8080
+
+# 部署到 GitHub Pages（通过 gh CLI）
+git add -A && git commit -m "..." && git push
+# 在线访问：https://juzipi94-jpg.github.io/little-pony/index.html
+```
+
 ## 技术架构
-- 单页 H5 应用，所有代码在 `index.html` 中
+- 单页 H5 应用，**所有代码在 `index.html` 中**（无构建步骤，无模块打包）
 - 基于 screen 栈管理实现页面切换（`switchScreen()` / `goBack()`）
-- 本地预览：`python3 -m http.server 8080`（从 `little-pony/` 目录启动）
 
 ## 核心页面
 - **home** - 首页：统一输入框（自然语言）、定位栏、推荐卡片（含内嵌标签：天气/购票）
@@ -36,14 +55,15 @@ Little Pony（小马出行）是一个 H5 页面载体的小工具，面向15-60
   - 输入后按回车或点击 → 按钮调用 `handleHomeInput()`
   - `handleHomeInput()` → `parseTravelIntent()` 解析意图 → 设 `window._smartChatIntent` → `switchScreen('chat')`
 - **快捷服务**：6项（买机票/订酒店/买门票/特色饮食/旅拍道具/穿衣建议），已移除"避坑指南"和"人流热力"
+  - `.quick-grid` 使用 `grid-template-columns:repeat(3,1fr)`（3列），勿改为4列
 - **推荐卡片**：仅保留天气标签（`.card-tag.weather`），已移除人流和避坑标签（仅首页移除，详情页保留）
 
 ## 详情页设计规范
-- 每日行程通过 Tab 切换（`switchDay()`），不纵向堆叠
+- 每日行程通过 Tab 切换（`switchDay(tabEl, panelId, dayIndex)`），不纵向堆叠
 - 天气/穿衣/人流/避坑/费用等信息**内嵌在每个景点条目中**，不单独分区展示
 - 每日顶部显示天气穿衣栏（`day-weather-bar`），底部显示当日花费（`day-cost-bar`）
 - 每个付费景点有 🎫 购票标签（`buy-tag`），点击调用 `buySingleTicket()`
-- 底部操作栏含：分享、一键订票（已移除收藏按钮）
+- 底部操作栏含：分享、一键订票（已移除收藏按钮，`.dbb-collect` CSS 已删除）
 - 相邻景点之间有轻量导航条（`transit`），提供步行/打车/地铁公交选项，点击调用 `openNav()`
 
 ## 购票系统（已实现）
@@ -101,9 +121,9 @@ Little Pony（小马出行）是一个 H5 页面载体的小工具，面向15-60
 - **话题**（`topics[]`）：识别用户在问什么（weather/food/hotel/transport/cost/safety/features/itinerary）
 
 ### 城市数据库 `cityDB` 与未知城市支持 `getOrInitCity(city)`
-20个预设城市，每个包含：`{ type, features[], food[], weather, img, dailyCost }`
+21个预设城市，每个包含：`{ type, features[], food[], weather, img, dailyCost }`
 - 预设7城（有完整 resultData/detailData）：杭州、北京、成都、大理、厦门、西安、青岛
-- 动态生成13城：三亚、丽江、重庆、南京、长沙、苏州、桂林、拉萨、昆明、哈尔滨、新疆、西藏、云南
+- 动态生成14城：三亚、丽江、重庆、南京、长沙、苏州、桂林、拉萨、昆明、哈尔滨、新疆、西藏、云南、林芝
 - **未知城市自动生成**：`getOrInitCity(city)` 对不在 cityDB 中的地名，基于关键词推断生成城市档案：
   - 15个国内地区规则：西域(伊犁/阿勒泰/喀什等)、蜀地山水(九寨/峨眉/稻城等)、湘楚(张家界/凤凰等)、彩云秘境(香格里拉/腾冲等)、徽派(黄山/宏村等)、丝路走廊(敦煌/张掖等)、海滨(威海/烟台等)、水乡古镇(乌镇/周庄等)、草原(呼伦贝尔/鄂尔多斯等)、东北(长白山/延吉等)、山水秘境(阳朔/黄果树等)、晋商(平遥/五台等)、赣鄱(庐山/景德镇等)、高原明珠(青海湖/茶卡等)
   - 23个国际地区规则：欧陆风情(法国/意大利/英国等)、东南亚风情(泰国/越南/柬埔寨等)、和风秘境(日本)、韩流之旅(韩国)、美利坚探索(美国)、南半球探险(澳洲/新西兰)、中东奢华(迪拜/阿联酋)、南亚秘境(印度/尼泊尔)、非洲探奇(非洲/埃及/摩洛哥/肯尼亚/坦桑尼亚等)、北欧极光(冰岛/挪威/芬兰)、海岛天堂(马尔代夫/斐济)、花园城市(新加坡)、横跨欧亚(土耳其)、拉美风情(南美/巴西/阿根廷/秘鲁)、俄式壮美(俄罗斯)、枫叶之国(加拿大)、中东风情(中东/沙特/约旦/以色列等)、丝路古国(中亚/乌兹别克斯坦/哈萨克斯坦等)、东欧秘境(东欧/波兰/捷克/匈牙利等)、北美之旅(北美)、极地探险(南极)
@@ -243,7 +263,7 @@ Little Pony（小马出行）是一个 H5 页面载体的小工具，面向15-60
 | 城市 | Unsplash 长格式 ID | 描述 |
 |---|---|---|
 | 杭州 | `photo-1526481280693-3bfa7568e0f3` | 西湖 |
-| 北京 | `photo-1509023464722-18d996393ca8` | 故宫 |
+| 北京 | `photo-1547981609-4b6bfe67ca0b` | 故宫 |
 | 成都 | `photo-1588252910189-9c9f5535646b` | 成都 |
 | 大理 | `photo-1725378812977-cc475abfa5a2` | 洱海 |
 | 厦门 | `photo-1721794525689-d2bd76190f1e` | 厦门海滨 |
@@ -261,6 +281,7 @@ Little Pony（小马出行）是一个 H5 页面载体的小工具，面向15-60
 | 哈尔滨 | `photo-1716308352490-271359910f14` | 冰雪大世界 |
 | 新疆 | `photo-1757069540493-8f74088b3269` | 天山 |
 | 西藏 | `photo-1703842079863-20413f288d03` | 西藏（同拉萨） |
+| 林芝 | `photo-1703842079863-20413f288d03` | 林芝高原 |
 | 云南 | `photo-1776294984950-3f812aa0f797` | 云南梯田 |
 
 ### getOrInitCity 国际规则图片映射
@@ -300,7 +321,7 @@ Little Pony（小马出行）是一个 H5 页面载体的小工具，面向15-60
 | 草原天堂 | `photo-1755789450537-6e1838cb3558` | 草原蒙古包 |
 | 东北风光 | `photo-1716308352490-271359910f14` | 哈尔滨（同城市图） |
 | 山水秘境 | `photo-1773318901379-aac92fdf5611` | 桂林（同城市图） |
-| 晋商文化 | `photo-1509023464722-18d996393ca8` | 北京（同城市图） |
+| 晋商文化 | `photo-1547981609-4b6bfe67ca0b` | 北京（同城市图） |
 | 赣鄱胜景 | `photo-1773318901379-aac92fdf5611` | 桂林（同城市图） |
 | 高原明珠 | `photo-1703842079863-20413f288d03` | 拉萨（同城市图） |
 
@@ -383,6 +404,36 @@ Little Pony（小马出行）是一个 H5 页面载体的小工具，面向15-60
 - **共享 ID 问题**：cityDB 和 getOrInitCity 规则可能共享同一个旧 ID，全局替换后需要逐行修正规则特有的图片
 - **premium 图片**：`plus.unsplash.com/premium_photo-` 格式不可用，只能用 `images.unsplash.com/photo-`
 - **短格式 ID**：如 `photo-XuMFb5DjVZU` 返回 404，必须用长格式如 `photo-1526481280693-3bfa7568e0f3`
+
+
+## 详情页多图系统（已实现）
+
+### 景点关键词→图片映射 `spotImageKeywords`
+- 数组，每项 `{ kw: string[], img: string }`，img 为 Unsplash 长格式 ID
+- 涵盖约20组景点关键词（长城、故宫、西湖、洱海、布达拉宫、鼓浪屿、兵马俑、栈桥、熊猫、洪崖洞、漓江、玉龙雪山、滇池、橘子洲、中山陵、拙政园、黄山、莫高窟、草原、南迦巴瓦等）
+
+### `getSpotImage(name)` → URL | null
+- 遍历 spotImageKeywords，匹配景点名称中的关键词
+- 返回完整 Unsplash URL（`w=400&h=200&fit=crop`）或 null
+
+### Tab 切换时 Hero 图自动切换
+- `switchDay(tabEl, panelId, dayIndex)` 新增 dayIndex 参数
+- 切换到某天时，取该天第一个有 `activity` 的非 transit 条目，调 `getSpotImage()` 获取图片
+- 无匹配则回退到 `plan.heroImg`
+- 切换动画：`opacity 0.2 → setTimeout(250ms) → 更新 backgroundImage → opacity 1`（CSS `transition: opacity .25s ease`）
+
+### 景点缩略图 `.spot-thumb`
+- `buildTimelineItemHTML()` 中，若 `getSpotImage(item.activity)` 返回非 null，在条目末尾渲染缩略图
+- 点击缩略图调用 `openSpotImg(url)` 打开全屏灯箱
+- CSS：`width:100%; height:120px; border-radius:10px; background-size:cover`
+- `::after` 伪元素显示 ⛶ 放大图标
+
+### 图片灯箱 `.img-lightbox` / `#spot-lightbox`
+- `position:fixed; inset:0; z-index:600`，黑色半透明背景
+- `.show` class 控制显示/隐藏（`display:flex`）
+- `openSpotImg(url)` — 将 URL 尺寸替换为 `w=800&h=500`，设置 `<img>` src，添加 `.show`
+- `closeSpotImg()` — 移除 `.show`
+- HTML 骨架在 `</body>` 前：`<div class="img-lightbox" id="spot-lightbox">...<img id="lightbox-img">...</div>`
 
 ## 待实现功能
 1. **我的门票**：在"我的"页面增加门票管理区域，支持查看已购门票、退票等操作

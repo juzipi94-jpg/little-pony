@@ -1,0 +1,19 @@
+{
+  "name": "little-pony",
+  "version": "1.0.0",
+  "description": "Little Pony - H5出行建议小工具",
+  "scripts": {
+    "dev": "npx serve . -p 3000 -s",
+    "start": "npx serve . -p 3000 -s"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vitejs/plugin-vue": "^6.0.7",
+    "pinia": "^3.0.4",
+    "vite": "^8.0.14",
+    "vue": "^3.5.34",
+    "vue-router": "^4.6.4"
+  }
+}
